@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block titlepage %}
+{% endblock %}
+{% block sidebar %}
+{% include "sidebar.html" %}
+{% endblock %}
+{% block content %}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">BOX NO</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-12 display-4">
+                                <input class="form-control" type="text" id="qr" value="CHLON0.5%-|ICLG19050|2|INF|BG|">
+                                <!-- <input type="hidden" id="code">
+                                <input type="hidden" id="batchno"> -->
+                                <input class="form-control" type="text" id="code">
+                                <input class="form-control" type="text" id="batchno">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <button class="btn btn-block btn-success p-5" id="submitBoxno">CHOOSE BOX</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">WEIGHT</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-12 strong text-right display-1">
+                                <strong><span id="weight">15.901</span> KG</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <select name="" id="" class="form-control">
+                        <option value="">---</option>
+                        <option value="">---</option>
+                        <option value="">---</option>
+                        <option value="">---</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-6">
+                        <button class="btn btn-block btn-success form-control">CHOOSE HEADER</button>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-block btn-success form-control">PRINT BATCH</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">BATCH HISTORY</h3>
+            </div>
+            <div class="card-body" style="overflow-y: scroll; height:500px;">
+                <ul class="products-list product-list-in-card pl-2 pr-2" id="batchhistorylist">
+                    <li class="item">
+                        <div class="product-img">
+                            <button class="btn btn-danger">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="product-info">
+                            <a href="javascript:void(0)" class="product-title">Paracetamol
+                                <span class="display-4 float-right">15.002 KG </span></a>
+                            <span class="product-description">
+                                BATCH NO. ABC123 BOX NO. 12
+                            </span>
+                        </div>
+                    </li>
+                    <li class="item">
+                        <div class="product-img">
+                            <button class="btn btn-danger">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="product-info">
+                            <a href="javascript:void(0)" class="product-title">Paracetamol
+                                <span class="display-4 float-right">15.002 KG </span></a>
+                            <span class="product-description">
+                                BATCH NO. ABC123 BOX NO. 12
+                            </span>
+                        </div>
+                    </li>
+                    <li class="item">
+                        <div class="product-img">
+                            <button class="btn btn-danger">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="product-info">
+                            <a href="javascript:void(0)" class="product-title">Paracetamol
+                                <span class="display-4 float-right">15.002 KG </span></a>
+                            <span class="product-description">
+                                BATCH NO. ABC123 BOX NO. 12
+                            </span>
+                        </div>
+                    </li>
+                    <li class="item">
+                        <div class="product-img">
+                            <button class="btn btn-danger">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="product-info">
+                            <a href="javascript:void(0)" class="product-title">Paracetamol
+                                <span class="display-4 float-right">15.002 KG </span></a>
+                            <span class="product-description">
+                                BATCH NO. ABC123 BOX NO. 12
+                            </span>
+                        </div>
+                    </li>
+                    <li class="item">
+                        <div class="product-img">
+                            <button class="btn btn-danger">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="product-info">
+                            <a href="javascript:void(0)" class="product-title">Paracetamol
+                                <span class="display-4 float-right">15.002 KG </span></a>
+                            <span class="product-description">
+                                BATCH NO. ABC123 BOX NO. 12
+                            </span>
+                        </div>
+                    </li>
+                    <li class="item">
+                        <div class="product-img">
+                            <button class="btn btn-danger">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="product-info">
+                            <a href="javascript:void(0)" class="product-title">Paracetamol
+                                <span class="display-4 float-right">15.002 KG </span></a>
+                            <span class="product-description">
+                                BATCH NO. ABC123 BOX NO. 12
+                            </span>
+                        </div>
+                    </li>
+                    <li class="item">
+                        <div class="product-img">
+                            <button class="btn btn-danger">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="product-info">
+                            <a href="javascript:void(0)" class="product-title">Paracetamol
+                                <span class="display-4 float-right">15.002 KG </span></a>
+                            <span class="product-description">
+                                BATCH NO. ABC123 BOX NO. 12
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block additionaljs %}
+<script>
+</script>
+{% endblock %}

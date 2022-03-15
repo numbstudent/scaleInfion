@@ -188,5 +188,72 @@
 {% endblock %}
 {% block additionaljs %}
 <script>
+    var url = "{% url 'register' %}"
+    $("#submitBoxno").click(function () {
+        var qr = $("#qr").val().split("|");
+        var code = qr[0]
+        var batchno = qr[1]
+        var boxno = qr[2]
+        if (code != null || code != "") {
+            $("#code").val(code)
+        }
+        if (batchno != null || batchno != "") {
+            $("#batchno").val(batchno)
+        }
+        // alert(code+" "+batchno+" "+boxno)
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: url,
+            data: JSON.stringify({ code: code, batchno: batchno, boxno: boxno, status:0 }),
+            success: function (data) {   // success callback function
+                console.log(data)
+            },
+            error: function (jqXhr, textStatus, errorMessage) { // error callback 
+                console.log('Error: ' + jqXhr.responseJSON.error)
+            }
+        })
+    })
+
+    function updateBoxList() {
+        var batchno = $("#batchno").val()
+        var code = $("#code").val()
+        var url = "/home/register?batchno="+ batchno
+        if (code && batchno) {
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: url,
+                success: function (data) {   // success callback function
+                    var html = '';
+                    // console.log(data)
+                    for (const row in data) {
+                        record = data[row]
+                        weight = record.logging_weighing == null? '-': record.logging_weighing
+                        html += '\
+                        <li class="item">\
+                            <div class="product-img">\
+                                <button class="btn btn-danger">\
+                                    <i class="fas fa-times"></i>\
+                                </button>\
+                            </div>\
+                            <div class="product-info">\
+                                <a href="javascript:void(0)" class="product-title">'+ record.product_name +'\
+                                    <span class="display-4 float-right">'+ weight+' KG </span></a>\
+                                <span class="product-description">\
+                                    BATCH NO. '+record.batchno+' BOX NO. '+record.boxno+'\
+                                </span>\
+                            </div>\
+                        </li>'
+                    }
+                    $('#batchhistorylist').html(html)
+                }
+            })
+        }
+    }
+
+    const interval = setInterval(function () {
+        updateBoxList()
+    }, 5000);
 </script>
 {% endblock %}

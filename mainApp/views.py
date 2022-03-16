@@ -17,9 +17,13 @@ loginpage = 'login'
 def index(request):
     return render(request, 'home.html')
 
+
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+
 @csrf_exempt
 def BatchView(request):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         form = ProductForm(request.POST)
         if form.is_valid():
             instance = form.save()
@@ -28,7 +32,7 @@ def BatchView(request):
         else:
             return JsonResponse({"error": form.errors}, status=400)
 
-    elif request.is_ajax and request.method == "GET":
+    elif is_ajax(request) and request.method == "GET":
         data = Product.objects.all()
         response = serializers.serialize("json", data)
         return HttpResponse(response, content_type='application/json')
@@ -36,7 +40,7 @@ def BatchView(request):
 
 @csrf_exempt
 def RegisterView(request, batchno=None):
-    if request.is_ajax and request.method == "POST":
+    if is_ajax(request) and request.method == "POST":
         form = RegisterForm(request.POST)
         print(request.POST)
         if form.is_valid():
@@ -56,7 +60,7 @@ def RegisterView(request, batchno=None):
         else:
             return JsonResponse({"message": "Isikan parameter."}, status=400)
 
-    elif request.is_ajax and request.method == "GET":
+    elif is_ajax(request) and request.method == "GET":
         batchno = request.GET.get('batchno')
         if batchno:
             data = Register.objects.annotate(product_name=F('product__name'), logging_weighing=F('logging__weighing'))\
@@ -66,7 +70,7 @@ def RegisterView(request, batchno=None):
             data = Register.objects.all().values()
         return JsonResponse(list(data), safe=False, status=200)
 
-    elif request.method == "PUT":
+    elif is_ajax(request) and request.method == "PUT":
         body = json.loads(request.body)
         registerid = body['registerid']
         obj = Register.objects.filter(id=registerid)

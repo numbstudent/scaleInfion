@@ -37,7 +37,7 @@
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <p class="nav-link">{% now "d M Y" %}</p>
+                    <p class="nav-link">Infion Weighing System - {% now "d M Y" %}</p>
                 </li>
             </ul>
 
@@ -48,8 +48,8 @@
 
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'logout' %}">
-                        <button class="btn btn-secondary">
-                            <i class="fas fa-sign-out-alt"></i>
+                        <button class="btn btn-danger">
+                            <i class="fas fa-sign-out-alt"></i> 
                         </button>
                     </a>
                 </li>
@@ -61,7 +61,7 @@
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
             <a href="{% static 'mainpage" class="brand-link">
-                <span class="brand-text font-weight-light">INFION</span>
+                <span class="brand-text font-weight-light"><img class="img-fluid img-thumbnail" src="{% static 'others/logo.png' %}"></span>
             </a>
 
             <!-- Sidebar -->

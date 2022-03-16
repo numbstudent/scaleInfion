@@ -38,22 +38,23 @@ def BatchView(request):
 def RegisterView(request, batchno=None):
     if request.is_ajax and request.method == "POST":
         form = RegisterForm(request.POST)
+        print(request.POST)
         if form.is_valid():
-            print(request.POST)
             code = request.POST.get('code')
             boxno = request.POST.get('boxno')
+            batchno = request.POST.get('batchno')
             productid = Product.objects.filter(code=code).first()
-            boxexists = Register.objects.filter(product=productid, boxno=boxno).exists()
+            boxexists = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).exists()
             if boxexists:
-                return JsonResponse({"error": "Box sudah diinput. Hapus box terlebih dahulu."}, status=400)
+                return JsonResponse({"message": "Box sudah diinput. Hapus box terlebih dahulu."}, status=400)
             else:
                 instance = form.save(commit=False)
                 instance.product = productid
                 instance.save()
-                ser_instance = serializers.serialize('json', [instance, ])
-                return JsonResponse({"instance": ser_instance}, status=200)
+                # ser_instance = serializers.serialize('json', [instance, ])
+                return JsonResponse({"message": "Data berhasil diinput"}, status=200)
         else:
-            return JsonResponse({"error": form.errors}, status=400)
+            return JsonResponse({"message": "Isikan parameter."}, status=400)
 
     elif request.is_ajax and request.method == "GET":
         batchno = request.GET.get('batchno')
@@ -68,14 +69,7 @@ def RegisterView(request, batchno=None):
     elif request.method == "PUT":
         body = json.loads(request.body)
         registerid = body['registerid']
-        batchno = body['batchno']
         obj = Register.objects.filter(id=registerid)
         print(obj)
         obj.delete()
-        if batchno:
-            data = Register.objects.annotate(product_name=F('product__name')).values('id', 'batchno', 'boxno', 'product_name')\
-            .filter(batchno=batchno).order_by('createdon')
-            print(data)
-        else:
-            data = Register.objects.all().values()
-        return JsonResponse({list(data)}, status=200)
+        return JsonResponse({"message": "Data berhasil dihapus"}, status=200)

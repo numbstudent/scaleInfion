@@ -98,7 +98,7 @@ elif "Application" in curpath:
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'USER': 'remote',
-            'NAME': 'app_test',
+            'NAME': 'IOT',
             'HOST': 'localhost',
             'PASSWORD': 'remote',
             'PORT': '3306',

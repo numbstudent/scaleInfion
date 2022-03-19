@@ -30,7 +30,7 @@ def BatchView(request):
             ser_instance = serializers.serialize('json', [ instance, ])
             return JsonResponse({"instance": ser_instance}, status=200)
         else:
-            return JsonResponse({"error": form.errors}, status=400)
+            return JsonResponse({"message": form.errors}, status=400)
 
     elif is_ajax(request) and request.method == "GET":
         data = Product.objects.all()
@@ -49,8 +49,11 @@ def RegisterView(request, batchno=None):
             batchno = request.POST.get('batchno')
             productid = Product.objects.filter(code=code).first()
             boxexists = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).exists()
+            boxkosongexists = Register.objects.filter(product=productid, batchno=batchno, status=0).exists()
             if boxexists:
-                return JsonResponse({"message": "Box sudah diinput. Hapus box terlebih dahulu."}, status=400)
+                return JsonResponse({"message": "Box sudah diinput. Hapus box terlebih dahulu untuk mereset."}, status=400)
+            elif boxkosongexists:
+                return JsonResponse({"message": "Box kosong harus ditimbang terlebih dahulu."}, status=400)
             else:
                 instance = form.save(commit=False)
                 instance.product = productid
@@ -63,9 +66,10 @@ def RegisterView(request, batchno=None):
     elif is_ajax(request) and request.method == "GET":
         batchno = request.GET.get('batchno')
         if batchno:
-            data = Register.objects.annotate(product_name=F('product__name'), logging_weighing=F('logging__weighing'))\
-            .values('id', 'batchno', 'boxno', 'product_name', 'logging_weighing')\
-            .filter(batchno=batchno).order_by('createdon')
+            insertWeight(batchno)
+            data = Register.objects.annotate(product_name=F('product__name'),iot_weight=F('weight__weighing'))\
+            .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight')\
+            .filter(batchno=batchno).order_by('-createdon')
         else:
             data = Register.objects.all().values()
         return JsonResponse(list(data), safe=False, status=200)
@@ -77,3 +81,26 @@ def RegisterView(request, batchno=None):
         print(obj)
         obj.delete()
         return JsonResponse({"message": "Data berhasil dihapus"}, status=200)
+
+@csrf_exempt
+def ScaleView(request):
+    #app_test
+    import random
+    b = Iot(lot='1', status='1', weighing=random.uniform(-10, 10))
+    b.save()
+
+    if request.method == "GET":
+        data = Iot.objects.all().order_by('-datetime').values('id','weighing').first()
+        return JsonResponse(data, safe=False, status=200)
+
+def insertWeight(batchno):
+    newweight = Iot.objects.all().order_by('-datetime').values_list('id', 'weighing')
+    unweighted = Register.objects.filter(batchno=batchno, status=0)
+    if newweight.exists() and unweighted.exists():
+        if newweight.first()[1] > 0:
+            weightid = newweight.first()[0]
+            print(newweight)
+            obj = unweighted.first()
+            obj.status = 1
+            obj.weight_id = weightid
+            obj.save()

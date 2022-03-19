@@ -82,7 +82,18 @@ WSGI_APPLICATION = 'scaleInfion.wsgi.application'
 import os
 curpath = os. getcwd()
 
-if "Application" in curpath:
+if ".bina" in curpath:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'USER': 'root',
+            'NAME': 'app_test',
+            'HOST': 'localhost',
+            'PASSWORD': 'root',
+            'PORT': '3306',
+        },
+    }
+elif "Application" in curpath:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',

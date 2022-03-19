@@ -7,6 +7,16 @@ class Product(models.Model):
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
 
+class Iot(models.Model):
+    id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.
+    datetime = models.DateTimeField(db_column='Datetime', auto_now=True)  # Field name made lowercase.
+    lot = models.IntegerField(db_column='Lot')  # Field name made lowercase.
+    status = models.IntegerField(db_column='Status')  # Field name made lowercase.
+    weighing = models.FloatField(db_column='Weighing')  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'IOT'
 
 class Register(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -15,7 +25,7 @@ class Register(models.Model):
     status = models.IntegerField()
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
-
+    weight = models.ForeignKey(Iot, null=True, on_delete=models.DO_NOTHING)
     class Meta:
         constraints = [
             models.UniqueConstraint(

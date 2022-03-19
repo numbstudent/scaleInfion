@@ -21,6 +21,6 @@ from mainApp import views as mv
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', mv.index, name='mainpage'),
-    path('weighing', include('mainApp.urls')),
+    path('weighing/', include('mainApp.urls')),
     path('auth/', include('secureapp.urls')),
 ]

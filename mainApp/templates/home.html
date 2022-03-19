@@ -115,11 +115,16 @@
             url: url,
             data: data,
             success: function (data) {   // success callback function
-                updateBoxList()
+                
                 console.log(data)
             },
             error: function (jqXhr, textStatus, errorMessage) { // error callback 
                 alert(jqXhr.responseJSON.message)
+            },
+            complete: function (data) {
+                if ((batchno != null || batchno != "") && (code != null || code != "")){
+                    updateBoxList()
+                }
             }
         })
     })
@@ -139,7 +144,7 @@
                     // console.log(data)
                     for (const row in data) {
                         record = data[row]
-                        weight = record.logging_weighing == null? '-': record.logging_weighing
+                        weight = record.iot_weight == null? '-': record.iot_weight
                         html += '\
                         <li class="item">\
                             <div class="product-img">\
@@ -165,6 +170,22 @@
     const interval = setInterval(function () {
         updateBoxList()
     }, 5000);
+
+    function updateWeight() {
+        var url = "{% url 'scale' %}"
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: url,
+            success: function (data) {   // success callback function
+                $("#weight").text(data.weighing)
+            }
+        })
+    }
+
+    const interval2 = setInterval(function () {
+        updateWeight()
+    }, 1000);
 
     $("#batchhistorylist").on("click", ".deleteBox",function () {
         var registerid = $(this).data('id');

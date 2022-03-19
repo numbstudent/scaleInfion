@@ -16,7 +16,7 @@ class Iot(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'IOT'
+        db_table = 'Logging'
 
 class Register(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)

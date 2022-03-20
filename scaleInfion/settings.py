@@ -104,6 +104,16 @@ elif "Application" in curpath:
             'PORT': '3306',
         },
     }
+elif "DEVELOPMENT" in curpath:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'USER': 'root',
+            'NAME': 'iot',
+            'HOST': 'localhost',
+            'PORT': '3306',
+        },
+    }
 else:
     DATABASES = {
         'default': {

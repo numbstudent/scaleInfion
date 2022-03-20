@@ -86,15 +86,18 @@ def RegisterView(request, batchno=None):
 def ScaleView(request):
     #app_test
     import random
-    b = Iot(lot='1', status='1', weighing=random.uniform(-10, 10))
+    b = Logging(lot='1', status='1', weighing=random.uniform(-10, 10))
     b.save()
 
+    obj = Logging.objects.latest('id')
+    print(obj)
+
     if request.method == "GET":
-        data = Iot.objects.all().order_by('-datetime').values('id','weighing').first()
+        data = Logging.objects.all().order_by('-id').values('id','weighing').first()
         return JsonResponse(data, safe=False, status=200)
 
 def insertWeight(batchno):
-    newweight = Iot.objects.all().order_by('-datetime').values_list('id', 'weighing')
+    newweight = Logging.objects.all().order_by('-id').values_list('id', 'weighing')
     unweighted = Register.objects.filter(batchno=batchno, status=0)
     if newweight.exists() and unweighted.exists():
         if newweight.first()[1] > 0:

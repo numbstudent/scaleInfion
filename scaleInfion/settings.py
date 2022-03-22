@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+import platform
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -79,48 +80,70 @@ WSGI_APPLICATION = 'scaleInfion.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-import os
-curpath = os. getcwd()
+# import os
+# curpath = os. getcwd()
+print(platform.system())
 
-if ".bina" in curpath:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'USER': 'root',
-            'NAME': 'app_test',
-            'HOST': 'localhost',
-            'PASSWORD': 'root',
-            'PORT': '3306',
-        },
-    }
-elif "Application" in curpath:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'USER': 'remote',
-            'NAME': 'IOT',
-            'HOST': 'localhost',
-            'PASSWORD': 'remote',
-            'PORT': '3306',
-        },
-    }
-elif "DEVELOPMENT" in curpath:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'USER': 'root',
-            'NAME': 'iot',
-            'HOST': 'localhost',
-            'PORT': '3306',
-        },
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'USER': 'remote',
+#         'NAME': 'IOT',
+#         'HOST': 'localhost',
+#         'PASSWORD': 'remote',
+#         'PORT': '3306',
+#     },
+# }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'USER': 'root',
+        'NAME': 'iot',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    },
+}
+
+# if ".bina" in curpath:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.mysql',
+#             'USER': 'root',
+#             'NAME': 'app_test',
+#             'HOST': 'localhost',
+#             'PASSWORD': 'root',
+#             'PORT': '3306',
+#         },
+#     }
+# elif "Application" in curpath:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.mysql',
+#             'USER': 'remote',
+#             'NAME': 'IOT',
+#             'HOST': 'localhost',
+#             'PASSWORD': 'remote',
+#             'PORT': '3306',
+#         },
+#     }
+# elif "DEVELOPMENT" in curpath:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.mysql',
+#             'USER': 'root',
+#             'NAME': 'iot',
+#             'HOST': 'localhost',
+#             'PORT': '3306',
+#         },
+#     }
+# else:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
 
 
 

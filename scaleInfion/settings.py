@@ -106,7 +106,7 @@ elif pf == 'Linux':
                 'PORT': '3306',
             },
         }
-    elif "Application" in curpath:
+    else:
         DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.mysql',
@@ -116,13 +116,6 @@ elif pf == 'Linux':
                 'PASSWORD': 'remote',
                 'PORT': '3306',
             },
-        }
-    else:
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db.sqlite3',
-            }
         }
 else:
     DATABASES = {

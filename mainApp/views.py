@@ -22,8 +22,8 @@ def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
 @csrf_exempt
-def BatchView(request):
-    if is_ajax(request) and request.method == "POST":
+def ProductView(request):
+    if request.method == "POST":
         form = ProductForm(request.POST)
         if form.is_valid():
             instance = form.save()
@@ -32,17 +32,15 @@ def BatchView(request):
         else:
             return JsonResponse({"message": form.errors}, status=400)
 
-    elif is_ajax(request) and request.method == "GET":
-        data = Product.objects.all()
-        response = serializers.serialize("json", data)
-        return HttpResponse(response, content_type='application/json')
+    elif request.method == "GET":
+        data = Product.objects.all().order_by('name').values()
+        return JsonResponse(list(data), safe=False, status=200)
 
 
 @csrf_exempt
 def RegisterView(request, batchno=None):
     if is_ajax(request) and request.method == "POST":
         form = RegisterForm(request.POST)
-        print(request.POST)
         if form.is_valid():
             code = request.POST.get('code')
             boxno = request.POST.get('boxno')
@@ -65,11 +63,12 @@ def RegisterView(request, batchno=None):
 
     elif is_ajax(request) and request.method == "GET":
         batchno = request.GET.get('batchno')
+        code = request.GET.get('code')
         if batchno:
             insertWeight(batchno)
             data = Register.objects.annotate(product_name=F('product__name'),iot_weight=F('weight__weighing'))\
             .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight')\
-            .filter(batchno=batchno).order_by('-createdon')
+            .filter(batchno=batchno, product__code=code).order_by('-createdon')
         else:
             data = Register.objects.all().values()
         return JsonResponse(list(data), safe=False, status=200)
@@ -107,3 +106,52 @@ def insertWeight(batchno):
             obj.status = 1
             obj.weight_id = weightid
             obj.save()
+
+
+@login_required(login_url=loginpage)
+def viewProduct(request):
+    context = {}
+    context['data'] = Product.objects.all()
+    if request.method == "POST":
+        form = ProductForm(request.POST)
+        context['form'] = form
+        if form.is_valid():
+            form.save()
+            return redirect('viewproduct')
+    else:
+        context['form'] = ProductForm()
+
+    return render(request, 'master_product.html', context=context)
+
+
+@login_required(login_url=loginpage)
+def deleteProduct(request, id):
+    obj = Product.objects.filter(id=id)
+    try:
+        obj.delete()
+    except RestrictedError:
+        error_message = 'Data ini tidak dapat dihapus karena sedang digunakan oleh data lain. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>'
+        return HttpResponse(error_message)
+    return redirect('viewproduct')
+
+@login_required(login_url=loginpage)
+def editProduct(request, id):
+    context = {}
+    context['id'] = id
+    if request.method == 'GET':
+        obj = Product.objects.get(id=id)
+        form = ProductForm(instance=obj)
+        context['data'] = obj
+        context['form'] = form
+    if request.method == 'POST':
+        obj = Product.objects.filter(id=id).first()
+        form = ProductForm(request.POST)
+        context['data'] = obj
+        context['form'] = form
+        if form.is_valid():
+            obj.name = form.cleaned_data.get('name')
+            obj.code = form.cleaned_data.get('code')
+            obj.status = form.cleaned_data.get('status')
+            obj.save()
+            return redirect('viewproduct')
+    return render(request, 'master_product.html', context=context)

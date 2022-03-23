@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block titlepage %}
+<h1>Master Product</h1>
+{% endblock %}
+{% block sidebar %}
+{% include "sidebar.html" %}
+{% endblock %}
+{% block content %}
+<div class="col-lg-6">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-12">
+                    <form action="{% url 'viewproduct' %}" method="POST">
+                        {% csrf_token %}
+                        {{ form | crispy }}
+                        <hr>
+                        <input class="btn btn-success" type="submit" value="Isikan">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <table class="table">
+                    <tr>
+                        <th>Name</th>
+                        <th>Code</th>
+                        <th>Action</th>
+                    </tr>
+                    {%for row in data%}
+                    <tr>
+                        <td>{{row.name}}</td>
+                        <td>{{row.code}}</td>
+                        <td><a class="btn btn-danger" href="{% url 'deleteproduct' row.id %}"
+                                onclick="return confirm('Apakah anda yakin untuk menghapus data?')"><i
+                                    class="fas fa-trash"></i></a></td>
+                    </tr>
+                    {%endfor%}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

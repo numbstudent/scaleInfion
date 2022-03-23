@@ -1,3 +1,4 @@
+from email.policy import default
 from django.db import models
 
 
@@ -6,6 +7,7 @@ class Product(models.Model):
     code = models.CharField(max_length=30, unique=True)
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
+    status = models.BooleanField(default=True)
 
 class Logging(models.Model):
     id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.
@@ -19,7 +21,7 @@ class Logging(models.Model):
         db_table = 'Logging'
 
 class Register(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.RESTRICT)
     batchno = models.CharField(max_length=10)
     boxno = models.IntegerField()
     status = models.IntegerField()

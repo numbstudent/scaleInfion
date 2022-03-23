@@ -7,7 +7,7 @@ import datetime
 class ProductForm(ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'code']
+        fields = ['id','name', 'code']
 
 class RegisterForm(ModelForm):
     class Meta:

@@ -114,6 +114,7 @@ def viewProduct(request):
     context['data'] = Product.objects.all()
     if request.method == "POST":
         form = ProductForm(request.POST)
+        context['action'] = 'view'
         context['form'] = form
         if form.is_valid():
             form.save()
@@ -137,11 +138,12 @@ def deleteProduct(request, id):
 @login_required(login_url=loginpage)
 def editProduct(request, id):
     context = {}
+    context['action'] = 'edit'
     context['id'] = id
     if request.method == 'GET':
         obj = Product.objects.get(id=id)
         form = ProductForm(instance=obj)
-        context['data'] = obj
+        context['data'] = Product.objects.all()
         context['form'] = form
     if request.method == 'POST':
         obj = Product.objects.filter(id=id).first()

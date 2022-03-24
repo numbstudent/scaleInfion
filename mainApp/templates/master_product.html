@@ -12,7 +12,11 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-lg-12">
+                    {% if action == 'view' %}
                     <form action="{% url 'viewproduct' %}" method="POST">
+                    {% elif action == 'edit' %}
+                    <form action="{% url 'editproduct' id %}" method="POST"></form>
+                    {% endif %}
                         {% csrf_token %}
                         {{ form | crispy }}
                         <hr>
@@ -37,7 +41,8 @@
                     <tr>
                         <td>{{row.name}}</td>
                         <td>{{row.code}}</td>
-                        <td><a class="btn btn-danger" href="{% url 'deleteproduct' row.id %}"
+                        <td><a class="btn btn-secondary" href="{% url 'editproduct' row.id %}"><i class="fas fa-edit"></i></a>
+                            <a class="btn btn-danger" href="{% url 'deleteproduct' row.id %}"
                                 onclick="return confirm('Apakah anda yakin untuk menghapus data?')"><i
                                     class="fas fa-trash"></i></a></td>
                     </tr>

@@ -15,7 +15,7 @@
                     {% if action == 'view' %}
                     <form action="{% url 'viewproduct' %}" method="POST">
                     {% elif action == 'edit' %}
-                    <form action="{% url 'editproduct' id %}" method="POST"></form>
+                    <form action="{% url 'editproduct' id %}" method="POST">
                     {% endif %}
                         {% csrf_token %}
                         {{ form | crispy }}
@@ -52,4 +52,11 @@
         </div>
     </div>
 </div>
+{% endblock %}
+{% block additionaljs %}
+<script>
+    {% if message %}
+        alert("{{message}}")
+    {% endif %}
+</script>
 {% endblock %}

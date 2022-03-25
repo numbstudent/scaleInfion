@@ -1,13 +1,14 @@
 from email.policy import default
 from django.db import models
 
+STATUS_CHOICES = ((True, 'Aktif'), (False, 'Tidak Aktif'))
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=30, unique=True)
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
-    status = models.BooleanField(default=True)
+    status = models.BooleanField(default=True,choices=STATUS_CHOICES)
 
 class Logging(models.Model):
     id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.

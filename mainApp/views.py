@@ -140,20 +140,22 @@ def editProduct(request, id):
     context = {}
     context['action'] = 'edit'
     context['id'] = id
+    context['message'] = None
     if request.method == 'GET':
         obj = Product.objects.get(id=id)
         form = ProductForm(instance=obj)
         context['data'] = Product.objects.all()
         context['form'] = form
     if request.method == 'POST':
-        obj = Product.objects.filter(id=id).first()
-        form = ProductForm(request.POST)
-        context['data'] = obj
+        obj = Product.objects.get(id=id)
+        form = ProductForm(request.POST, instance=obj)
+        context['data'] = Product.objects.all()
         context['form'] = form
         if form.is_valid():
             obj.name = form.cleaned_data.get('name')
             obj.code = form.cleaned_data.get('code')
             obj.status = form.cleaned_data.get('status')
             obj.save()
-            return redirect('viewproduct')
+            context['message'] = "Data berhasil disimpan."
+            # return redirect('viewproduct')
     return render(request, 'master_product.html', context=context)

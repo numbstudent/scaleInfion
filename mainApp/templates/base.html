@@ -22,6 +22,7 @@
     <link rel="stylesheet"
         href="{% static 'adminlte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
     <link rel="stylesheet" href="{% static 'adminlte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'adminlte/plugins/daterangepicker/daterangepicker.css' %}">
     {% block css %}
     {% endblock %}
 </head>
@@ -774,11 +775,19 @@
         <script src="{% static 'adminlte/plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
         <script src="{% static 'adminlte/plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
         <script src="{% static 'adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+        <script src="{% static 'adminlte/plugins/moment/moment.min.js' %}"></script>
+        <script src="{% static 'adminlte/plugins/daterangepicker/daterangepicker.js' %}"></script>
         <script>
             $(function () {
                 //Initialize Select2 Elements
                 $('.select2bs4').select2({
                     theme: 'bootstrap4'
+                })
+            })
+            $(function () {
+                //Initialize Select2 Elements
+                $('.datetimepicker').daterangepicker({
+                    singleDatePicker: true
                 })
             })
         </script>

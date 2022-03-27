@@ -1,3 +1,5 @@
+from itertools import product
+from math import prod
 from mainApp.models import *
 from mainApp.forms import *
 from django.shortcuts import get_list_or_404, render, redirect
@@ -159,3 +161,29 @@ def editProduct(request, id):
             context['message'] = "Data berhasil disimpan."
             # return redirect('viewproduct')
     return render(request, 'master_product.html', context=context)
+
+
+@login_required(login_url=loginpage)
+def reportBatch(request):
+    context = {}
+    context['data'] = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
+        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date').order_by('product', 'batchno', 'boxno')
+    if request.method == "POST":
+        form = ReportBatchForm(request.POST)
+        product = request.POST.get('productid')
+        batchno = request.POST.get('batchno')
+        inputdatefrom = request.POST.get('inputdatefrom')
+        context['form'] = form
+        datamodel = Register.objects
+        if product:
+            datamodel = datamodel.filter(product=product)
+        if batchno:
+            datamodel = datamodel.filter(batchno=batchno)
+        if inputdatefrom:
+            datamodel = datamodel.filter(weight__datetime__gte=inputdatefrom)
+        context['data'] = datamodel.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
+            .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date').order_by('product', 'batchno', 'boxno')
+    else:
+        context['form'] = ReportBatchForm()
+
+    return render(request, 'report_batch.html', context=context)

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block titlepage %}
+<h1>Report Batch</h1>
+{% endblock %}
+{% block sidebar %}
+{% include "sidebar.html" %}
+{% endblock %}
+{% block content %}
+<div class="col-lg-6">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-12">
+                    <form action="{% url 'reportbatch' %}" method="POST">
+                        {% csrf_token %}
+                        {{ form | crispy }}
+                        <hr>
+                        <input class="btn btn-success" type="submit" value="Isikan">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <table class="table">
+                    <tr>
+                        <th>Product</th>
+                        <th>Batch No</th>
+                        <th>Box No</th>
+                        <th>Weight</th>
+                        <th>Input Date</th>
+                    </tr>
+                    {%for row in data%}
+                    <tr>
+                        <td>{{row.product_name}}</td>
+                        <td>{{row.batchno}}</td>
+                        <td>{{row.boxno}}</td>
+                        <td>{{row.iot_weight}}</td>
+                        <td>{{row.input_date}}</td>
+                        {%endfor%}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block additionaljs %}
+<script>
+    {% if message %}
+        alert("{{message}}")
+    {% endif %}
+</script>
+{% endblock %}

@@ -784,16 +784,22 @@
                     theme: 'bootstrap4'
                 })
             })
-            $(function () {
-                //Initialize Select2 Elements
-                $('.datetimepicker').daterangepicker({
-                    singleDatePicker: true,
-                    autoUpdateInput: false,
-                    locale: {
-                        cancelLabel: 'Clear'
-                    }
-                })
-            })
+            $('.datepick').daterangepicker({
+                autoUpdateInput: false,
+                singleDatePicker: true,
+                locale: {
+                    cancelLabel: 'Clear',
+                    format: 'YYYY-MM-DD'
+                }
+            });
+
+            $('.datepick').on('apply.daterangepicker', function (ev, picker) {
+                $(this).val(picker.startDate.format('YYYY-MM-DD'));
+            });
+
+            $('.datepick').on('cancel.daterangepicker', function (ev, picker) {
+                $(this).val('');
+            });
         </script>
         <script>
             $(function () {

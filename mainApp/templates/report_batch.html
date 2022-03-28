@@ -7,17 +7,31 @@
 {% include "sidebar.html" %}
 {% endblock %}
 {% block content %}
-<div class="col-lg-6">
-    <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-lg-12">
-                    <form action="{% url 'reportbatch' %}" method="POST" autocomplete="off">
-                        {% csrf_token %}
-                        {{ form | crispy }}
-                        <hr>
-                        <input class="btn btn-success" type="submit" value="Isikan">
-                    </form>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <form action="{% url 'reportbatch' %}" method="POST" autocomplete="off">
+                            {% csrf_token %}
+                            {{ form | crispy }}
+                            <hr>
+                            <input class="btn btn-success" type="submit" value="Cari">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-12">
+
+                        <button id="exportbatch" class="btn btn-primary btn-block">Export CSV</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -52,7 +66,30 @@
 {% block additionaljs %}
 <script>
     {% if message %}
-        alert("{{message}}")
+    alert("{{message}}")
     {% endif %}
+
+    $("#exportbatch").click(function () {
+        var url = "{% url 'reportbatchcsv' %}"
+        var productid = $("#id_productid").val()
+        var batchno = $("#id_batchno").val()
+        var inputdatefrom = $("#id_inputdatefrom").val()
+        var inputdateto = $("#id_inputdateto").val()
+        window.open(url + "?productid=" + productid + "&batchno=" + batchno + "&inputdatefrom=" + inputdatefrom + "&inputdateto=" + inputdateto)
+        // $.ajax({
+        //     type: "POST",
+        //     dataType: "json",
+        //     url: url,
+        //     data: JSON.stringify({
+        //         "productid": productid, 
+        //         "batchno": batchno, 
+        //         "inputdatefrom": inputdatefrom, 
+        //         "inputdateto": inputdateto, 
+        //     }),
+        //     success: function (data) {   // success callback function
+        //         console.log(data)
+        //     }
+        // })
+    })
 </script>
 {% endblock %}

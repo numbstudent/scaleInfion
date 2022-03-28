@@ -39,3 +39,34 @@ class PrintHeader(models.Model):
     name = models.CharField(max_length=50)
     label = models.CharField(max_length=20)
     imageurl = models.CharField(max_length=100)
+
+
+
+#REPORT MODELS
+class Department(models.Model):
+    name = models.CharField(max_length=100)
+
+class ReportTitle(models.Model):
+    title = models.CharField(max_length=100)
+    subtitle = models.CharField(max_length=100)
+
+class Report(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.RESTRICT)
+    batchno = models.CharField(max_length=10)
+    reporttitle = models.ForeignKey(ReportTitle, on_delete=models.RESTRICT)
+    department = models.ForeignKey(Department, on_delete=models.RESTRICT)
+    reviewdate = models.DateTimeField(blank=True, null=True)
+    effectivedate = models.DateTimeField(blank=True, null=True)
+    dnno = models.CharField(max_length=20,blank=True, null=True)
+    dnno = models.CharField(max_length=20,blank=True, null=True)
+    dnrev = models.IntegerField()
+    createdon = models.DateTimeField(auto_now_add=True)
+    updatedon = models.DateTimeField(auto_now=True)
+
+
+class UploadedRegister(models.Model):
+    batchno = models.CharField(max_length=10)
+    boxno = models.IntegerField()
+    weight = models.FloatField()
+    createdon = models.DateTimeField(auto_now_add=True)
+    updatedon = models.DateTimeField(auto_now=True)

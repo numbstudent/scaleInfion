@@ -12,6 +12,8 @@ from django.db import IntegrityError
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 import json
+import csv
+
 
 loginpage = 'login'
 
@@ -113,10 +115,10 @@ def insertWeight(batchno):
 @login_required(login_url=loginpage)
 def viewProduct(request):
     context = {}
+    context['action'] = 'view'
     context['data'] = Product.objects.all()
     if request.method == "POST":
         form = ProductForm(request.POST)
-        context['action'] = 'view'
         context['form'] = form
         if form.is_valid():
             form.save()
@@ -164,6 +166,114 @@ def editProduct(request, id):
 
 
 @login_required(login_url=loginpage)
+def viewDepartment(request):
+    context = {}
+    context['action'] = 'view'
+    context['data'] = Department.objects.all()
+    if request.method == "POST":
+        form = DepartmentForm(request.POST)
+        context['form'] = form
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.name = request.POST.get('name').upper()
+            instance.save()
+            return redirect('viewdepartment')
+    else:
+        context['form'] = DepartmentForm()
+
+    return render(request, 'master_department.html', context=context)
+
+
+@login_required(login_url=loginpage)
+def deleteDepartment(request, id):
+    obj = Department.objects.filter(id=id)
+    try:
+        obj.delete()
+    except RestrictedError:
+        error_message = 'Data ini tidak dapat dihapus karena sedang digunakan oleh data lain. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>'
+        return HttpResponse(error_message)
+    return redirect('viewdepartment')
+
+@login_required(login_url=loginpage)
+def editDepartment(request, id):
+    context = {}
+    context['action'] = 'edit'
+    context['id'] = id
+    context['message'] = None
+    if request.method == 'GET':
+        obj = Department.objects.get(id=id)
+        form = DepartmentForm(instance=obj)
+        context['data'] = Department.objects.all()
+        context['form'] = form
+    if request.method == 'POST':
+        obj = Department.objects.get(id=id)
+        form = DepartmentForm(request.POST, instance=obj)
+        context['data'] = Department.objects.all()
+        context['form'] = form
+        if form.is_valid():
+            obj.name = form.cleaned_data.get('name').upper()
+            obj.save()
+            context['message'] = "Data berhasil disimpan."
+            # return redirect('viewdepartment')
+    return render(request, 'master_department.html', context=context)
+
+
+@login_required(login_url=loginpage)
+def viewReportTitle(request):
+    context = {}
+    context['action'] = 'view'
+    context['data'] = ReportTitle.objects.all()
+    if request.method == "POST":
+        form = ReportTitleForm(request.POST)
+        context['form'] = form
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.title = request.POST.get('title').upper()
+            instance.subtitle = request.POST.get('subtitle').upper()
+            instance.save()
+            return redirect('viewreporttitle')
+    else:
+        context['form'] = ReportTitleForm()
+
+    return render(request, 'master_reporttitle.html', context=context)
+
+
+@login_required(login_url=loginpage)
+def deleteReportTitle(request, id):
+    obj = ReportTitle.objects.filter(id=id)
+    try:
+        obj.delete()
+    except RestrictedError:
+        error_message = 'Data ini tidak dapat dihapus karena sedang digunakan oleh data lain. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>'
+        return HttpResponse(error_message)
+    return redirect('viewreporttitle')
+
+@login_required(login_url=loginpage)
+def editReportTitle(request, id):
+    context = {}
+    context['action'] = 'edit'
+    context['id'] = id
+    context['message'] = None
+    if request.method == 'GET':
+        obj = ReportTitle.objects.get(id=id)
+        form = ReportTitleForm(instance=obj)
+        context['data'] = ReportTitle.objects.all()
+        context['form'] = form
+    if request.method == 'POST':
+        obj = ReportTitle.objects.get(id=id)
+        form = ReportTitleForm(request.POST, instance=obj)
+        context['data'] = ReportTitle.objects.all()
+        context['form'] = form
+        if form.is_valid():
+            obj.title = form.cleaned_data.get('title').upper()
+            obj.subtitle = form.cleaned_data.get('subtitle').upper()
+            obj.save()
+            context['message'] = "Data berhasil disimpan."
+            # return redirect('viewreporttitle')
+    return render(request, 'master_reporttitle.html', context=context)
+
+
+@login_required(login_url=loginpage)
 def reportBatch(request):
     context = {}
     context['data'] = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
@@ -173,6 +283,7 @@ def reportBatch(request):
         product = request.POST.get('productid')
         batchno = request.POST.get('batchno')
         inputdatefrom = request.POST.get('inputdatefrom')
+        inputdateto = request.POST.get('inputdateto')
         context['form'] = form
         datamodel = Register.objects
         if product:
@@ -181,9 +292,54 @@ def reportBatch(request):
             datamodel = datamodel.filter(batchno=batchno)
         if inputdatefrom:
             datamodel = datamodel.filter(weight__datetime__gte=inputdatefrom)
+        if inputdateto:
+            inputdateto = inputdateto + " 23:59"
+            datamodel = datamodel.filter(weight__datetime__lte=inputdateto)
         context['data'] = datamodel.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
             .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date').order_by('product', 'batchno', 'boxno')
     else:
         context['form'] = ReportBatchForm()
 
     return render(request, 'report_batch.html', context=context)
+
+@csrf_exempt
+def reportBatchCSV(request):
+    context = {}
+    datamodel = Register.objects
+    if request.method == "GET":
+        form = ReportBatchForm(request.GET)
+        product = request.GET.get('productid')
+        batchno = request.GET.get('batchno')
+        inputdatefrom = request.GET.get('inputdatefrom')
+        inputdateto = request.GET.get('inputdateto')
+        context['form'] = form
+        if product:
+            datamodel = datamodel.filter(product=product)
+        if batchno:
+            datamodel = datamodel.filter(batchno=batchno)
+        if inputdatefrom:
+            datamodel = datamodel.filter(weight__datetime__gte=inputdatefrom)
+        if inputdateto:
+            inputdateto = inputdateto + " 23:59"
+            datamodel = datamodel.filter(weight__datetime__lte=inputdateto)
+        context['data'] = datamodel.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
+            .order_by('product', 'batchno', 'boxno')
+        if not product and not batchno and not inputdatefrom and not inputdateto:
+            context['data'] = context['data'][:30]
+        
+
+    output = []
+    response = HttpResponse(
+        content_type='text/csv'
+        # ,
+        # headers={'Content-Disposition': 'attachment; filename="report_batch.csv"'},
+    )
+    writer = csv.writer(response)
+    query_set = context['data']
+    #Header
+    writer.writerow(['Product Name', 'Batch No', 'Box No', 'Weight', 'Date'])
+    for record in query_set:
+        output.append([record.product_name, record.batchno, record.boxno, record.iot_weight, record.input_date])
+    #CSV Data
+    writer.writerows(output)
+    return response

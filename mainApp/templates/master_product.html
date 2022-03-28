@@ -13,9 +13,9 @@
             <div class="row">
                 <div class="col-lg-12">
                     {% if action == 'view' %}
-                    <form action="{% url 'viewproduct' %}" method="POST">
+                    <form action="{% url 'viewproduct' %}" method="POST"  autocomplete="off">
                     {% elif action == 'edit' %}
-                    <form action="{% url 'editproduct' id %}" method="POST">
+                    <form action="{% url 'editproduct' id %}" method="POST"  autocomplete="off">
                     {% endif %}
                         {% csrf_token %}
                         {{ form | crispy }}

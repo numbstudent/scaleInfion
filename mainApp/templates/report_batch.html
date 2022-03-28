@@ -12,7 +12,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-lg-12">
-                    <form action="{% url 'reportbatch' %}" method="POST">
+                    <form action="{% url 'reportbatch' %}" method="POST" autocomplete="off">
                         {% csrf_token %}
                         {{ form | crispy }}
                         <hr>

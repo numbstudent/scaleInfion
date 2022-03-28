@@ -787,7 +787,11 @@
             $(function () {
                 //Initialize Select2 Elements
                 $('.datetimepicker').daterangepicker({
-                    singleDatePicker: true
+                    singleDatePicker: true,
+                    autoUpdateInput: false,
+                    locale: {
+                        cancelLabel: 'Clear'
+                    }
                 })
             })
         </script>

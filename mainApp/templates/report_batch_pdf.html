@@ -1,0 +1,95 @@
+{% load static %}
+<html>
+
+<head>
+    <style>
+        @page {
+            size: A4;
+            /* Change from the default size of A4 */
+            margin: 0mm;
+            /* Set margin on each page */
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid;
+            padding: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <table border="1" class="table">
+        <tr>
+            <td rowspan="2"><img style="width:100%" src="{% static 'others/logo.png' %}"></td>
+            <td style="text-align: center;"><b><i>FORM</i></b></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td style="text-align: center;"><b><i>REPORT TITLE</i></b></td>
+            <td style="text-align: center;"><b><i>DEPARTMENT</i></b></td>
+        </tr>
+        <tr>
+            <td><i>DN: </i><br>Eff. Date: </td>
+            <td style="text-align: center;"><i>This document will be reviewed on: <br>November 2025</i></td>
+            <td><i>Rev of DN: <br>Date: </i></td>
+        </tr>
+        <tr>
+            <td colspan="3" style="padding: 10px 30px;">
+                <table style="border: 0px;">
+                    <tr>
+                        <td style="border: 0px;">Nama Produk</td>
+                        <td style="border: 0px;">: {{product_name}}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 0px;">No Batch</td>
+                        <td style="border: 0px;">: {{batchno}}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr style="font-size: small;">
+            <td colspan="3" style="padding: 30px; height: 800px; vertical-align:top;">
+                <table style="border: 0px;">
+                    <tr style="border: 0px;">
+                        <td style="border: 0px;">
+                            <table border="1">
+                                <tr style="text-align: center;">
+                                    <th>Tanggal Penimbangan</th>
+                                    <th>No. Karton</th>
+                                    <th>Hasil Penimbangan</th>
+                                </tr>
+                                {%for row in data%}
+                                <tr style="text-align: right;">
+                                    <td>{{row.input_date|date:"j/n/Y"}}</td>
+                                    <td>{{row.boxno}}</td>
+                                    <td>{{row.iot_weight}}</td>
+                                </tr>
+                                {%endfor%}
+                            </table>
+                        </td>
+                        <td style="border: 0px;">
+                            <table border="1">
+                                <tr style="text-align: center;">
+                                    <th>Tanggal Penimbangan</th>
+                                    <th>No. Karton</th>
+                                    <th>Hasil Penimbangan</th>
+                                </tr>
+                                {%for row in data%}
+                                <tr style="text-align: right;">
+                                    <td>{{row.input_date|date:"j/n/Y"}}</td>
+                                    <td>{{row.boxno}}</td>
+                                    <td>{{row.iot_weight}}</td>
+                                </tr>
+                                {%endfor%}
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

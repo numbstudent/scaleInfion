@@ -4,23 +4,6 @@
                with font-awesome or any other icon font library -->
         <li class="nav-item">
             <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-home"></i>
-                <p>
-                    Home
-                    <i class="right fas fa-angle-left"></i>
-                </p>
-            </a>
-            <ul class="nav nav-treeview">
-                <li class="nav-item">
-                    <a href="{% url 'weighing'%}" class="nav-link">
-                        <i class="far fa-circle nav-icon"></i>
-                        <p>Weighing</p>
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="nav-item">
-            <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-database"></i>
                 <p>
                     Master Data
@@ -50,7 +33,32 @@
         </li>
         <li class="nav-item">
             <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-database"></i>
+                <i class="nav-icon fas fa-balance-scale"></i>
+                <p>
+                    Transaction
+                    <i class="right fas fa-angle-left"></i>
+                </p>
+            </a>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+                    <a href="{% url 'weighing'%}" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Weighing</p>
+                    </a>
+                </li>
+            </ul>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+                    <a href="{% url 'viewuploadbatch'%}" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Upload Batch</p>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-file"></i>
                 <p>
                     Report
                     <i class="right fas fa-angle-left"></i>

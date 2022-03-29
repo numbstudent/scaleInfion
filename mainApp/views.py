@@ -276,16 +276,16 @@ def editReportTitle(request, id):
 @login_required(login_url=loginpage)
 def reportBatch(request):
     context = {}
-    context['data'] = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
-        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date').order_by('product', 'batchno', 'boxno')
+    datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
+        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date').order_by('-input_date')
     if request.method == "POST":
         form = ReportBatchForm(request.POST)
+        formreportpdf =
         product = request.POST.get('productid')
         batchno = request.POST.get('batchno')
         inputdatefrom = request.POST.get('inputdatefrom')
         inputdateto = request.POST.get('inputdateto')
         context['form'] = form
-        datamodel = Register.objects
         if product:
             datamodel = datamodel.filter(product=product)
         if batchno:
@@ -295,17 +295,17 @@ def reportBatch(request):
         if inputdateto:
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(weight__datetime__lte=inputdateto)
-        context['data'] = datamodel.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
-            .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date').order_by('product', 'batchno', 'boxno')
     else:
         context['form'] = ReportBatchForm()
-
+    context['data'] = datamodel[:100]
     return render(request, 'report_batch.html', context=context)
 
 @csrf_exempt
 def reportBatchCSV(request):
+    #fetch data
     context = {}
-    datamodel = Register.objects
+    datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
+        .order_by('-input_date')
     if request.method == "GET":
         form = ReportBatchForm(request.GET)
         product = request.GET.get('productid')
@@ -322,24 +322,103 @@ def reportBatchCSV(request):
         if inputdateto:
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(weight__datetime__lte=inputdateto)
-        context['data'] = datamodel.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
-            .order_by('product', 'batchno', 'boxno')
-        if not product and not batchno and not inputdatefrom and not inputdateto:
-            context['data'] = context['data'][:30]
-        
+    context['data'] = datamodel[:100]
 
+    #writing to csv
     output = []
     response = HttpResponse(
-        content_type='text/csv'
-        # ,
-        # headers={'Content-Disposition': 'attachment; filename="report_batch.csv"'},
+        content_type='text/csv',
+        headers={'Content-Disposition': 'attachment; filename="report_batch.csv"'},
     )
     writer = csv.writer(response)
     query_set = context['data']
-    #Header
+    #Table Header
     writer.writerow(['Product Name', 'Batch No', 'Box No', 'Weight', 'Date'])
     for record in query_set:
         output.append([record.product_name, record.batchno, record.boxno, record.iot_weight, record.input_date])
-    #CSV Data
+    #Table Data
     writer.writerows(output)
     return response
+
+
+@login_required(login_url=loginpage)
+def reportBatchPDF(request):
+    from django.core.files.storage import FileSystemStorage
+    from django.http import HttpResponse
+    from django.template.loader import render_to_string
+    from weasyprint import HTML
+
+    datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
+        .order_by('boxno')
+    product_name = ""
+    if request.method == "GET":
+        form = ReportBatchForm(request.GET)
+        product = request.GET.get('productid')
+        batchno = request.GET.get('batchno')
+        inputdatefrom = request.GET.get('inputdatefrom')
+        inputdateto = request.GET.get('inputdateto')
+        if product:
+            datamodel = datamodel.filter(product=product)
+            product_name = Product.objects.filter(id=product).values_list('name',flat=True)[0]
+        if batchno:
+            datamodel = datamodel.filter(batchno=batchno)
+        if inputdatefrom:
+            datamodel = datamodel.filter(weight__datetime__gte=inputdatefrom)
+        if inputdateto:
+            inputdateto = inputdateto + " 23:59"
+            datamodel = datamodel.filter(weight__datetime__lte=inputdateto)
+    else:
+        datamodel = datamodel[:10]
+    html_string = render_to_string('report_batch_pdf.html', {'data': datamodel, 'product_name':product_name, 'batchno':batchno})
+
+    html = HTML(string=html_string, base_url=request.build_absolute_uri())
+    html.write_pdf(target='/tmp/REPORTBATCH.pdf');
+
+    fs = FileSystemStorage('/tmp')
+    with fs.open('REPORTBATCH.pdf') as pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="REPORTBATCH.pdf"'
+        return response
+
+    return response
+
+@login_required(login_url=loginpage)
+def viewUploadBatch(request):
+    from io import StringIO
+    context = {}
+    context['action'] = 'view'    
+    context['data'] = UploadedRegister.objects.annotate(product_name=F('product__name'))\
+    .values('id','product_name','batchno','boxno','weight','measuredate')\
+    .order_by('-createdon')
+    if request.method == "POST":
+        form = UploadBatchForm(request.POST, request.FILES)
+        context['form'] = form
+        if form.is_valid():
+            productid = request.POST.get('productid')
+            product = Product.objects.get(id=productid)
+            batchno = request.POST.get('batchno')
+            file = request.FILES['file'].read().decode('utf-8')
+            reader = csv.reader(StringIO(file), delimiter=',')
+            next(reader) #skip header
+            for row in reader:
+                measuredate = row[2]
+                measuredate = measuredate.split("/")
+                measuredate = [measuredate[2],measuredate[1],measuredate[0]]
+                measuredate = "-".join(measuredate)
+                obj = UploadedRegister(product=product, batchno=batchno, boxno=row[0], weight=row[1], measuredate=measuredate)
+                obj.save()
+            return redirect('viewuploadbatch')
+    else:
+        context['form'] = UploadBatchForm()
+
+    return render(request, 'upload_batch.html', context=context)
+
+@login_required(login_url=loginpage)
+def deleteUploadBatch(request, id):
+    obj = UploadedRegister.objects.filter(id=id)
+    try:
+        obj.delete()
+    except RestrictedError:
+        error_message = 'Data ini tidak dapat dihapus karena sedang digunakan oleh data lain. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>'
+        return HttpResponse(error_message)
+    return redirect('viewuploadbatch')

@@ -45,7 +45,8 @@ class ReportBatchForm(forms.Form):
     import datetime
     productid = ProductModelChoiceField(
         queryset=Product.objects.all(), required=False, label="Product")
-    batchno = forms.ModelChoiceField(queryset=Register.objects.values_list('batchno',flat=True).distinct(), required=False, label="Batch No")
+    # batchno = forms.ModelChoiceField(queryset=Register.objects.values_list('batchno',flat=True).distinct(), required=False, label="Batch No")
+    batchno = forms.CharField(required=False, label="Batch No")
     inputdatefrom = forms.DateField(required=False, label="From Date", widget=forms.DateInput(attrs={
         'class': 'form-control datepick'
     }))
@@ -53,3 +54,12 @@ class ReportBatchForm(forms.Form):
         'class': 'form-control datepick'
     }))
 
+class UploadBatchForm(forms.Form):
+    productid = ProductModelChoiceField(
+        queryset=Product.objects.all(), required=False, label="Product")
+    batchno = forms.CharField(required=False, label="Batch No")
+    file = forms.FileField()
+
+class ReportPDFForm(forms.Form):
+    productid = ProductModelChoiceField(
+        queryset=Product.objects.all(), required=False, label="Product")

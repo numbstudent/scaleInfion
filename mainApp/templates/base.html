@@ -784,6 +784,15 @@
                     theme: 'bootstrap4'
                 })
             })
+            $('.dataTable').DataTable({
+                "paging": true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": false,
+                "autoWidth": true,
+                "responsive": true,
+            });
             $('.datepick').daterangepicker({
                 autoUpdateInput: false,
                 singleDatePicker: true,

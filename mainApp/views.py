@@ -412,7 +412,13 @@ def reportBatchPDF(request):
     else:
         datamodel = datamodel[0]
         datamodel2 = datamodel2[0]
-    rowlen = datamodel.count()//2
+    if datamodel.count()%2 == 0:
+        rowlen = datamodel.count()//2
+    else:
+        rowlen = datamodel.count()//2+1
+
+    # testing in windows
+    # return render(request, 'report_batch_pdf_template.html', context={'data': datamodel, 'data2': datamodel2, 'header': header, 'rowlen': rowlen})
     html_string = render_to_string('report_batch_pdf_template.html', {'data': datamodel, 'data2': datamodel2, 'header':header, 'rowlen':rowlen})
 
     html = HTML(string=html_string, base_url=request.build_absolute_uri())

@@ -69,7 +69,7 @@ def RegisterView(request, batchno=None):
         batchno = request.GET.get('batchno')
         code = request.GET.get('code')
         if batchno:
-            insertWeight(batchno)
+            insertWeight(batchno) #for simulating without real scale
             data = Register.objects.annotate(product_name=F('product__name'),iot_weight=F('weight__weighing'))\
             .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight')\
             .filter(batchno=batchno, product__code=code).order_by('-createdon')
@@ -81,7 +81,6 @@ def RegisterView(request, batchno=None):
         body = json.loads(request.body)
         registerid = body['registerid']
         obj = Register.objects.filter(id=registerid)
-        print(obj)
         obj.delete()
         return JsonResponse({"message": "Data berhasil dihapus"}, status=200)
 
@@ -93,7 +92,6 @@ def ScaleView(request):
     b.save()
 
     obj = Logging.objects.latest('id')
-    print(obj)
 
     if request.method == "GET":
         data = Logging.objects.all().order_by('-id').values('id','weighing').first()
@@ -105,7 +103,6 @@ def insertWeight(batchno):
     if newweight.exists() and unweighted.exists():
         if newweight.first()[1] > 0:
             weightid = newweight.first()[0]
-            print(newweight)
             obj = unweighted.first()
             obj.status = 1
             obj.weight_id = weightid
@@ -219,68 +216,68 @@ def editDepartment(request, id):
 
 
 @login_required(login_url=loginpage)
-def viewReportTitle(request):
+def viewReportBody(request):
     context = {}
     context['action'] = 'view'
-    context['data'] = ReportTitle.objects.all()
+    context['data'] = Report.objects.all()
     if request.method == "POST":
-        form = ReportTitleForm(request.POST)
+        form = ReportBodyForm(request.POST)
         context['form'] = form
         if form.is_valid():
-            instance = form.save(commit=False)
-            instance.title = request.POST.get('title').upper()
-            instance.subtitle = request.POST.get('subtitle').upper()
-            instance.save()
-            return redirect('viewreporttitle')
+            # instance = form.save(commit=False)
+            # instance.title = request.POST.get('title').upper()
+            # instance.subtitle = request.POST.get('subtitle').upper()
+            # instance.save()
+            form.save()
+            return redirect('viewreportbody')
     else:
-        context['form'] = ReportTitleForm()
+        context['form'] = list(ReportBodyForm())
 
-    return render(request, 'master_reporttitle.html', context=context)
+    return render(request, 'report_body.html', context=context)
 
 
 @login_required(login_url=loginpage)
-def deleteReportTitle(request, id):
-    obj = ReportTitle.objects.filter(id=id)
+def deleteReportBody(request, id):
+    obj = Report.objects.filter(id=id)
     try:
         obj.delete()
     except RestrictedError:
         error_message = 'Data ini tidak dapat dihapus karena sedang digunakan oleh data lain. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>'
         return HttpResponse(error_message)
-    return redirect('viewreporttitle')
+    return redirect('viewreportbody')
 
 @login_required(login_url=loginpage)
-def editReportTitle(request, id):
+def editReportBody(request, id):
     context = {}
     context['action'] = 'edit'
     context['id'] = id
     context['message'] = None
     if request.method == 'GET':
-        obj = ReportTitle.objects.get(id=id)
-        form = ReportTitleForm(instance=obj)
-        context['data'] = ReportTitle.objects.all()
+        obj = Report.objects.get(id=id)
+        form = ReportBodyForm(instance=obj)
+        context['data'] = Report.objects.all()
         context['form'] = form
     if request.method == 'POST':
-        obj = ReportTitle.objects.get(id=id)
-        form = ReportTitleForm(request.POST, instance=obj)
-        context['data'] = ReportTitle.objects.all()
+        obj = Report.objects.get(id=id)
+        form = ReportBodyForm(request.POST, instance=obj)
+        context['data'] = Report.objects.all()
         context['form'] = form
         if form.is_valid():
             obj.title = form.cleaned_data.get('title').upper()
             obj.subtitle = form.cleaned_data.get('subtitle').upper()
             obj.save()
             context['message'] = "Data berhasil disimpan."
-            # return redirect('viewreporttitle')
-    return render(request, 'master_reporttitle.html', context=context)
+            # return redirect('viewreportbody')
+    return render(request, 'report_body.html', context=context)
 
 
 @login_required(login_url=loginpage)
-def reportBatch(request):
+def viewReportBatch(request):
     context = {}
     datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
         .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date').order_by('-input_date')
     if request.method == "POST":
         form = ReportBatchForm(request.POST)
-        formreportpdf =
         product = request.POST.get('productid')
         batchno = request.POST.get('batchno')
         inputdatefrom = request.POST.get('inputdatefrom')
@@ -342,34 +339,81 @@ def reportBatchCSV(request):
 
 
 @login_required(login_url=loginpage)
+def viewReportTitle(request):
+    context = {}
+    context['action'] = 'view'
+    context['data'] = ReportTitle.objects.all()
+    if request.method == "POST":
+        form = ReportTitleForm(request.POST)
+        context['form'] = form
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.title = request.POST.get('title').upper()
+            instance.subtitle = request.POST.get('subtitle').upper()
+            instance.save()
+            return redirect('viewreporttitle')
+    else:
+        context['form'] = ReportTitleForm()
+
+    return render(request, 'master_reporttitle.html', context=context)
+
+
+@login_required(login_url=loginpage)
+def deleteReportTitle(request, id):
+    obj = ReportTitle.objects.filter(id=id)
+    try:
+        obj.delete()
+    except RestrictedError:
+        error_message = 'Data ini tidak dapat dihapus karena sedang digunakan oleh data lain. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>'
+        return HttpResponse(error_message)
+    return redirect('viewreporttitle')
+
+@login_required(login_url=loginpage)
+def editReportTitle(request, id):
+    context = {}
+    context['action'] = 'edit'
+    context['id'] = id
+    context['message'] = None
+    if request.method == 'GET':
+        obj = ReportTitle.objects.get(id=id)
+        form = ReportTitleForm(instance=obj)
+        context['data'] = ReportTitle.objects.all()
+        context['form'] = form
+    if request.method == 'POST':
+        obj = ReportTitle.objects.get(id=id)
+        form = ReportTitleForm(request.POST, instance=obj)
+        context['data'] = ReportTitle.objects.all()
+        context['form'] = form
+        if form.is_valid():
+            obj.title = form.cleaned_data.get('title').upper()
+            obj.subtitle = form.cleaned_data.get('subtitle').upper()
+            obj.save()
+            context['message'] = "Data berhasil disimpan."
+            # return redirect('viewreporttitle')
+    return render(request, 'master_reporttitle.html', context=context)
+
+@login_required(login_url=loginpage)
 def reportBatchPDF(request):
     from django.core.files.storage import FileSystemStorage
     from django.http import HttpResponse
     from django.template.loader import render_to_string
     from weasyprint import HTML
 
-    datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
-        .order_by('boxno')
+    datamodel = Register.objects.order_by('boxno')
+    datamodel2 = UploadedRegister.objects.order_by('boxno')
     product_name = ""
     if request.method == "GET":
         form = ReportBatchForm(request.GET)
         product = request.GET.get('productid')
-        batchno = request.GET.get('batchno')
-        inputdatefrom = request.GET.get('inputdatefrom')
-        inputdateto = request.GET.get('inputdateto')
-        if product:
-            datamodel = datamodel.filter(product=product)
-            product_name = Product.objects.filter(id=product).values_list('name',flat=True)[0]
-        if batchno:
-            datamodel = datamodel.filter(batchno=batchno)
-        if inputdatefrom:
-            datamodel = datamodel.filter(weight__datetime__gte=inputdatefrom)
-        if inputdateto:
-            inputdateto = inputdateto + " 23:59"
-            datamodel = datamodel.filter(weight__datetime__lte=inputdateto)
+        reportid = request.GET.get('id')
+        header = Report.objects.all().get(id=reportid)
+        datamodel = datamodel.filter(batchno=header.batchno, product=header.product)
+        datamodel2 = datamodel2.filter(batchno=header.batchno, product=header.product)
     else:
-        datamodel = datamodel[:10]
-    html_string = render_to_string('report_batch_pdf.html', {'data': datamodel, 'product_name':product_name, 'batchno':batchno})
+        datamodel = datamodel[0]
+        datamodel2 = datamodel2[0]
+    rowlen = datamodel.count()/2
+    html_string = render_to_string('report_batch_pdf_template.html', {'data': datamodel, 'data2': datamodel2, 'header':header, 'rowlen':rowlen})
 
     html = HTML(string=html_string, base_url=request.build_absolute_uri())
     html.write_pdf(target='/tmp/REPORTBATCH.pdf');

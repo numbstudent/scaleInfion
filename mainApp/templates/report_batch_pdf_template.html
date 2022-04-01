@@ -16,44 +16,52 @@
             border: 1px solid;
             padding: 3px;
         }
+
+        #pageFooter:after {
+            counter-increment: page;
+            content: counter(page);
+        }
     </style>
 </head>
 
 <body>
     <table border="1" class="table">
         <tr>
-            <td rowspan="2"><img style="width:100%" src="{% static 'others/logo.png' %}"></td>
+            <td rowspan="2" style="text-align: center;"><img style="width:150px" src="{% static 'others/logo.png' %}">
+            </td>
             <td style="text-align: center;"><b><i>FORM</i></b></td>
             <td></td>
         </tr>
         <tr>
-            <td style="text-align: center;"><b><i>REPORT TITLE</i></b></td>
-            <td style="text-align: center;"><b><i>DEPARTMENT</i></b></td>
+            <td style="text-align: center;width: 320px;font-size: 12px;"><b><i>{{header.reporttitle.title}}
+                        <br><small>{{header.reporttitle.subtitle}}</small></i></b></td>
+            <td style="text-align: center;width: 250px;"><i>{{header.department.name}}</i></td>
         </tr>
         <tr>
-            <td><i>DN: </i><br>Eff. Date: </td>
-            <td style="text-align: center;"><i>This document will be reviewed on: <br>November 2025</i></td>
-            <td><i>Rev of DN: <br>Date: </i></td>
+            <td><i>DN: {{header.dnno}}</i><br>Eff. Date: {{header.effectivedate|date:"j/n/Y"}}</td>
+            <td style="text-align: center;"><i>This document will be reviewed on:
+                    <br>{{header.reviewdate|date:"j/n/Y"}}</i></td>
+            <td><i>Rev of DN: {{header.dnrev}}<br>Date: {{header.createdon|date:"j/n/Y"}}</i></td>
         </tr>
         <tr>
             <td colspan="3" style="padding: 10px 30px;">
                 <table style="border: 0px;">
                     <tr>
                         <td style="border: 0px;">Nama Produk</td>
-                        <td style="border: 0px;">: {{product_name}}</td>
+                        <td style="border: 0px;">: {{header.product.name}}</td>
                     </tr>
                     <tr>
                         <td style="border: 0px;">No Batch</td>
-                        <td style="border: 0px;">: {{batchno}}</td>
+                        <td style="border: 0px;">: {{header.batchno}}</td>
                     </tr>
                 </table>
             </td>
         </tr>
-        <tr style="font-size: small;">
-            <td colspan="3" style="padding: 30px; height: 800px; vertical-align:top;">
+        <tr style="font-size: 11px;">
+            <td colspan="3" style="padding: 5px 30px; vertical-align:top;min-height: 800px;">
                 <table style="border: 0px;">
                     <tr style="border: 0px;">
-                        <td style="border: 0px;">
+                        <td style="border: 0px;vertical-align:top;">
                             <table border="1">
                                 <tr style="text-align: center;">
                                     <th>Tanggal Penimbangan</th>
@@ -62,29 +70,40 @@
                                 </tr>
                                 {%for row in data%}
                                 <tr style="text-align: right;">
-                                    <td>{{row.input_date|date:"j/n/Y"}}</td>
+                                    <td>{{row.weight.datetime|date:"j/n/Y"}}</td>
                                     <td>{{row.boxno}}</td>
-                                    <td>{{row.iot_weight}}</td>
+                                    <td>{{row.weight.weighing}}</td>
                                 </tr>
+                                {% if forloop.counter|divisibleby:rowlen and forloop.counter != data.count %}
+                                </table>
+                                </td>
+                                <td style="border: 0px;vertical-align:top;">
+                                <table border="1">
+                                    <tr style="text-align: center;">
+                                        <th>Tanggal Penimbangan</th>
+                                        <th>No. Karton</th>
+                                        <th>Hasil Penimbangan</th>
+                                    </tr>
+                                {% endif %}
                                 {%endfor%}
                             </table>
                         </td>
-                        <td style="border: 0px;">
+                        <!-- <td style="border: 0px;vertical-align:top;">
                             <table border="1">
                                 <tr style="text-align: center;">
                                     <th>Tanggal Penimbangan</th>
                                     <th>No. Karton</th>
                                     <th>Hasil Penimbangan</th>
                                 </tr>
-                                {%for row in data%}
+                                {%for row in data2%}
                                 <tr style="text-align: right;">
-                                    <td>{{row.input_date|date:"j/n/Y"}}</td>
+                                    <td>{{row.createdon|date:"j/n/Y"}}</td>
                                     <td>{{row.boxno}}</td>
-                                    <td>{{row.iot_weight}}</td>
+                                    <td>{{row.weight}}</td>
                                 </tr>
                                 {%endfor%}
                             </table>
-                        </td>
+                        </td> -->
                     </tr>
                 </table>
             </td>

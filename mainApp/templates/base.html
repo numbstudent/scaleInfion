@@ -784,6 +784,9 @@
                     theme: 'bootstrap4'
                 })
             })
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
             $('.dataTable').DataTable({
                 "paging": true,
                 "lengthChange": true,

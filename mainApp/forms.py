@@ -31,6 +31,14 @@ class ProductModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.name
 
+class ReportTitleModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.title
+
+class DepartmentModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.name
+
 class DepartmentForm(ModelForm):
     class Meta:
         model = Department
@@ -60,6 +68,32 @@ class UploadBatchForm(forms.Form):
     batchno = forms.CharField(required=False, label="Batch No")
     file = forms.FileField()
 
-class ReportPDFForm(forms.Form):
-    productid = ProductModelChoiceField(
-        queryset=Product.objects.all(), required=False, label="Product")
+class ReportBodyForm(ModelForm):
+    # productid = ProductModelChoiceField(
+    #     queryset=Product.objects.all(), required=False, label="Product")
+    # batchno = forms.CharField(required=False, label="Batch No")
+    # reporttitle = ReportTitleModelChoiceField(
+    #     queryset=ReportTitle.objects.all(), required=False, label="Report Title")
+    # department = DepartmentModelChoiceField(
+    #     queryset=Department.objects.all(), required=False, label="Department")
+    # reviewdate = 
+
+    class Meta:
+        model = Report
+        fields = ['id','product','batchno','reporttitle','department','reviewdate','effectivedate','dnno','dnrev']
+        labels = {
+            "batchno": "Batch No",
+            "reporttitle": "Report Title",
+            "reviewdate": "Review Date",
+            "effectivedate": "Effective Date",
+            "dnno": "DN No",
+            "dnrev": "DN Rev",
+        }
+        widgets = {
+            "reviewdate": forms.DateInput(attrs={
+                'class': 'form-control datepick'
+            }),
+            "effectivedate": forms.DateInput(attrs={
+                'class': 'form-control datepick'
+            }),
+        }

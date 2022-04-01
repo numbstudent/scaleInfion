@@ -21,7 +21,11 @@ urlpatterns = [
     path('master/delete-reporttitle/<int:id>', views.deleteReportTitle, name='deletereporttitle'),
     path('master/edit-reporttitle/<int:id>', views.editReportTitle, name='editreporttitle'),
 
-    path('report/batch', views.reportBatch, name='reportbatch'),
+    path('master/reportbody', views.viewReportBody, name='viewreportbody'),
+    path('master/delete-reportbody/<int:id>', views.deleteReportBody, name='deletereportbody'),
+    path('master/edit-reportbody/<int:id>', views.editReportBody, name='editreportbody'),
+
+    path('report/batch', views.viewReportBatch, name='reportbatch'),
     path('report/batch/export', views.reportBatchCSV, name='reportbatchcsv'),
     path('report/batch/exportpdf', views.reportBatchPDF, name='reportbatchpdf'),
 

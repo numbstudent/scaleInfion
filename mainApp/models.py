@@ -9,6 +9,8 @@ class Product(models.Model):
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
     status = models.BooleanField(default=True,choices=STATUS_CHOICES)
+    def __str__(self):
+        return self.name
 
 class Logging(models.Model):
     id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.
@@ -23,7 +25,7 @@ class Logging(models.Model):
 
 class Register(models.Model):
     product = models.ForeignKey(Product, on_delete=models.RESTRICT)
-    batchno = models.CharField(max_length=10)
+    batchno = models.CharField(max_length=15)
     boxno = models.IntegerField()
     status = models.IntegerField()
     createdon = models.DateTimeField(auto_now_add=True)
@@ -45,19 +47,22 @@ class PrintHeader(models.Model):
 #REPORT MODELS
 class Department(models.Model):
     name = models.CharField(max_length=100)
+    def __str__(self):
+        return self.name
 
 class ReportTitle(models.Model):
     title = models.CharField(max_length=100)
     subtitle = models.CharField(max_length=100)
+    def __str__(self):
+        return self.title
 
 class Report(models.Model):
     product = models.ForeignKey(Product, on_delete=models.RESTRICT)
-    batchno = models.CharField(max_length=10)
+    batchno = models.CharField(max_length=15)
     reporttitle = models.ForeignKey(ReportTitle, on_delete=models.RESTRICT)
     department = models.ForeignKey(Department, on_delete=models.RESTRICT)
     reviewdate = models.DateTimeField(blank=True, null=True)
     effectivedate = models.DateTimeField(blank=True, null=True)
-    dnno = models.CharField(max_length=20,blank=True, null=True)
     dnno = models.CharField(max_length=20,blank=True, null=True)
     dnrev = models.IntegerField()
     createdon = models.DateTimeField(auto_now_add=True)
@@ -66,7 +71,7 @@ class Report(models.Model):
 
 class UploadedRegister(models.Model):
     product = models.ForeignKey(Product, on_delete=models.RESTRICT)
-    batchno = models.CharField(max_length=10)
+    batchno = models.CharField(max_length=15)
     boxno = models.IntegerField()
     weight = models.FloatField()
     measuredate = models.DateTimeField(null=True, blank=True)

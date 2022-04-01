@@ -58,7 +58,7 @@
                             <td>{{row.dnno}}</td>
                             <td>{{row.dnrev}}</td>
                             <td>{{row.createdon}}</td>
-                            <td><a data-toggle="tooltip" title="Export to PDF" class="btn btn-primary" href="{% url 'reportbatchpdf' %}?id={{row.id}}"><i class="fas fa-file"></i></a>
+                            <td><a data-toggle="tooltip" title="Export to PDF" target="_blank" class="btn btn-primary" href="{% url 'reportbatchpdf' %}?id={{row.id}}"><i class="fas fa-file"></i></a>
                                 <a data-toggle="tooltip" title="Edit" class="btn btn-secondary" href="{% url 'editreportbody' row.id %}"><i
                                         class="fas fa-edit"></i></a>
                                 <a data-toggle="tooltip" title="Delete" class="btn btn-danger" href="{% url 'deletereportbody' row.id %}"

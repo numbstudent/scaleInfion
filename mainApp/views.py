@@ -69,7 +69,7 @@ def RegisterView(request, batchno=None):
         batchno = request.GET.get('batchno')
         code = request.GET.get('code')
         if batchno:
-            insertWeight(batchno) #for simulating without real scale
+            # insertWeight(batchno) # Generating weight for simulating without real scale
             data = Register.objects.annotate(product_name=F('product__name'),iot_weight=F('weight__weighing'))\
             .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight')\
             .filter(batchno=batchno, product__code=code).order_by('-createdon')
@@ -256,12 +256,12 @@ def editReportBody(request, id):
         obj = Report.objects.get(id=id)
         form = ReportBodyForm(instance=obj)
         context['data'] = Report.objects.all()
-        context['form'] = form
+        context['form'] = list(form)
     if request.method == 'POST':
         obj = Report.objects.get(id=id)
         form = ReportBodyForm(request.POST, instance=obj)
         context['data'] = Report.objects.all()
-        context['form'] = form
+        context['form'] = list(form)
         if form.is_valid():
             obj.title = form.cleaned_data.get('title').upper()
             obj.subtitle = form.cleaned_data.get('subtitle').upper()
@@ -412,7 +412,10 @@ def reportBatchPDF(request):
     else:
         datamodel = datamodel[0]
         datamodel2 = datamodel2[0]
-    rowlen = datamodel.count()//2
+    if datamodel.count()%2 == 0:
+        rowlen = datamodel.count()//2
+    else:
+        rowlen = datamodel.count()//2+1
     html_string = render_to_string('report_batch_pdf_template.html', {'data': datamodel, 'data2': datamodel2, 'header':header, 'rowlen':rowlen})
 
     html = HTML(string=html_string, base_url=request.build_absolute_uri())

@@ -13,6 +13,7 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 import json
 import csv
+from datetime import datetime, timedelta
 
 
 loginpage = 'login'
@@ -69,7 +70,7 @@ def RegisterView(request, batchno=None):
         batchno = request.GET.get('batchno')
         code = request.GET.get('code')
         if batchno:
-            # insertWeight(batchno) # Generating weight for simulating without real scale
+            insertWeight(batchno) 
             data = Register.objects.annotate(product_name=F('product__name'),iot_weight=F('weight__weighing'))\
             .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight')\
             .filter(batchno=batchno, product__code=code).order_by('-createdon')
@@ -87,14 +88,16 @@ def RegisterView(request, batchno=None):
 @csrf_exempt
 def ScaleView(request):
     #app_test
-    import random
-    b = Logging(lot='1', status='1', weighing=random.uniform(-10, 10))
-    b.save()
+    # generating weight for simulating without real scale
+    # import random
+    # b = Logging(lot='1', status='1', weighing=random.uniform(-10, 10))
+    # b.save()
 
     obj = Logging.objects.latest('id')
 
     if request.method == "GET":
-        data = Logging.objects.all().order_by('-id').values('id','weighing').first()
+        curtime = datetime.now() - timedelta(seconds=1)
+        data = Logging.objects.filter(datetime__gte=curtime).order_by('-id').values('id','weighing').first()
         return JsonResponse(data, safe=False, status=200)
 
 def insertWeight(batchno):
@@ -158,7 +161,7 @@ def editProduct(request, id):
             obj.status = form.cleaned_data.get('status')
             obj.save()
             context['message'] = "Data berhasil disimpan."
-            # return redirect('viewproduct')
+            return redirect('viewproduct')
     return render(request, 'master_product.html', context=context)
 
 
@@ -211,7 +214,7 @@ def editDepartment(request, id):
             obj.name = form.cleaned_data.get('name').upper()
             obj.save()
             context['message'] = "Data berhasil disimpan."
-            # return redirect('viewdepartment')
+            return redirect('viewdepartment')
     return render(request, 'master_department.html', context=context)
 
 
@@ -267,7 +270,7 @@ def editReportBody(request, id):
             obj.subtitle = form.cleaned_data.get('subtitle').upper()
             obj.save()
             context['message'] = "Data berhasil disimpan."
-            # return redirect('viewreportbody')
+            return redirect('viewreportbody')
     return render(request, 'report_body.html', context=context)
 
 
@@ -389,7 +392,7 @@ def editReportTitle(request, id):
             obj.subtitle = form.cleaned_data.get('subtitle').upper()
             obj.save()
             context['message'] = "Data berhasil disimpan."
-            # return redirect('viewreporttitle')
+            return redirect('viewreporttitle')
     return render(request, 'master_reporttitle.html', context=context)
 
 @login_required(login_url=loginpage)

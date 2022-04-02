@@ -178,7 +178,12 @@
             dataType: "json",
             url: url,
             success: function (data) {   // success callback function
-                $("#weight").text(data.weighing)
+                if(data==null){
+                    $("#weight").text("-")
+                }else{
+                    $("#weight").text(data.weighing)
+                }
+                
             }
         })
     }

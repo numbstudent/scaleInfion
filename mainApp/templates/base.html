@@ -793,7 +793,7 @@
                 "searching": true,
                 "ordering": true,
                 "info": false,
-                "autoWidth": true,
+                "autoWidth": false,
                 "responsive": true,
             });
             $('.datepick').daterangepicker({
@@ -811,6 +811,16 @@
 
             $('.datepick').on('cancel.daterangepicker', function (ev, picker) {
                 $(this).val('');
+            });
+
+            $(function () {
+                var hash = window.location.hash;
+                hash && $('a[href="' + hash + '"]').tab('show');
+                $('ul.nav.nav-pills a').click(function (e) {
+                    $(this).tab('show');
+                    $('body').scrollTop();
+                    window.location.hash = this.hash;
+                });
             });
         </script>
         <script>

@@ -96,7 +96,7 @@ def ScaleView(request):
     obj = Logging.objects.latest('id')
 
     if request.method == "GET":
-        curtime = datetime.now() - timedelta(seconds=1)
+        curtime = datetime.now() - timedelta(seconds=2)
         data = Logging.objects.filter(datetime__gte=curtime).order_by('-id').values('id','weighing').first()
         return JsonResponse(data, safe=False, status=200)
 

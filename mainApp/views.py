@@ -53,7 +53,7 @@ def RegisterView(request, batchno=None):
             productid = Product.objects.filter(code=code).first()
             boxexists = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).exists()
             boxkosongexists = Register.objects.filter(product=productid, batchno=batchno, status=0).exists()
-            if boxexists:
+            if boxexists or int(boxno) < 1:
                 return JsonResponse({"message": "Box sudah diinput. Hapus box terlebih dahulu untuk mereset."}, status=400)
             elif boxkosongexists:
                 return JsonResponse({"message": "Box kosong harus ditimbang terlebih dahulu."}, status=400)
@@ -70,7 +70,7 @@ def RegisterView(request, batchno=None):
         batchno = request.GET.get('batchno')
         code = request.GET.get('code')
         if batchno:
-            insertWeight(batchno) 
+            insertsuccess = insertWeight(batchno) 
             data = Register.objects.annotate(product_name=F('product__name'),iot_weight=F('weight__weighing'))\
             .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight')\
             .filter(batchno=batchno, product__code=code).order_by('-createdon')
@@ -89,9 +89,9 @@ def RegisterView(request, batchno=None):
 def ScaleView(request):
     #app_test
     # generating weight for simulating without real scale
-    # import random
-    # b = Logging(lot='1', status='1', weighing=random.uniform(-10, 10))
-    # b.save()
+    import random
+    b = Logging(lot='1', status='1', weighing=random.uniform(-10, 200))
+    b.save()
 
     obj = Logging.objects.latest('id')
 
@@ -101,15 +101,26 @@ def ScaleView(request):
         return JsonResponse(data, safe=False, status=200)
 
 def insertWeight(batchno):
-    newweight = Logging.objects.all().order_by('-id').values_list('id', 'weighing')
+    curtime = datetime.now() - timedelta(seconds=5)
+    newweight = Logging.objects.filter(datetime__gte=curtime).order_by('-id').values_list('id', 'weighing')
     unweighted = Register.objects.filter(batchno=batchno, status=0)
     if newweight.exists() and unweighted.exists():
         if newweight.first()[1] > 0:
             weightid = newweight.first()[0]
             obj = unweighted.first()
-            obj.status = 1
-            obj.weight_id = weightid
-            obj.save()
+            print(obj.product.minweight)
+            print(obj.product.maxweight)
+            if newweight.first()[1] >= obj.product.minweight and newweight.first()[1] <= obj.product.maxweight:
+                obj.status = 1
+                obj.weight_id = weightid
+                obj.save()
+                print("Data memenuhi syarat beban.")
+                return True
+            else:
+                print("Error: Data tidak memenuhi syarat beban. (weight=" +
+                      newweight.first()[1]+",min="+obj.product.minweight+"max="+obj.product.maxweight)
+                return False
+
 
 
 @login_required(login_url=loginpage)
@@ -158,6 +169,8 @@ def editProduct(request, id):
         if form.is_valid():
             obj.name = form.cleaned_data.get('name')
             obj.code = form.cleaned_data.get('code')
+            obj.minweight = form.cleaned_data.get('minweight')
+            obj.maxweight = form.cleaned_data.get('maxweight')
             obj.status = form.cleaned_data.get('status')
             obj.save()
             context['message'] = "Data berhasil disimpan."

@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'secureapp',
     'mainApp',
     'crispy_forms',
-    'weasyprint',
+    # 'weasyprint',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

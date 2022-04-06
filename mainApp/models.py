@@ -6,6 +6,8 @@ STATUS_CHOICES = ((True, 'Aktif'), (False, 'Tidak Aktif'))
 class Product(models.Model):
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=30, unique=True)
+    minweight = models.FloatField()
+    maxweight = models.FloatField()
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
     status = models.BooleanField(default=True,choices=STATUS_CHOICES)

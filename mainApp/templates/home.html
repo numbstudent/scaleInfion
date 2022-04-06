@@ -13,12 +13,13 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">BOX NO</h3>
+                        <h3 class="card-title">INPUT QR</h3>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-lg-12 display-4">
-                                <input class="form-control" type="text" id="qr" value="CHLON0.5%-|ICLG19050|2|INF|BG|">
+                                <input class="form-control" type="text" id="qr">
+                                <!-- placeholder="CHLON0.5%-|ICLG19050|2|INF|BG|" -->
                                 <input type="hidden" id="code">
                                 <input type="hidden" id="batchno">
                                 <!-- <input class="form-control" type="text" id="code">
@@ -52,28 +53,6 @@
         </div>
 
 
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <select name="" id="" class="form-control">
-                        <option value="">---</option>
-                        <option value="">---</option>
-                        <option value="">---</option>
-                        <option value="">---</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="row">
-                    <div class="col-md-6">
-                        <button class="btn btn-block btn-success form-control">PILIH HEADER</button>
-                    </div>
-                    <div class="col-md-6">
-                        <button class="btn btn-block btn-success form-control">CETAK BATCH</button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
     <div class="col-md-6">
         <div class="card">
@@ -92,6 +71,10 @@
 <script>
     var url = "{% url 'register' %}"
     $("#submitBoxno").click(function () {
+        boxSubmit()
+    })
+
+    function boxSubmit() {
         var qr = $("#qr").val().split("|");
         var code = qr[0]
         var batchno = qr[1]
@@ -104,10 +87,10 @@
         }
         // alert(code+" "+batchno+" "+boxno)
         var data = {
-            code:code,
-            batchno:batchno,
-            boxno:boxno,
-            status:"0"
+            code: code,
+            batchno: batchno,
+            boxno: boxno,
+            status: "0"
         }
         $.ajax({
             type: "POST",
@@ -115,19 +98,19 @@
             url: url,
             data: data,
             success: function (data) {   // success callback function
-                
+
                 console.log(data)
             },
             error: function (jqXhr, textStatus, errorMessage) { // error callback 
                 alert(jqXhr.responseJSON.message)
             },
             complete: function (data) {
-                if ((batchno != null || batchno != "") && (code != null || code != "")){
+                if ((batchno != null || batchno != "") && (code != null || code != "")) {
                     updateBoxList()
                 }
             }
         })
-    })
+    }
 
     function updateBoxList() {
         var batchno = $("#batchno").val()
@@ -205,5 +188,13 @@
             }
         })
     })
+
+    $(document).on('keypress', function (e) {
+        if (e.which == 13 && e.target.id == 'qr') {
+            boxSubmit()
+            $('#' + e.target.id).val("")
+        }
+        $('#qr').focus()
+    });
 </script>
 {% endblock %}

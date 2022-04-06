@@ -7,7 +7,7 @@ import datetime
 class ProductForm(ModelForm):
     class Meta:
         model = Product
-        fields = ['id','name', 'code', 'status']
+        fields = ['id', 'name', 'code', 'minweight', 'maxweight', 'status']
         widgets = {
             'status': forms.RadioSelect
         }

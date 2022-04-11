@@ -7,9 +7,14 @@ import datetime
 class ProductForm(ModelForm):
     class Meta:
         model = Product
-        fields = ['id', 'name', 'code', 'minweight', 'maxweight', 'status']
+        fields = ['id', 'name', 'code', 'minweight', 'maxweight', 'standardweight', 'status']
         widgets = {
             'status': forms.RadioSelect
+        }
+        labels = {
+            "minweight": "Minimum Weight",
+            "maxweight": "Maximum Weight",
+            "standardweight": "Standard Weight",
         }
 
 class RegisterForm(ModelForm):
@@ -52,7 +57,9 @@ class ReportTitleForm(ModelForm):
 class ReportBatchForm(forms.Form):
     import datetime
     productid = ProductModelChoiceField(
-        queryset=Product.objects.all(), required=False, label="Product")
+        queryset=Product.objects.all(), required=False, label="Product", widget=forms.Select(attrs={
+            'class': 'form-control select2bs4'
+    }))
     # batchno = forms.ModelChoiceField(queryset=Register.objects.values_list('batchno',flat=True).distinct(), required=False, label="Batch No")
     batchno = forms.CharField(required=False, label="Batch No")
     inputdatefrom = forms.DateField(required=False, label="From Date", widget=forms.DateInput(attrs={
@@ -64,7 +71,9 @@ class ReportBatchForm(forms.Form):
 
 class UploadBatchForm(forms.Form):
     productid = ProductModelChoiceField(
-        queryset=Product.objects.all(), required=False, label="Product")
+        queryset=Product.objects.all(), required=False, label="Product", widget=forms.Select(attrs={
+            'class': 'form-control select2bs4'
+        }))
     batchno = forms.CharField(required=False, label="Batch No")
     file = forms.FileField()
 

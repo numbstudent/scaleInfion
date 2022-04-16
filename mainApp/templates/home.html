@@ -13,7 +13,7 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">INPUT QR</h3>
+                        <h3 class="card-title">{% if state.status %}{{state.product}}{% else %}Set Weighing State terlebih dahulu!{% endif %}</h3>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -89,8 +89,7 @@
         var data = {
             code: code,
             batchno: batchno,
-            boxno: boxno,
-            status: "0"
+            boxno: boxno
         }
         $.ajax({
             type: "POST",

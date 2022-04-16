@@ -6,6 +6,7 @@ urlpatterns = [
     path('', views.index, name='weighing'),
     path('product', views.ProductView, name='product'),
     path('scale', views.ScaleView, name='scale'),
+    path('weighingstate', views.viewWeighingState, name='weighingstate'),
     path('register', views.RegisterView, name='register'),
     path('register/<str:batchno>', views.RegisterView, name='registerbatchno'),
 

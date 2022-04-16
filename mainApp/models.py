@@ -8,6 +8,7 @@ class Product(models.Model):
     code = models.CharField(max_length=30, unique=True)
     minweight = models.FloatField()
     maxweight = models.FloatField()
+    standardweight = models.FloatField()
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
     status = models.BooleanField(default=True,choices=STATUS_CHOICES)
@@ -29,7 +30,7 @@ class Register(models.Model):
     product = models.ForeignKey(Product, on_delete=models.RESTRICT)
     batchno = models.CharField(max_length=15)
     boxno = models.IntegerField()
-    status = models.IntegerField()
+    status = models.IntegerField(null=True, default=None)
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
     weight = models.ForeignKey(Logging, null=True, on_delete=models.DO_NOTHING)
@@ -77,5 +78,11 @@ class UploadedRegister(models.Model):
     boxno = models.IntegerField()
     weight = models.FloatField()
     measuredate = models.DateTimeField(null=True, blank=True)
+    createdon = models.DateTimeField(auto_now_add=True)
+    updatedon = models.DateTimeField(auto_now=True)
+
+class WeighingState(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.RESTRICT)
+    status = models.BooleanField(default=True,choices=STATUS_CHOICES)
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)

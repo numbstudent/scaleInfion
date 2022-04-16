@@ -20,7 +20,7 @@ class ProductForm(ModelForm):
 class RegisterForm(ModelForm):
     class Meta:
         model = Register
-        fields = ['batchno', 'boxno', 'status']
+        fields = ['batchno', 'boxno']
 
 class LoggingForm(ModelForm):
     class Meta:
@@ -105,4 +105,12 @@ class ReportBodyForm(ModelForm):
             "effectivedate": forms.DateInput(attrs={
                 'class': 'form-control datepick'
             }),
+        }
+
+class WeighingStateForm(ModelForm):
+    class Meta:
+        model = WeighingState
+        fields = ['id', 'product','status']
+        widgets = {
+            'status': forms.RadioSelect
         }

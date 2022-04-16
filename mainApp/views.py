@@ -20,7 +20,9 @@ loginpage = 'login'
 
 @login_required(login_url=loginpage)
 def index(request):
-    return render(request, 'home.html')
+    context = {}
+    context ['state'] = WeighingState.objects.get(id=1)
+    return render(request, 'home.html', context=context)
 
 
 def is_ajax(request):
@@ -53,6 +55,10 @@ def RegisterView(request, batchno=None):
             productid = Product.objects.filter(code=code).first()
             boxexists = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).exists()
             boxkosongexists = Register.objects.filter(product=productid, batchno=batchno, status=0).exists()
+            weighingstate = WeighingState.objects.filter(id=1, status=True, product=productid).exists()
+            print(weighingstate)
+            if not weighingstate:
+                return JsonResponse({"message": "Box tidak sesuai dengan Weighing State."}, status=400)
             if boxexists or int(boxno) < 1:
                 return JsonResponse({"message": "Box sudah diinput. Hapus box terlebih dahulu untuk mereset."}, status=400)
             elif boxkosongexists:
@@ -103,22 +109,25 @@ def ScaleView(request):
 def insertWeight(batchno):
     curtime = datetime.now() - timedelta(seconds=5)
     newweight = Logging.objects.filter(datetime__gte=curtime).order_by('-id').values_list('id', 'weighing')
-    unweighted = Register.objects.filter(batchno=batchno, status=0)
+    unweighted = Register.objects.filter(batchno=batchno, status=None)
     if newweight.exists() and unweighted.exists():
         if newweight.first()[1] > 0:
             weightid = newweight.first()[0]
             obj = unweighted.first()
-            print(obj.product.minweight)
-            print(obj.product.maxweight)
+            # print(obj.product.minweight)
+            # print(obj.product.maxweight)
             if newweight.first()[1] >= obj.product.minweight and newweight.first()[1] <= obj.product.maxweight:
-                obj.status = 1
+                obj.status = True
                 obj.weight_id = weightid
                 obj.save()
-                print("Data memenuhi syarat beban.")
+                # print("Data memenuhi syarat beban.")
                 return True
             else:
-                print("Error: Data tidak memenuhi syarat beban. (weight=" +
-                      newweight.first()[1]+",min="+obj.product.minweight+"max="+obj.product.maxweight)
+                obj.status = False
+                obj.weight_id = weightid
+                obj.save()
+                # print("Error: Data tidak memenuhi syarat beban. (weight=" +
+                #       str(newweight.first()[1])+",min="+str(obj.product.minweight)+"max="+str(obj.product.maxweight))
                 return False
 
 
@@ -487,3 +496,22 @@ def deleteUploadBatch(request, id):
         error_message = 'Data ini tidak dapat dihapus karena sedang digunakan oleh data lain. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>'
         return HttpResponse(error_message)
     return redirect('viewuploadbatch')
+
+@login_required(login_url=loginpage)
+def viewWeighingState(request):
+    context = {}
+    context['action'] = 'view'
+    context['data'] = WeighingState.objects.filter(id=1)
+    if request.method == "POST":
+        form = WeighingStateForm(request.POST)
+        context['form'] = form
+        if form.is_valid():
+            obj = WeighingState.objects.get(id=1)
+            obj.product = form.cleaned_data.get('product')
+            obj.status = form.cleaned_data.get('status')
+            obj.save()
+            return redirect('weighingstate')
+    else:
+        context['form'] = WeighingStateForm()
+
+    return render(request, 'weighingstate.html', context=context)

@@ -18,16 +18,27 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'viewdepartment'%}" class="nav-link">
-                        <i class="far fa-circle nav-icon"></i>
-                        <p>Department</p>
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-chevron-right"></i>
+                        <p>
+                            Master Data
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{% url 'viewreporttitle'%}" class="nav-link">
-                        <i class="far fa-circle nav-icon"></i>
-                        <p>Report Title</p>
-                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'viewdepartment'%}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Department</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'viewreporttitle'%}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Report Title</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </li>
@@ -44,6 +55,14 @@
                     <a href="{% url 'weighing'%}" class="nav-link">
                         <i class="far fa-circle nav-icon"></i>
                         <p>Weighing</p>
+                    </a>
+                </li>
+            </ul>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+                    <a href="{% url 'history'%}" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Weighing History</p>
                     </a>
                 </li>
             </ul>

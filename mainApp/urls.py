@@ -10,6 +10,8 @@ urlpatterns = [
     path('endbatch', views.viewEndBatch, name='endbatch'),
     path('register', views.RegisterView, name='register'),
     path('register/<str:batchno>', views.RegisterView, name='registerbatchno'),
+    path('history', views.viewHistory, name='history'),
+
 
     path('master/product', views.viewProduct, name='viewproduct'),
     path('master/delete-product/<int:id>', views.deleteProduct, name='deleteproduct'),

@@ -37,6 +37,9 @@
                                         <tr>
                                             <th>Name</th>
                                             <th>Code</th>
+                                            <th>Std. Weight</th>
+                                            <th>Min. Weight</th>
+                                            <th>Max. Weight</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -45,6 +48,9 @@
                                         <tr>
                                             <td>{{row.name}}</td>
                                             <td>{{row.code}}</td>
+                                            <td>{{row.standardweight}}</td>
+                                            <td>{{row.minweight}}</td>
+                                            <td>{{row.maxweight}}</td>
                                             <td><a class="btn btn-secondary" href="{% url 'editproduct' row.id %}"><i
                                                         class="fas fa-edit"></i></a>
                                                 <a class="btn btn-danger" href="{% url 'deleteproduct' row.id %}"

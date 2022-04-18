@@ -21,7 +21,7 @@ loginpage = 'login'
 @login_required(login_url=loginpage)
 def index(request):
     context = {}
-    context ['state'] = WeighingState.objects.get(id=1)
+    context ['state'] = WeighingState.objects.filter(id=1).first()
     return render(request, 'home.html', context=context)
 
 
@@ -75,14 +75,17 @@ def RegisterView(request, batchno=None):
     elif is_ajax(request) and request.method == "GET":
         batchno = request.GET.get('batchno')
         code = request.GET.get('code')
+        insertsuccess = "True"
         if batchno:
-            insertsuccess = insertWeight(batchno) 
+            box = insertWeight(batchno)
+            if not box['status']:
+                insertsuccess = "False"
             data = Register.objects.annotate(product_name=F('product__name'),iot_weight=F('weight__weighing'))\
-            .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight')\
+            .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight','status')\
             .filter(batchno=batchno, product__code=code).order_by('-createdon')
         else:
             data = Register.objects.all().values()
-        return JsonResponse(list(data), safe=False, status=200)
+        return JsonResponse({"insertsuccess":insertsuccess,"id":box['id'], "batch":list(data)}, safe=False, status=200)
 
     elif is_ajax(request) and request.method == "PUT":
         body = json.loads(request.body)
@@ -96,7 +99,7 @@ def ScaleView(request):
     #app_test
     # generating weight for simulating without real scale
     import random
-    b = Logging(lot='1', status='1', weighing=random.uniform(-10, 200))
+    b = Logging(lot='1', status='1', weighing=random.uniform(4.450, 4.500))
     b.save()
 
     obj = Logging.objects.latest('id')
@@ -108,6 +111,9 @@ def ScaleView(request):
 
 def insertWeight(batchno):
     # curtime = datetime.now() - timedelta(seconds=5)
+    measuredbox = {}
+    measuredbox['status']=True
+    measuredbox['id'] = None
     newweight = Logging.objects.all().\
         order_by('-id').values_list('id', 'weighing')
         # .filter(datetime__gte=curtime)\
@@ -116,25 +122,28 @@ def insertWeight(batchno):
     if unweighted.exists():
         newweight = newweight.filter(datetime__gte=unweighted.values().first()['createdon'])
     if newweight.exists() and unweighted.exists():
-        if newweight.first()[0] > 0:
+        if newweight.first()[1] > 0:
             weightid = newweight.first()[0]
             obj = unweighted.first()
-            # print(obj.product.minweight)
-            # print(obj.product.maxweight)
-            if newweight.first()[0] >= obj.product.minweight and newweight.first()[0] <= obj.product.maxweight:
+            print(obj.product.minweight)
+            print(obj.product.maxweight)
+            print(newweight.first()[1])
+            if newweight.first()[1] >= obj.product.minweight and newweight.first()[1] <= obj.product.maxweight:
                 obj.status = True
                 obj.weight_id = weightid
                 obj.save()
+                measuredbox['status'] = True
+                measuredbox['id'] = weightid
                 # print("Data memenuhi syarat beban.")
-                return True
             else:
                 obj.status = False
                 obj.weight_id = weightid
                 obj.save()
+                measuredbox['status'] = False
+                measuredbox['id'] = weightid
                 # print("Error: Data tidak memenuhi syarat beban. (weight=" +
                 #       str(newweight.first()[1])+",min="+str(obj.product.minweight)+"max="+str(obj.product.maxweight))
-                return False
-
+    return measuredbox
 
 
 @login_required(login_url=loginpage)
@@ -302,10 +311,44 @@ def editReportBody(request, id):
 
 
 @login_required(login_url=loginpage)
+def viewHistory(request):
+    context = {}
+    datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
+        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date', 'status').order_by('-input_date')
+    hasFilter = False
+    if request.method == "POST":
+        form = ReportBatchForm(request.POST)
+        product = request.POST.get('productid')
+        batchno = request.POST.get('batchno')
+        inputdatefrom = request.POST.get('inputdatefrom')
+        inputdateto = request.POST.get('inputdateto')
+        context['form'] = list(form)
+        if product:
+            datamodel = datamodel.filter(product=product)
+        if batchno:
+            datamodel = datamodel.filter(batchno=batchno)
+        if inputdatefrom:
+            datamodel = datamodel.filter(weight__datetime__gte=inputdatefrom)
+        if inputdateto:
+            inputdateto = inputdateto + " 23:59"
+            datamodel = datamodel.filter(weight__datetime__lte=inputdateto)
+        if product or batchno or inputdatefrom or inputdateto:
+            hasFilter = True
+    else:
+        context['form'] = list(ReportBatchForm())
+    if hasFilter:
+       context['data'] = datamodel
+    else:
+       context['data'] = datamodel[:100]
+    return render(request, 'history.html', context=context)
+
+
+@login_required(login_url=loginpage)
 def viewReportBatch(request):
     context = {}
     datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
         .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date').order_by('-input_date')
+    hasFilter = False
     if request.method == "POST":
         form = ReportBatchForm(request.POST)
         product = request.POST.get('productid')
@@ -322,15 +365,22 @@ def viewReportBatch(request):
         if inputdateto:
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(weight__datetime__lte=inputdateto)
+        if product or batchno or inputdatefrom or inputdateto:
+            hasFilter = True
     else:
-        context['form'] = ReportBatchForm()
-    context['data'] = datamodel[:100]
+        context['form'] = list(ReportBatchForm())
+    if hasFilter:
+       context['data'] = datamodel
+    else:
+       context['data'] = datamodel[:100]
     return render(request, 'report_batch.html', context=context)
+
 
 @csrf_exempt
 def reportBatchCSV(request):
     #fetch data
     context = {}
+    hasFilter = False
     datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
         .order_by('-input_date')
     if request.method == "GET":
@@ -349,8 +399,12 @@ def reportBatchCSV(request):
         if inputdateto:
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(weight__datetime__lte=inputdateto)
-    context['data'] = datamodel[:100]
-
+        if product or batchno or inputdatefrom or inputdateto:
+            hasFilter = True
+    if hasFilter:
+       context['data'] = datamodel
+    else:
+       context['data'] = datamodel[:100]
     #writing to csv
     output = []
     response = HttpResponse(
@@ -362,7 +416,8 @@ def reportBatchCSV(request):
     #Table Header
     writer.writerow(['Product Name', 'Batch No', 'Box No', 'Weight', 'Date'])
     for record in query_set:
-        output.append([record.product_name, record.batchno, record.boxno, record.iot_weight, record.input_date])
+        output.append([record.product_name, record.batchno,
+                      record.boxno, record.iot_weight, record.input_date])
     #Table Data
     writer.writerows(output)
     return response
@@ -507,14 +562,19 @@ def viewWeighingState(request): #startbatch
     context = {}
     context['action'] = 'view'
     context['data'] = WeighingState.objects.filter(id=1, status=True)
-    noState = WeighingState.objects.filter(id=1, status=False).exists()
-    if noState and request.method == "POST":
+    noState = WeighingState.objects.filter(id=1, status=True).exists()
+    if not noState and request.method == "POST":
         form = WeighingStateForm(request.POST)
         context['form'] = form
         if form.is_valid():
-            obj = WeighingState.objects.get(id=1)
-            obj.product = form.cleaned_data.get('product')
-            obj.batchno = form.cleaned_data.get('batchno')
+            dataexist = WeighingState.objects.filter(id=1).exists()
+            if dataexist:
+                obj = WeighingState.objects.get(id=1)
+                obj.product = form.cleaned_data.get('product')
+                obj.batchno = form.cleaned_data.get('batchno')
+            else:
+                obj = WeighingState(id=1, product=form.cleaned_data.get(
+                    'product'), batchno=form.cleaned_data.get('batchno'))
             # obj.status = form.cleaned_data.get('status')
             obj.status = 1
             obj.save()

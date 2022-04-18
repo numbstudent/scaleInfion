@@ -6,7 +6,30 @@
 {% include "sidebar.html" %}
 {% endblock %}
 {% block content %}
-
+<div class="modal fade" id="rejectModal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Reject Box</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="rejectbox">Berat box tidak memenuhi standar berat produk. Pilih status untuk box ini:</label>
+                <p id="rejectedbox"></p>
+                <select class="form-control" name="rejectbox" id="rejectbox">
+                    <option value="reject">Reject</option>
+                    <option value="lastbox">Last Box</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Pilih</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-md-6">
         <div class="row">
@@ -123,10 +146,18 @@
                 url: url,
                 success: function (data) {   // success callback function
                     var html = '';
-                    // console.log(data)
-                    for (const row in data) {
-                        record = data[row]
-                        weight = record.iot_weight == null? '-': record.iot_weight
+                    console.log(data)
+                    for (const row in data.batch) {
+                        var record = data.batch[row]
+                        var weight = record.iot_weight == null? '-': record.iot_weight
+                        var status = ""
+                        if (record.status==0) {
+                            status = 'Reject'
+                        } else if (record.status==2){
+                            status = 'Last Box'
+                        } else {
+                            status = 'Ok'
+                        } 
                         html += '\
                         <li class="item">\
                             <div class="product-img">\
@@ -135,13 +166,17 @@
                                 </button>\
                             </div>\
                             <div class="product-info">\
-                                <a href="javascript:void(0)" class="product-title">'+ record.product_name +'\
+                                <a href="javascript:void(0)" class="product-title">'+ status +'\
                                     <span class="display-4 float-right">'+ weight+' g </span></a>\
                                 <span class="product-description">\
-                                    BATCH NO. '+record.batchno+' BOX NO. '+record.boxno+'\
+                                    BOX NO. '+record.boxno+'\
                                 </span>\
                             </div>\
                         </li>'
+                    }
+                    if(data.insertsuccess == "False"){
+                        // $("#rejectedbox").text(data.)
+                        $("#rejectModal").modal('show')
                     }
                     $('#batchhistorylist').html(html)
                 }

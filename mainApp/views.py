@@ -54,11 +54,11 @@ def RegisterView(request, batchno=None):
             batchno = request.POST.get('batchno')
             productid = Product.objects.filter(code=code).first()
             boxexists = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).exists()
-            boxkosongexists = Register.objects.filter(product=productid, batchno=batchno, status=0).exists()
-            weighingstate = WeighingState.objects.filter(id=1, status=True, product=productid).exists()
+            boxkosongexists = Register.objects.filter(product=productid, batchno=batchno, status=None).exists()
+            weighingstate = WeighingState.objects.filter(id=1, status=True, batchno=batchno, product=productid).exists()
             print(weighingstate)
             if not weighingstate:
-                return JsonResponse({"message": "Box tidak sesuai dengan Weighing State."}, status=400)
+                return JsonResponse({"message": "Box tidak sesuai dengan Batch."}, status=400)
             if boxexists or int(boxno) < 1:
                 return JsonResponse({"message": "Box sudah diinput. Hapus box terlebih dahulu untuk mereset."}, status=400)
             elif boxkosongexists:
@@ -107,16 +107,21 @@ def ScaleView(request):
         return JsonResponse(data, safe=False, status=200)
 
 def insertWeight(batchno):
-    curtime = datetime.now() - timedelta(seconds=5)
-    newweight = Logging.objects.filter(datetime__gte=curtime).order_by('-id').values_list('id', 'weighing')
+    # curtime = datetime.now() - timedelta(seconds=5)
+    newweight = Logging.objects.all().\
+        order_by('-id').values_list('id', 'weighing')
+        # .filter(datetime__gte=curtime)\
+    
     unweighted = Register.objects.filter(batchno=batchno, status=None)
+    if unweighted.exists():
+        newweight = newweight.filter(datetime__gte=unweighted.values().first()['createdon'])
     if newweight.exists() and unweighted.exists():
-        if newweight.first()[1] > 0:
+        if newweight.first()[0] > 0:
             weightid = newweight.first()[0]
             obj = unweighted.first()
             # print(obj.product.minweight)
             # print(obj.product.maxweight)
-            if newweight.first()[1] >= obj.product.minweight and newweight.first()[1] <= obj.product.maxweight:
+            if newweight.first()[0] >= obj.product.minweight and newweight.first()[0] <= obj.product.maxweight:
                 obj.status = True
                 obj.weight_id = weightid
                 obj.save()
@@ -498,20 +503,44 @@ def deleteUploadBatch(request, id):
     return redirect('viewuploadbatch')
 
 @login_required(login_url=loginpage)
-def viewWeighingState(request):
+def viewWeighingState(request): #startbatch
     context = {}
     context['action'] = 'view'
-    context['data'] = WeighingState.objects.filter(id=1)
-    if request.method == "POST":
+    context['data'] = WeighingState.objects.filter(id=1, status=True)
+    noState = WeighingState.objects.filter(id=1, status=False).exists()
+    if noState and request.method == "POST":
         form = WeighingStateForm(request.POST)
         context['form'] = form
         if form.is_valid():
             obj = WeighingState.objects.get(id=1)
             obj.product = form.cleaned_data.get('product')
-            obj.status = form.cleaned_data.get('status')
+            obj.batchno = form.cleaned_data.get('batchno')
+            # obj.status = form.cleaned_data.get('status')
+            obj.status = 1
             obj.save()
-            return redirect('weighingstate')
+            return redirect('startbatch')
     else:
         context['form'] = WeighingStateForm()
 
     return render(request, 'weighingstate.html', context=context)
+
+@login_required(login_url=loginpage)
+def viewEndBatch(request): #endbatch
+    context = {}
+    context['action'] = 'view'
+    context['data'] = WeighingState.objects.filter(id=1, status=False)
+    noState = WeighingState.objects.filter(id=1, status=False).exists()
+    if not noState and request.method == "POST":
+        form = WeighingStateForm(request.POST)
+        context['form'] = form
+        if form.is_valid():
+            obj = WeighingState.objects.get(id=1)
+            obj.product = form.cleaned_data.get('product')
+            # obj.status = form.cleaned_data.get('status')
+            obj.status = 0
+            obj.save()
+            return redirect('endbatch')
+    else:
+        context['form'] = WeighingStateForm()
+
+    return render(request, 'end_batch.html', context=context)

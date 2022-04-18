@@ -110,7 +110,7 @@ class ReportBodyForm(ModelForm):
 class WeighingStateForm(ModelForm):
     class Meta:
         model = WeighingState
-        fields = ['id', 'product','status']
+        fields = ['id', 'product','batchno']
         widgets = {
             'status': forms.RadioSelect
         }

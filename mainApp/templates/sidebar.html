@@ -21,7 +21,7 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-chevron-right"></i>
                         <p>
-                            Master Data
+                            Report
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
@@ -57,37 +57,40 @@
                         <p>Weighing</p>
                     </a>
                 </li>
-            </ul>
-            <ul class="nav nav-treeview">
                 <li class="nav-item">
                     <a href="{% url 'history'%}" class="nav-link">
                         <i class="far fa-circle nav-icon"></i>
                         <p>Weighing History</p>
                     </a>
                 </li>
-            </ul>
-            <ul class="nav nav-treeview">
                 <li class="nav-item">
-                    <a href="{% url 'viewuploadbatch'%}" class="nav-link">
-                        <i class="far fa-circle nav-icon"></i>
-                        <p>Upload Batch</p>
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-chevron-right"></i>
+                        <p>
+                            Batch
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
                     </a>
-                </li>
-            </ul>
-            <ul class="nav nav-treeview">
-                <li class="nav-item">
-                    <a href="{% url 'startbatch'%}" class="nav-link">
-                        <i class="far fa-circle nav-icon"></i>
-                        <p>Start Batch</p>
-                    </a>
-                </li>
-            </ul>
-            <ul class="nav nav-treeview">
-                <li class="nav-item">
-                    <a href="{% url 'endbatch'%}" class="nav-link">
-                        <i class="far fa-circle nav-icon"></i>
-                        <p>End Batch</p>
-                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'viewuploadbatch'%}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Upload Batch</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'startbatch'%}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Start Batch</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'endbatch'%}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>End Batch</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </li>

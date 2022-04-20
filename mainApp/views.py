@@ -133,14 +133,14 @@ def insertWeight(batchno):
                 obj.weight_id = weightid
                 obj.save()
                 measuredbox['status'] = True
-                measuredbox['id'] = weightid
+                measuredbox['id'] = obj.id
                 # print("Data memenuhi syarat beban.")
             else:
-                obj.status = False
+                obj.status = None
                 obj.weight_id = weightid
                 obj.save()
-                measuredbox['status'] = False
-                measuredbox['id'] = weightid
+                measuredbox['status'] = None
+                measuredbox['id'] = obj.id
                 # print("Error: Data tidak memenuhi syarat beban. (weight=" +
                 #       str(newweight.first()[1])+",min="+str(obj.product.minweight)+"max="+str(obj.product.maxweight))
     return measuredbox
@@ -601,6 +601,33 @@ def viewEndBatch(request): #endbatch
             obj.save()
             return redirect('endbatch')
     else:
-        context['form'] = WeighingStateForm()
+        activestate = WeighingState.objects.filter(id=1).values('product','batchno').first()
+        batchno = activestate['batchno']
+        productid = activestate['product']
+        form = WeighingStateForm()
+        form.fields["product"].queryset = Product.objects.filter(id=1)
+        form.fields["batchno"].initial = batchno
+        context['form'] = form
 
     return render(request, 'end_batch.html', context=context)
+
+@csrf_exempt
+def RejectBox(request):
+    if request.method == "POST":
+        form = RejectForm(request.POST)
+        id = request.POST.get('id')
+        status = request.POST.get('status')
+        print(request.POST)
+        if form.is_valid():
+            boxexists = Register.objects.filter(id=id).exists()
+            if not boxexists:
+                return JsonResponse({"message": "Box tidak ditemukan."}, status=400)
+            else:
+                instance = Register.objects.filter(id=id).first()
+                instance.status = status
+                instance.save()
+                return JsonResponse({"message": "Data berhasil diinput"}, status=200)
+        else:
+            return JsonResponse({"message": "Isikan parameter."}, status=400)
+    else:
+        return JsonResponse({"message": "Bad Request."}, status=400)

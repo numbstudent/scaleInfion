@@ -11,6 +11,7 @@ urlpatterns = [
     path('register', views.RegisterView, name='register'),
     path('register/<str:batchno>', views.RegisterView, name='registerbatchno'),
     path('history', views.viewHistory, name='history'),
+    path('rejectbox', views.RejectBox, name='rejectbox'),
 
 
     path('master/product', views.viewProduct, name='viewproduct'),

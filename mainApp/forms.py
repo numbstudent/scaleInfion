@@ -22,6 +22,11 @@ class RegisterForm(ModelForm):
         model = Register
         fields = ['batchno', 'boxno']
 
+class RejectForm(ModelForm):
+    class Meta:
+        model = Register
+        fields = ['id']
+
 class LoggingForm(ModelForm):
     class Meta:
         model = Logging

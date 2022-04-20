@@ -17,15 +17,12 @@
                 </button>
             </div>
             <div class="modal-body">
-                <label for="rejectbox">Berat box tidak memenuhi standar berat produk. Pilih status untuk box ini:</label>
-                <p id="rejectedbox"></p>
-                <select class="form-control" name="rejectbox" id="rejectbox">
-                    <option value="reject">Reject</option>
-                    <option value="lastbox">Last Box</option>
-                </select>
+                <label for="rejectbox">Berat box tidak memenuhi standar berat produk. <br>Pilih status untuk box ini:</label>
+                <input class="form-control" type="hidden" id="rejectboxid">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Pilih</button>
+                <button type="button" class="btn btn-primary float-left" id="btnlastbox" data-dismiss="modal">Last Box</button>
+                <button type="button" class="btn btn-primary float-right" id="btnreject" data-dismiss="modal">Reject</button>
             </div>
         </div>
     </div>
@@ -36,7 +33,7 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">{% if state.status %}{{state.product}}{% else %}Set Weighing State terlebih dahulu!{% endif %}</h3>
+                        <h3 class="card-title">{% if state.status %}{{state.product}}{% else %}Set Batch State terlebih dahulu!{% endif %}</h3>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -80,7 +77,7 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">NO. BATCH: {{state.batchno}} </h3>
+                <h3 class="card-title">{% if state.status %}NO. BATCH: {{state.batchno}}{% else %}Set Batch State terlebih dahulu!{% endif %} </h3>
             </div>
             <div class="card-body" style="overflow-y: scroll; height:500px;">
                 <ul class="products-list product-list-in-card pl-2 pr-2" id="batchhistorylist">
@@ -152,11 +149,11 @@
                         var weight = record.iot_weight == null? '-': record.iot_weight
                         var status = ""
                         if (record.status==0) {
-                            status = 'Reject'
+                            status = 'REJECT'
                         } else if (record.status==2){
-                            status = 'Last Box'
+                            status = 'LAST BOX'
                         } else {
-                            status = 'Ok'
+                            status = 'OK'
                         } 
                         html += '\
                         <li class="item">\
@@ -176,6 +173,7 @@
                     }
                     if(data.insertsuccess == "False"){
                         // $("#rejectedbox").text(data.)
+                        $("#rejectboxid").val(data.id)
                         $("#rejectModal").modal('show')
                     }
                     $('#batchhistorylist').html(html)
@@ -223,6 +221,41 @@
         })
     })
 
+    $("#btnlastbox").click(function () {
+        var rejectboxid = $("#rejectboxid").val();
+        var url = "{% url 'rejectbox' %}"
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: url,
+            data: { "id": rejectboxid, "status":2 },
+            success: function (data) {   // success callback function
+                alert(data.message)
+                updateBoxList()
+            },
+            error: function (jqXhr, textStatus, errorMessage) { // error callback 
+                alert(jqXhr.responseJSON.message)
+            },
+        })
+    })
+
+    $("#btnreject").click(function () {
+        var rejectboxid = $("#rejectboxid").val();
+        var url = "{% url 'rejectbox' %}"
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: url,
+            data: { "id": rejectboxid, "status": 0 },
+            success: function (data) {   // success callback function
+                alert(data.message)
+                updateBoxList()
+            },
+            error: function (jqXhr, textStatus, errorMessage) { // error callback 
+                alert(jqXhr.responseJSON.message)
+            },
+        })
+    })
     $(document).on('keypress', function (e) {
         if (e.which == 13 && e.target.id == 'qr') {
             boxSubmit()

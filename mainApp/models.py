@@ -1,5 +1,7 @@
 from email.policy import default
 from django.db import models
+from django.contrib.auth.models import User
+
 
 STATUS_CHOICES = ((True, 'Aktif'), (False, 'Tidak Aktif'))
 
@@ -12,6 +14,8 @@ class Product(models.Model):
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
     status = models.BooleanField(default=True,choices=STATUS_CHOICES)
+    createdby = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="createdby")
+    updatedby = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, blank=True, related_name="updatedby")
     def __str__(self):
         return self.name
 
@@ -34,6 +38,8 @@ class Register(models.Model):
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
     weight = models.ForeignKey(Logging, null=True, on_delete=models.DO_NOTHING)
+    createdby = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="createdby")
+    updatedby = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, blank=True, related_name="updatedby")
     class Meta:
         constraints = [
             models.UniqueConstraint(

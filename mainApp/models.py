@@ -38,8 +38,8 @@ class Register(models.Model):
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
     weight = models.ForeignKey(Logging, null=True, on_delete=models.DO_NOTHING)
-    createdby = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="createdby")
-    updatedby = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, blank=True, related_name="updatedby")
+    createdby = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="createdby_rel")
+    updatedby = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, blank=True, related_name="updatedby_rel")
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -91,5 +91,7 @@ class WeighingState(models.Model):
     product = models.ForeignKey(Product, on_delete=models.RESTRICT)
     batchno = models.CharField(max_length=15)
     status = models.BooleanField(default=True,choices=STATUS_CHOICES)
+    spvpabrik = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="spvpabrik")
+    spvgudang = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="spvgudang")
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)

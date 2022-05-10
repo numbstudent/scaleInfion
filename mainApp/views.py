@@ -77,9 +77,10 @@ def RegisterView(request, batchno=None):
         code = request.GET.get('code')
         insertsuccess = "True"
         if batchno:
-            box = insertWeight(batchno)
-            if not box['status']:
-                insertsuccess = "False"
+            ## kalau weight masuk tidak via mesin
+            # box = insertWeight(batchno)
+            # if not box['status']:
+            #     insertsuccess = "False"
             data = Register.objects.annotate(product_name=F('product__name'),iot_weight=F('weight__weighing'))\
             .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight','status')\
             .filter(batchno=batchno, product__code=code).order_by('-createdon')

@@ -99,9 +99,9 @@ def RegisterView(request, batchno=None):
 def ScaleView(request):
     #app_test
     # generating weight for simulating without real scale
-    import random
-    b = Logging(lot='1', status='1', weighing=random.uniform(4.450, 4.500))
-    b.save()
+    # import random
+    # b = Logging(lot='1', status='1', weighing=random.uniform(4.450, 4.500))
+    # b.save()
 
     obj = Logging.objects.latest('id')
 

@@ -111,3 +111,27 @@ def viewRegister(request):
         'form': form
     }
     return render(request, 'registration/register.html', context)
+
+@login_required(login_url=loginpage)
+def groupAdd(request, id):
+    context = {}
+    context['action'] = 'edit'
+    context['id'] = id
+    context['message'] = None
+    if request.method == 'GET':
+        obj = User.objects.get(id=id)
+        form = GroupAddForm(instance=obj)
+        context['data'] = User.objects.all()
+        context['form'] = form
+    if request.method == 'POST':
+        obj = User.objects.get(id=id)
+        form = GroupAddForm(request.POST, instance=obj)
+        context['data'] = User.objects.all()
+        context['form'] = form
+        if form.is_valid():
+            from django.contrib.auth.models import Group
+            my_group = Group.objects.get(id='my_group_name') 
+            my_group.user_set.add(your_user)
+            context['message'] = "Data berhasil disimpan."
+            # return redirect('userlist')
+    return render(request, 'registration/groupadd.html', context=context)

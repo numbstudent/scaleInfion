@@ -42,6 +42,7 @@ def viewUser(request):
     context = {}
     context['action'] = 'view'
     context['data'] = User.objects.all()
+    print(context['data'].groups.values())
     context['isvalid'] = 'yes'
     if request.method == "POST":
         form = UserCreationForm(request.POST)
@@ -119,19 +120,17 @@ def groupAdd(request, id):
     context['id'] = id
     context['message'] = None
     if request.method == 'GET':
-        obj = User.objects.get(id=id)
-        form = GroupAddForm(instance=obj)
-        context['data'] = User.objects.all()
+        form = GroupAddForm()
         context['form'] = form
     if request.method == 'POST':
         obj = User.objects.get(id=id)
-        form = GroupAddForm(request.POST, instance=obj)
-        context['data'] = User.objects.all()
+        form = GroupAddForm(request.POST)
         context['form'] = form
         if form.is_valid():
-            from django.contrib.auth.models import Group
-            my_group = Group.objects.get(id='my_group_name') 
-            my_group.user_set.add(your_user)
+            group_id = form.cleaned_data.get('group').id
+            print(form.cleaned_data)
+            my_group = Group.objects.get(id=group_id) 
+            my_group.user_set.add(obj)
             context['message'] = "Data berhasil disimpan."
-            # return redirect('userlist')
+            return redirect('userlist')
     return render(request, 'registration/groupadd.html', context=context)

@@ -13,11 +13,11 @@ class UserModelChoiceField(ModelChoiceField):
         return obj.name
 
 class GroupAddForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.queryset = Author.objects.filter(name__startswith='O')
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     self.queryset = Group.objects.filter(name__startswith='O')
 
-    productid = GroupModelChoiceField(
+    group = GroupModelChoiceField(
         queryset=Group.objects.all(), label="Group", widget=forms.Select(attrs={
             'class': 'form-control select2bs4'
     }))

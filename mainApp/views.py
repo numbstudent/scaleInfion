@@ -641,17 +641,17 @@ def viewWeighingState(request):
     context['action'] = 'view'
     context['data'] = WeighingState.objects.all()
     if request.method == "POST":
-        form = WeighingStateForm(request.POST)
+        form = WeighingStateFormInitial(request.POST)
         context['form'] = form
         if form.is_valid():
-            # instance = form.save(commit=False)
-            # instance.title = request.POST.get('title').upper()
-            # instance.subtitle = request.POST.get('subtitle').upper()
-            # instance.save()
-            form.save()
+            instance = form.save(commit=False)
+            instance.pendingstatus = True
+            instance.status = False
+            instance.save()
             return redirect('viewweighingstate')
     else:
-        context['form'] = list(WeighingStateForm())
+        form = WeighingStateFormInitial()
+        context['form'] = form
 
     return render(request, 'weighingstate.html', context=context)
 

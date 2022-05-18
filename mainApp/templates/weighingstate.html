@@ -37,9 +37,9 @@
                                         <tr>
                                             <th>Product Name</th>
                                             <th>Batch No</th>
-                                            <th>Pending Status</th>
+                                            <th>Open Status</th>
                                             <th>Status</th>
-                                            <!-- <th>Action</th> -->
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -47,15 +47,15 @@
                                         <tr>
                                             <td>{{row.product.name}}</td>
                                             <td>{{row.batchno}}</td>
-                                            <td>{{row.pendingstatus|yesno:'Pending, Close'}}</td>
+                                            <td>{{row.pendingstatus|yesno:'Open, Close'}}</td>
                                             <td>{{row.status|yesno:'Aktif, Tidak Aktif'}}</td>
-                                            <!-- <td>
-                                                <a class="btn btn-secondary" href="{% url 'editproduct' row.id %}"><i
+                                            <td>
+                                                <a class="btn btn-secondary" href="{% url 'editweighingstate' row.id %}"><i
                                                         class="fas fa-edit"></i></a>
-                                                <a class="btn btn-danger" href="{% url 'deleteproduct' row.id %}"
+                                                <a class="btn btn-danger" href="{% url 'deleteweighingstate' row.id %}"
                                                     onclick="return confirm('Apakah anda yakin untuk menghapus data?')"><i
                                                         class="fas fa-trash"></i></a>
-                                            </td> -->
+                                            </td>
                                         </tr>
                                         {%endfor%}
                                     </tbody>

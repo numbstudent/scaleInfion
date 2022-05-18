@@ -119,3 +119,8 @@ class WeighingStateForm(ModelForm):
         widgets = {
             'status': forms.RadioSelect
         }
+
+class WeighingStateFormInitial(ModelForm):
+    class Meta:
+        model = WeighingState
+        fields = ['id', 'product','batchno']

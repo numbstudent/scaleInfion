@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 
 STATUS_CHOICES = ((True, 'Aktif'), (False, 'Tidak Aktif'))
+PENDING_CHOICES = ((1, 'Pending'), (0, 'Close'))
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
@@ -91,7 +92,8 @@ class WeighingState(models.Model):
     product = models.ForeignKey(Product, on_delete=models.RESTRICT)
     batchno = models.CharField(max_length=15)
     status = models.BooleanField(default=True,choices=STATUS_CHOICES)
-    spvpabrik = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="spvpabrik")
-    spvgudang = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="spvgudang")
+    pendingstatus = models.BooleanField(default=True,choices=PENDING_CHOICES) #pendingstatus true = masih belum close
+    spvpabrik = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="spvpabrik", null=True) #boleh kosong di create awal batchno
+    spvgudang = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="spvgudang", null=True) #boleh kosong di create awal batchno
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)

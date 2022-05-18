@@ -46,7 +46,9 @@
                                         <tr>
                                             <td>{{row.username}}</td>
                                             <td>{{row.first_name}}</td>
-                                            <td>{{row.group}}</td>
+                                            <td>{% for group in row.groups.all %}
+                                            {{ group.name }}
+                                            {% endfor %}</td>
                                             <td><a class="btn btn-secondary" href="{% url 'edituser' row.id %}"><i
                                                         class="fas fa-edit"></i></a>
                                                 <a class="btn btn-primary" href="{% url 'groupadd' row.id %}"><i

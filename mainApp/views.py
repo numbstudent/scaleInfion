@@ -589,7 +589,7 @@ def viewWeighingState(request): #startbatch
 def viewEndBatch(request): #endbatch
     context = {}
     context['action'] = 'view'
-    context['data'] = WeighingState.objects.filter(id=1, status=False)
+    context['data'] = WeighingState.objects.filter()
     noState = WeighingState.objects.filter(id=1, status=False).exists()
     if not noState and request.method == "POST":
         form = WeighingStateForm(request.POST)
@@ -602,12 +602,12 @@ def viewEndBatch(request): #endbatch
             obj.save()
             return redirect('endbatch')
     else:
-        activestate = WeighingState.objects.filter(id=1).values('product','batchno').first()
+        activestate = WeighingState.objects.filter().values('product','batchno','pendingstatus').first()
         batchno = activestate['batchno']
         productid = activestate['product']
         form = WeighingStateForm()
-        form.fields["product"].queryset = Product.objects.filter(id=1)
-        form.fields["batchno"].initial = batchno
+        # form.fields["product"].queryset = Product.objects.filter(id=1)
+        # form.fields["batchno"].initial = batchno
         context['form'] = form
 
     return render(request, 'end_batch.html', context=context)
@@ -632,3 +632,60 @@ def RejectBox(request):
             return JsonResponse({"message": "Isikan parameter."}, status=400)
     else:
         return JsonResponse({"message": "Bad Request."}, status=400)
+
+
+
+@login_required(login_url=loginpage)
+def viewWeighingState(request):
+    context = {}
+    context['action'] = 'view'
+    context['data'] = WeighingState.objects.all()
+    if request.method == "POST":
+        form = WeighingStateForm(request.POST)
+        context['form'] = form
+        if form.is_valid():
+            # instance = form.save(commit=False)
+            # instance.title = request.POST.get('title').upper()
+            # instance.subtitle = request.POST.get('subtitle').upper()
+            # instance.save()
+            form.save()
+            return redirect('viewweighingstate')
+    else:
+        context['form'] = list(WeighingStateForm())
+
+    return render(request, 'weighingstate.html', context=context)
+
+
+@login_required(login_url=loginpage)
+def deleteWeighingState(request, id):
+    obj = WeighingState.objects.filter(id=id)
+    try:
+        obj.delete()
+    except RestrictedError:
+        error_message = 'Data ini tidak dapat dihapus karena sedang digunakan oleh data lain. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>'
+        return HttpResponse(error_message)
+    return redirect('viewweighingstate')
+
+@login_required(login_url=loginpage)
+def editWeighingState(request, id):
+    context = {}
+    context['action'] = 'edit'
+    context['id'] = id
+    context['message'] = None
+    if request.method == 'GET':
+        obj = WeighingState.objects.get(id=id)
+        form = WeighingStateForm(instance=obj)
+        context['data'] = WeighingState.objects.all()
+        context['form'] = list(form)
+    if request.method == 'POST':
+        obj = WeighingState.objects.get(id=id)
+        form = WeighingStateForm(request.POST, instance=obj)
+        context['data'] = WeighingState.objects.all()
+        context['form'] = list(form)
+        if form.is_valid():
+            obj.title = form.cleaned_data.get('title').upper()
+            obj.subtitle = form.cleaned_data.get('subtitle').upper()
+            obj.save()
+            context['message'] = "Data berhasil disimpan."
+            return redirect('viewWeighingState')
+    return render(request, 'weighingstate.html', context=context)

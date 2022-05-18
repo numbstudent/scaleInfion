@@ -16,7 +16,7 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if action == 'edit' %} active {% endif %}" id="button-tab-2" data-toggle="pill" href="#tab-2"
-                    role="tab" aria-controls="tab-2" aria-selected="false">{% if action == 'view' %} Set State {% else %} Edit {% endif %}</a>
+                    role="tab" aria-controls="tab-2" aria-selected="false">{% if action == 'view' %} Set Batch {% else %} Edit {% endif %}</a>
             </li>
             {% if action == 'edit' %}
             <li class="nav-item">
@@ -35,8 +35,9 @@
                                 <table class="table dataTable">
                                     <thead>
                                         <tr>
-                                            <th>Name</th>
+                                            <th>Product Name</th>
                                             <th>Batch No</th>
+                                            <th>Pending</th>
                                             <th>Status</th>
                                             <!-- <th>Action</th> -->
                                         </tr>
@@ -46,6 +47,7 @@
                                         <tr>
                                             <td>{{row.product.name}}</td>
                                             <td>{{row.batchno}}</td>
+                                            <td>{{row.status|yesno:'Pending, Close'}}</td>
                                             <td>{{row.status|yesno:'Aktif, Tidak Aktif'}}</td>
                                             <!-- <td>
                                                 <a class="btn btn-secondary" href="{% url 'editproduct' row.id %}"><i

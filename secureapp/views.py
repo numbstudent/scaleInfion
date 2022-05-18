@@ -42,7 +42,6 @@ def viewUser(request):
     context = {}
     context['action'] = 'view'
     context['data'] = User.objects.all()
-    print(context['data'].groups.values())
     context['isvalid'] = 'yes'
     if request.method == "POST":
         form = UserCreationForm(request.POST)
@@ -128,9 +127,9 @@ def groupAdd(request, id):
         context['form'] = form
         if form.is_valid():
             group_id = form.cleaned_data.get('group').id
-            print(form.cleaned_data)
             my_group = Group.objects.get(id=group_id) 
-            my_group.user_set.add(obj)
+            obj.groups.clear() #clear user from any group
+            my_group.user_set.add(obj) #set user to group
             context['message'] = "Data berhasil disimpan."
             return redirect('userlist')
     return render(request, 'registration/groupadd.html', context=context)

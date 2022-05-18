@@ -6,8 +6,8 @@ urlpatterns = [
     path('', views.index, name='weighing'),
     path('product', views.ProductView, name='product'),
     path('scale', views.ScaleView, name='scale'),
-    path('startbatch', views.viewWeighingState, name='startbatch'),
-    path('endbatch', views.viewEndBatch, name='endbatch'),
+    # path('startbatch', views.viewWeighingState, name='startbatch'),
+    # path('endbatch', views.viewEndBatch, name='endbatch'),
     path('register', views.RegisterView, name='register'),
     path('register/<str:batchno>', views.RegisterView, name='registerbatchno'),
     path('history', views.viewHistory, name='history'),
@@ -29,6 +29,10 @@ urlpatterns = [
     path('master/reportbody', views.viewReportBody, name='viewreportbody'),
     path('master/delete-reportbody/<int:id>', views.deleteReportBody, name='deletereportbody'),
     path('master/edit-reportbody/<int:id>', views.editReportBody, name='editreportbody'),
+
+    path('weighingstate', views.viewWeighingState, name='viewweighingstate'),
+    path('delete-weighingstate/<int:id>', views.deleteWeighingState, name='deleteweighingstate'),
+    path('edit-weighingstate/<int:id>', views.editWeighingState, name='editweighingstate'),
 
     path('report/batch', views.viewReportBatch, name='reportbatch'),
     path('report/batch/export', views.reportBatchCSV, name='reportbatchcsv'),

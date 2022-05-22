@@ -53,20 +53,18 @@
                                             <td>{{row.status|yesno:'Aktif, Tidak Aktif'}}</td>
                                             <td>
                                                 {% if row.pendingstatus %}
-                                                <a class="btn btn-secondary" href="{% url 'editweighingstate' row.id %}"><i class="fas fa-edit"></i></a>
+                                                <a class="btn btn-secondary" href="{% url 'editweighingstate' row.id %}"><i
+                                                        class="fas fa-edit"></i></a>
                                                 <a class="btn btn-danger" href="{% url 'deleteweighingstate' row.id %}"
-                                                    onclick="return confirm('Apakah anda yakin untuk menghapus data?')"><i class="fas fa-trash"></i></a>
+                                                    onclick="return confirm('Apakah anda yakin untuk menghapus data?')"><i
+                                                        class="fas fa-trash"></i></a>
                                                 {% endif %}
                                             </td>
                                             <td>
                                                 {% if row.status and row.pendingstatus %}
-                                                <a class="btn btn-danger"
-                                                    onclick="return confirm('Apakah anda yakin untuk mendeaktivasi No Batch {{row.batchno}}?')"
-                                                    href="{% url 'activateweighingstate' row.id 'deactivate' %}"><i class="fas fa-times"></i></a>
+                                                <a class="btn btn-danger" onclick="return confirm('Apakah anda yakin untuk mendeaktivasi No Batch {{row.batchno}}?')" href="{% url 'activateweighingstate' row.id 'deactivate' %}"><i class="fas fa-times"></i></a>
                                                 {% elif not row.status and row.pendingstatus %}
-                                                <a class="btn btn-primary"
-                                                    onclick="return confirm('Apakah anda yakin untuk mengaktivasi No Batch {{row.batchno}}?')"
-                                                    href="{% url 'activateweighingstate' row.id 'activate' %}"><i class="fas fa-check"></i></a>
+                                                <a class="btn btn-primary" onclick="return confirm('Apakah anda yakin untuk mengaktivasi No Batch {{row.batchno}}?')" href="{% url 'activateweighingstate' row.id 'activate' %}"><i class="fas fa-check"></i></a>
                                                 {% endif %}
                                             </td>
                                             <td>
@@ -89,11 +87,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-lg-12">
-                                    {% if action == 'view' %}
-                                    <form action="{% url 'viewweighingstate' %}" method="POST" autocomplete="off">
-                                        {% elif action == 'edit' %}
-                                        <!-- <form action="{% url 'editproduct' id %}" method="POST" autocomplete="off"> -->
-                                            {% endif %}
+                                        <form action="{% url 'closeweighingstate' id %}" method="POST" autocomplete="off">
                                             {% csrf_token %}
                                             {{ form | crispy }}
                                             <hr>

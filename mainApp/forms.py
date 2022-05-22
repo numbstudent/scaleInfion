@@ -41,6 +41,17 @@ class ProductModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.name
 
+class BatchnoModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.batchno
+
+class DepartmentModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.name
+class ReportTitleModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.title
+
 class ReportTitleModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.title
@@ -82,35 +93,62 @@ class UploadBatchForm(forms.Form):
     batchno = forms.CharField(required=False, label="Batch No")
     file = forms.FileField()
 
-class ReportBodyForm(ModelForm):
-    # productid = ProductModelChoiceField(
-    #     queryset=Product.objects.all(), required=False, label="Product")
-    # batchno = forms.CharField(required=False, label="Batch No")
-    # reporttitle = ReportTitleModelChoiceField(
-    #     queryset=ReportTitle.objects.all(), required=False, label="Report Title")
-    # department = DepartmentModelChoiceField(
-    #     queryset=Department.objects.all(), required=False, label="Department")
-    # reviewdate = 
 
-    class Meta:
-        model = Report
-        fields = ['id','product','batchno','reporttitle','department','reviewdate','effectivedate','dnno','dnrev']
-        labels = {
-            "batchno": "Batch No",
-            "reporttitle": "Report Title",
-            "reviewdate": "Review Date",
-            "effectivedate": "Effective Date",
-            "dnno": "DN No",
-            "dnrev": "DN Rev",
-        }
-        widgets = {
-            "reviewdate": forms.DateInput(attrs={
-                'class': 'form-control datepick'
-            }),
-            "effectivedate": forms.DateInput(attrs={
-                'class': 'form-control datepick'
-            }),
-        }
+class ReportBodyForm(forms.Form):
+    batchno = BatchnoModelChoiceField(
+        queryset=WeighingState.objects.filter(pendingstatus=False).order_by('-updatedon'), label="Batch No", widget=forms.Select(attrs={
+            'class': 'form-control select2bs4'
+    }))
+    reporttitle = ReportTitleModelChoiceField(
+        queryset=ReportTitle.objects.all(), label="Report Title", widget=forms.Select(attrs={
+            'class': 'form-control select2bs4'
+    }))
+    department = DepartmentModelChoiceField(
+        queryset=Department.objects.all(), label="Report Title", widget=forms.Select(attrs={
+            'class': 'form-control select2bs4'
+    }))
+    reviewdate = forms.DateField(label="Review Date", widget=forms.DateInput(attrs={
+        'class': 'form-control datepick'
+    }))
+    effectivedate = forms.DateField(label="Effective Date", widget=forms.DateInput(attrs={
+        'class': 'form-control datepick'
+    }))
+    dnno = forms.CharField(label="DN No")
+    dnrev = forms.CharField(label="DN Rev")
+
+# class ReportBodyForm(ModelForm):
+#     # productid = ProductModelChoiceField(
+#     #     queryset=Product.objects.all(), required=False, label="Product")
+#     # batchno = forms.CharField(required=False, label="Batch No")
+#     # reporttitle = ReportTitleModelChoiceField(
+#     #     queryset=ReportTitle.objects.all(), required=False, label="Report Title")
+#     # department = DepartmentModelChoiceField(
+#     #     queryset=Department.objects.all(), required=False, label="Department")
+#     # reviewdate = 
+
+#     # batchno = BatchnoModelChoiceField(
+#     #     queryset=WeighingState.objects.all(), required=False, label="Batch No", widget=forms.Select(attrs={
+#     #         'class': 'form-control select2bs4'
+#     # }))
+#     class Meta:
+#         model = Report
+#         fields = ['id','product','batchno','reporttitle','department','reviewdate','effectivedate','dnno','dnrev']
+#         labels = {
+#             "batchno": "Batch No",
+#             "reporttitle": "Report Title",
+#             "reviewdate": "Review Date",
+#             "effectivedate": "Effective Date",
+#             "dnno": "DN No",
+#             "dnrev": "DN Rev",
+#         }
+#         widgets = {
+#             "reviewdate": forms.DateInput(attrs={
+#                 'class': 'form-control datepick'
+#             }),
+#             "effectivedate": forms.DateInput(attrs={
+#                 'class': 'form-control datepick'
+#             }),
+#         }
 
 class WeighingStateForm(ModelForm):
     class Meta:
@@ -120,7 +158,19 @@ class WeighingStateForm(ModelForm):
             'status': forms.RadioSelect
         }
 
-class WeighingStateFormInitial(ModelForm):
+
+class WeighingStateInitialForm(ModelForm):
     class Meta:
         model = WeighingState
         fields = ['id', 'product','batchno']
+
+
+class WeighingStateCloseForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['spvpabrik'].required = True
+        self.fields['spvgudang'].required = True
+
+    class Meta:
+        model = WeighingState
+        fields = ['id', 'product', 'batchno','spvpabrik','spvgudang']

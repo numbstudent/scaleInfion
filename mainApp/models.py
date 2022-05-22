@@ -90,7 +90,7 @@ class UploadedRegister(models.Model):
 
 class WeighingState(models.Model):
     product = models.ForeignKey(Product, on_delete=models.RESTRICT)
-    batchno = models.CharField(max_length=15)
+    batchno = models.CharField(max_length=15, unique=True)
     status = models.BooleanField(default=True,choices=STATUS_CHOICES)
     pendingstatus = models.BooleanField(default=True,choices=PENDING_CHOICES) #pendingstatus true = masih belum close
     spvpabrik = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="spvpabrik", null=True) #boleh kosong di create awal batchno

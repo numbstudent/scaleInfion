@@ -33,7 +33,9 @@ urlpatterns = [
     path('weighingstate', views.viewWeighingState, name='viewweighingstate'),
     path('delete-weighingstate/<int:id>', views.deleteWeighingState, name='deleteweighingstate'),
     path('edit-weighingstate/<int:id>', views.editWeighingState, name='editweighingstate'),
-    path('close-batch/<int:id>', views.editWeighingState, name='editweighingstate'),
+    path('close-batch/<int:id>', views.closeWeighingState, name='closeweighingstate'),
+    path('activate-batch/<int:id>/<str:status>', views.activateWeighingState, name='activateweighingstate'),
+    path('batchno-history/<str:batchno>', views.viewBatchHistory, name='viewbatchhistory'),
 
     path('report/batch', views.viewReportBatch, name='reportbatch'),
     path('report/batch/export', views.reportBatchCSV, name='reportbatchcsv'),

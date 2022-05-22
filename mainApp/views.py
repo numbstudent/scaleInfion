@@ -265,10 +265,20 @@ def viewReportBody(request):
         context['form'] = form
         if form.is_valid():
             # instance = form.save(commit=False)
-            # instance.title = request.POST.get('title').upper()
-            # instance.subtitle = request.POST.get('subtitle').upper()
-            # instance.save()
-            form.save()
+            batchnoid = request.POST.get('batchno')
+            product = WeighingState.objects.filter(id=batchnoid).values('product')
+            batchno = WeighingState.objects.filter(id=batchnoid).values('batchno').first()
+            reporttitle = ReportTitle.objects.get(id=request.POST.get('reporttitle'))
+            department = Department.objects.get(id=request.POST.get('department'))
+            reviewdate = request.POST.get('reviewdate')
+            effectivedate = request.POST.get('effectivedate')
+            dnno = request.POST.get('dnno')
+            dnrev = request.POST.get('dnrev')
+            
+            Report(product=product, batchno=batchno, reporttitle=reporttitle, department=department,
+                   reviewdate=reviewdate, effectivedate=effectivedate, dnno=dnno, dnrev=dnrev)
+
+            # form.save()
             return redirect('viewreportbody')
     else:
         context['form'] = list(ReportBodyForm())
@@ -641,16 +651,19 @@ def viewWeighingState(request):
     context['action'] = 'view'
     context['data'] = WeighingState.objects.all()
     if request.method == "POST":
-        form = WeighingStateFormInitial(request.POST)
+        form = WeighingStateInitialForm(request.POST)
         context['form'] = form
         if form.is_valid():
             instance = form.save(commit=False)
             instance.pendingstatus = True
             instance.status = False
+            instance.batchno = form.cleaned_data.get('batchno').upper()
+            # batchnoobj = WeighingState.objects.all()
+            # batchnoobj.update(status=False)
             instance.save()
             return redirect('viewweighingstate')
     else:
-        form = WeighingStateFormInitial()
+        form = WeighingStateInitialForm()
         context['form'] = form
 
     return render(request, 'weighingstate.html', context=context)
@@ -683,9 +696,65 @@ def editWeighingState(request, id):
         context['data'] = WeighingState.objects.all()
         context['form'] = list(form)
         if form.is_valid():
-            obj.title = form.cleaned_data.get('title').upper()
-            obj.subtitle = form.cleaned_data.get('subtitle').upper()
+            # obj.title = form.cleaned_data.get('title').upper()
+            obj.batchno = form.cleaned_data.get('batchno').upper()
             obj.save()
             context['message'] = "Data berhasil disimpan."
             return redirect('viewWeighingState')
     return render(request, 'weighingstate.html', context=context)
+
+@login_required(login_url=loginpage)
+def activateWeighingState(request, id, status):
+    context = {}
+    context['action'] = 'edit'
+    context['id'] = id
+    context['message'] = None
+    if request.method == 'GET':
+        if status == 'activate':
+            batchnoobj = WeighingState.objects.filter(status=True)
+            batchnoobj.update(status=False)
+            obj = WeighingState.objects.filter(id=id)
+            obj.update(status=True)
+        elif status == 'deactivate':
+            obj = WeighingState.objects.filter(id=id)
+            obj.update(status=False)
+        return redirect('viewweighingstate')
+
+
+@login_required(login_url=loginpage)
+def closeWeighingState(request, id):
+    context = {}
+    context['action'] = 'edit'
+    context['id'] = id
+    context['message'] = None
+    if request.method == 'GET':
+        obj = WeighingState.objects.get(id=id)
+        form = WeighingStateCloseForm(instance=obj)
+        form.fields["spvpabrik"].queryset = User.objects.filter(
+            groups__name='supervisorpabrik')
+        form.fields["spvgudang"].queryset = User.objects.filter(
+            groups__name='supervisorgudang')
+        context['data'] = WeighingState.objects.all()
+        context['form'] = list(form)
+    if request.method == 'POST':
+        obj = WeighingState.objects.get(id=id)
+        form = WeighingStateCloseForm(request.POST, instance=obj)
+        context['data'] = WeighingState.objects.all()
+        context['form'] = list(form)
+        if form.is_valid():
+            obj.spvpabrik = form.cleaned_data.get('spvpabrik')
+            obj.spvgudang = form.cleaned_data.get('spvgudang')
+            obj.pendingstatus = False
+            obj.save()
+            context['message'] = "Data berhasil disimpan."
+            return redirect('viewweighingstate')
+    return render(request, 'weighingstateclose.html', context=context)
+
+
+@login_required(login_url=loginpage)
+def viewBatchHistory(request, batchno):
+    context = {}
+    datamodel = Register.objects.filter(batchno=batchno).annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
+        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date', 'status').order_by('-input_date')
+    context['data'] = datamodel
+    return render(request, 'batchno_history.html', context=context)

@@ -49,7 +49,16 @@
                                         <tr>
                                             <td>{{row.product.name}}</td>
                                             <td><a href="{% url 'viewbatchhistory' row.batchno %}">{{row.batchno}}</a></td>
-                                            <td>{{row.pendingstatus|yesno:'Open, Close'}}</td>
+                                            <td>{{row.pendingstatus|yesno:'Open, Close'}}
+                                                {% if not row.pendingstatus %}
+                                                <br>
+                                                <small>
+                                                Approval by: 
+                                                {{row.spvpabrik}}, 
+                                                {{row.spvgudang}}
+                                                </small>
+                                                {% endif %}   
+                                            </td>
                                             <td>{{row.status|yesno:'Aktif, Tidak Aktif'}}</td>
                                             <td>
                                                 {% if row.pendingstatus %}

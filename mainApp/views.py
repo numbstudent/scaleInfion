@@ -266,8 +266,9 @@ def viewReportBody(request):
         if form.is_valid():
             # instance = form.save(commit=False)
             batchnoid = request.POST.get('batchno')
-            product = WeighingState.objects.filter(id=batchnoid).values('product')
-            batchno = WeighingState.objects.filter(id=batchnoid).values('batchno').first()
+            product = Product.objects.get(weighingstate__id=batchnoid)
+            batchno = WeighingState.objects.filter(id=batchnoid).values('batchno').first()['batchno']
+            print(batchno)
             reporttitle = ReportTitle.objects.get(id=request.POST.get('reporttitle'))
             department = Department.objects.get(id=request.POST.get('department'))
             reviewdate = request.POST.get('reviewdate')
@@ -275,10 +276,10 @@ def viewReportBody(request):
             dnno = request.POST.get('dnno')
             dnrev = request.POST.get('dnrev')
             
-            Report(product=product, batchno=batchno, reporttitle=reporttitle, department=department,
+            obj = Report(product=product, batchno=batchno, reporttitle=reporttitle, department=department,
                    reviewdate=reviewdate, effectivedate=effectivedate, dnno=dnno, dnrev=dnrev)
 
-            # form.save()
+            obj.save()
             return redirect('viewreportbody')
     else:
         context['form'] = list(ReportBodyForm())
@@ -513,7 +514,7 @@ def reportBatchPDF(request):
     else:
         rowlen = datamodel.count()//2+1
     # testing in windows
-    # return render(request, 'report_batch_pdf_template.html', context={'data': datamodel, 'data2': datamodel2, 'header': header, 'rowlen': rowlen})
+    return render(request, 'report_batch_pdf_template.html', context={'data': datamodel, 'data2': datamodel2, 'header': header, 'rowlen': rowlen})
     html_string = render_to_string('report_batch_pdf_template.html', {'data': datamodel, 'data2': datamodel2, 'header':header, 'rowlen':rowlen})
 
     html = HTML(string=html_string, base_url=request.build_absolute_uri())

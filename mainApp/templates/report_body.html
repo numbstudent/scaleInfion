@@ -58,8 +58,8 @@
                                             <td>{{row.createdon}}</td>
                                             <td><a data-toggle="tooltip" title="Export to PDF" target="_blank" class="btn btn-primary"
                                                     href="{% url 'reportbatchpdf' %}?id={{row.id}}"><i class="fas fa-file"></i></a>
-                                                <a data-toggle="tooltip" title="Edit" class="btn btn-secondary"
-                                                    href="{% url 'editreportbody' row.id %}"><i class="fas fa-edit"></i></a>
+                                                <!-- <a data-toggle="tooltip" title="Edit" class="btn btn-secondary"
+                                                    href="{% url 'editreportbody' row.id %}"><i class="fas fa-edit"></i></a> -->
                                                 <a data-toggle="tooltip" title="Delete" class="btn btn-danger"
                                                     href="{% url 'deletereportbody' row.id %}"
                                                     onclick="return confirm('Apakah anda yakin untuk menghapus data?')"><i

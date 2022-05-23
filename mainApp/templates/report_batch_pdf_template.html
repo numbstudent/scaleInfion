@@ -6,7 +6,7 @@
         @page {
             size: A4;
             /* Change from the default size of A4 */
-            margin: 0mm;
+            margin: 12mm;
             /* Set margin on each page */
         }
 
@@ -75,15 +75,15 @@
                                     <td>{{row.weight.weighing}}</td>
                                 </tr>
                                 {% if forloop.counter|divisibleby:rowlen and forloop.counter != data.count %}
-                                </table>
-                                </td>
-                                <td style="border: 0px;vertical-align:top;">
-                                <table border="1">
-                                    <tr style="text-align: center;">
-                                        <th>Tanggal Penimbangan</th>
-                                        <th>No. Karton</th>
-                                        <th>Hasil Penimbangan</th>
-                                    </tr>
+                            </table>
+                        </td>
+                        <td style="border: 0px;vertical-align:top;">
+                            <table border="1">
+                                <tr style="text-align: center;">
+                                    <th>Tanggal Penimbangan</th>
+                                    <th>No. Karton</th>
+                                    <th>Hasil Penimbangan</th>
+                                </tr>
                                 {% endif %}
                                 {%endfor%}
                             </table>
@@ -110,5 +110,91 @@
         </tr>
     </table>
 </body>
+<!-- <tr>
+    <td>
+<tr>
+    <td>Dilakukan Oleh</td>
+</tr>
+<tr>
+    <td>Petugas Penimbangan</td>
+</tr>
+<tr>
+    <td>Paraf:
+        <br>
+        <br>
+        <br>
+    </td>
+</tr>
+<tr>
+    <td>Nama</td>
+</tr>
+<tr>
+    <td>Tanggal</td>
+</tr>
+</td>
+<td>
+    <tr>
+        <td>Diperiksa Oleh</td>
+    </tr>
+    <tr>
+        <td>Petugas Gudang</td>
+    </tr>
+    <tr>
+        <td>Paraf:
+            <br>
+            <br>
+            <br>
+        </td>
+    </tr>
+    <tr>
+        <td>Nama</td>
+    </tr>
+    <tr>
+        <td>Tanggal</td>
+    </tr>
+</td>
+<td>
+    <tr>
+        <td>Diverifikasi Oleh</td>
+    </tr>
+    <tr>
+        <td>Supervisor Produksi</td>
+    </tr>
+    <tr>
+        <td>Paraf:
+            <br>
+            <br>
+            <br>
+        </td>
+    </tr>
+    <tr>
+        <td>Nama</td>
+    </tr>
+    <tr>
+        <td>Tanggal</td>
+    </tr>
+</td>
 
+<td>
+    <tr>
+        <td>Diverifikasi Oleh</td>
+    </tr>
+    <tr>
+        <td>Supervisor Gudang</td>
+    </tr>
+    <tr>
+        <td>Paraf:
+            <br>
+            <br>
+            <br>
+        </td>
+    </tr>
+    <tr>
+        <td>Nama</td>
+    </tr>
+    <tr>
+        <td>Tanggal</td>
+    </tr>
+</td>
+</tr> -->
 </html>

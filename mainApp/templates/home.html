@@ -89,7 +89,7 @@
 {% endblock %}
 {% block additionaljs %}
 <script>
-    var url = "{% url 'register' %}"
+    var url = "{% url 'registerqr' %}"
     $("#submitBoxno").click(function () {
         boxSubmit()
     })
@@ -134,7 +134,7 @@
     function updateBoxList() {
         var batchno = $("#batchno").val()
         var code = $("#code").val()
-        var url = "{% url 'register' %}"+"/register?batchno="+ batchno +"&code="+ code
+        var url = "{% url 'registerqr' %}"+"/register?batchno="+ batchno +"&code="+ code
         // var url = "/weighing
         if (code && batchno) {
             $.ajax({

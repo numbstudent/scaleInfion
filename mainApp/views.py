@@ -66,6 +66,7 @@ def RegisterView(request, batchno=None):
             else:
                 instance = form.save(commit=False)
                 instance.product = productid
+                instance.createdby = request.user
                 instance.save()
                 # ser_instance = serializers.serialize('json', [instance, ])
                 return JsonResponse({"message": "Data berhasil diinput"}, status=200)
@@ -86,7 +87,8 @@ def RegisterView(request, batchno=None):
             .filter(batchno=batchno, product__code=code).order_by('-createdon')
         else:
             data = Register.objects.all().values()
-        return JsonResponse({"insertsuccess":insertsuccess,"id":box['id'], "batch":list(data)}, safe=False, status=200)
+        # return JsonResponse({"insertsuccess":insertsuccess,"id":box['id'], "batch":list(data)}, safe=False, status=200)
+        return JsonResponse({"insertsuccess":insertsuccess, "batch":list(data)}, safe=False, status=200)
 
     elif is_ajax(request) and request.method == "PUT":
         body = json.loads(request.body)
@@ -107,7 +109,8 @@ def ScaleView(request):
 
     if request.method == "GET":
         curtime = datetime.now() - timedelta(seconds=2)
-        data = Logging.objects.filter(datetime__gte=curtime).order_by('-id').values('id','weighing').first()
+        # data = Logging.objects.filter(datetime__gte=curtime).order_by('-id').values('id','weighing').first()
+        data = Logging.objects.order_by('-id').values('id','weighing').first()
         return JsonResponse(data, safe=False, status=200)
 
 def insertWeight(batchno):

@@ -8,8 +8,8 @@ urlpatterns = [
     path('scale', views.ScaleView, name='scale'),
     # path('startbatch', views.viewWeighingState, name='startbatch'),
     # path('endbatch', views.viewEndBatch, name='endbatch'),
-    path('register', views.RegisterView, name='register'),
-    path('register/<str:batchno>', views.RegisterView, name='registerbatchno'),
+    path('registerqr', views.RegisterView, name='registerqr'),
+    path('registerqr/<str:batchno>', views.RegisterView, name='registerbatchno'),
     path('history', views.viewHistory, name='history'),
     path('rejectbox', views.RejectBox, name='rejectbox'),
 

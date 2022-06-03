@@ -70,9 +70,9 @@
                                 </tr>
                                 {%for row in data%}
                                 <tr style="text-align: right;">
-                                    <td>{{row.weight.datetime|date:"j/n/Y"}}</td>
+                                    <td>{{row.createdon|date:"j/n/Y"}}</td>
                                     <td>{{row.boxno}}</td>
-                                    <td>{{row.weight.weighing}}</td>
+                                    <td>{{row.weight}}</td>
                                 </tr>
                                 {% if forloop.counter|divisibleby:rowlen and forloop.counter != data.count %}
                             </table>

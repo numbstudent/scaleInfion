@@ -174,3 +174,8 @@ class WeighingStateCloseForm(ModelForm):
     class Meta:
         model = WeighingState
         fields = ['id', 'product', 'batchno','spvpabrik','spvgudang']
+
+class SimulatorForm(ModelForm):
+    class Meta:
+        model = Logging
+        fields = ['status', 'weighing']

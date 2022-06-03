@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block titlepage %}
+<h1>Simulator</h1>
+{% endblock %}
+{% block sidebar %}
+{% include "sidebar.html" %}
+{% endblock %}
+{% block content %}
+<div class="card card-secondary card-tabs">
+    <div class="card-header p-0 pt-1">
+        <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link {% if action == 'view' %} active {% endif %}" id="button-tab-1" data-toggle="pill" href="#tab-1"
+                    role="tab" aria-controls="tab-1" aria-selected="true">List</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if action == 'edit' %} active {% endif %}" id="button-tab-2" data-toggle="pill" href="#tab-2"
+                    role="tab" aria-controls="tab-2" aria-selected="false">{% if action == 'view' %} New {% else %} Edit {% endif %}</a>
+            </li>
+            {% if action == 'edit' %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'viewsimulator' %}#tab-2">New</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="card-body">
+        <div class="tab-content" id="custom-tabs-one-tabContent">
+            <div class="tab-pane fade {% if action == 'view' %} active show {% endif %}" id="tab-1" role="tabpanel" aria-labelledby="button-tab-1">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <table class="table dataTable">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Weight</th>
+                                            <th>Status</th>
+                                            <th>Created On</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {%for row in data%}
+                                        <tr>
+                                            <td>{{row.id}}</td>
+                                            <td>{{row.weighing}}</td>
+                                            <td>
+                                                {% if row.status == 0 %}
+                                                OK
+                                                {% elif row.status == 1 %}
+                                                Reject
+                                                {% elif row.status == 2 %}
+                                                Last Box
+                                                {% endif %}
+                                            </td>
+                                            <td>{{row.datetime}}</td>
+                                        </tr>
+                                        {%endfor%}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade {% if action == 'edit' %} active show {% endif %}" id="tab-2" role="tabpanel" aria-labelledby="button-tab-2">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    {% if action == 'view' %}
+                                    <form action="{% url 'viewsimulator' %}" method="POST" autocomplete="off">
+                                        {% elif action == 'edit' %}
+                                        <form action="{% url 'editsimulator' id %}" method="POST" autocomplete="off">
+                                            {% endif %}
+                                            {% csrf_token %}
+                                            {{ form | crispy }}
+                                            <hr>
+                                            <input class="btn btn-success" type="submit" value="Simpan">
+                                        </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+{% block additionaljs %}
+<script>
+    {% if message %}
+        alert("{{message}}")
+    {% endif %}
+</script>
+{% endblock %}

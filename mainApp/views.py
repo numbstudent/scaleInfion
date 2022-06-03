@@ -21,7 +21,7 @@ loginpage = 'login'
 @login_required(login_url=loginpage)
 def index(request):
     context = {}
-    context ['state'] = WeighingState.objects.filter(id=1).first()
+    context ['state'] = WeighingState.objects.filter(status=True).first()
     return render(request, 'home.html', context=context)
 
 
@@ -55,7 +55,7 @@ def RegisterView(request, batchno=None):
             productid = Product.objects.filter(code=code).first()
             boxexists = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).exists()
             boxkosongexists = Register.objects.filter(product=productid, batchno=batchno, status=None).exists()
-            weighingstate = WeighingState.objects.filter(id=1, status=True, batchno=batchno, product=productid).exists()
+            weighingstate = WeighingState.objects.filter(status=True, batchno=batchno, product=productid).exists()
             print(weighingstate)
             if not weighingstate:
                 return JsonResponse({"message": "Box tidak sesuai dengan Batch."}, status=400)
@@ -82,7 +82,7 @@ def RegisterView(request, batchno=None):
             # box = insertWeight(batchno)
             # if not box['status']:
             #     insertsuccess = "False"
-            data = Register.objects.annotate(product_name=F('product__name'),iot_weight=F('weight__weighing'))\
+            data = Register.objects.annotate(product_name=F('product__name'),iot_weight=F('weight'))\
             .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight','status')\
             .filter(batchno=batchno, product__code=code).order_by('-createdon')
         else:
@@ -97,20 +97,47 @@ def RegisterView(request, batchno=None):
         obj.delete()
         return JsonResponse({"message": "Data berhasil dihapus"}, status=200)
 
+@login_required(login_url=loginpage)
+def ScaleSimulator(request):
+    context = {}
+    context['action'] = 'view'
+    context['data'] = Logging.objects.all().order_by('-id')[:10]
+    if request.method == "POST":
+        form = SimulatorForm(request.POST)
+        context['form'] = form
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.lot = 1
+            instance.save()
+            return redirect('viewsimulator')
+    else:
+        context['form'] = SimulatorForm()
+
+    return render(request, 'weighing_simulator.html', context=context)
+
 @csrf_exempt
 def ScaleView(request):
-    #app_test
-    # generating weight for simulating without real scale
-    # import random
-    # b = Logging(lot='1', status='1', weighing=random.uniform(4.450, 4.500))
-    # b.save()
 
     obj = Logging.objects.latest('id')
 
     if request.method == "GET":
-        curtime = datetime.now() - timedelta(seconds=2)
-        # data = Logging.objects.filter(datetime__gte=curtime).order_by('-id').values('id','weighing').first()
-        data = Logging.objects.order_by('-id').values('id','weighing').first()
+        curtime = datetime.now() - timedelta(minutes=1)
+        data = Logging.objects.filter(datetime__gte=curtime).order_by('-id').values('id','weighing').first()
+        # data = Logging.objects.order_by('-id').values('id','weighing').first()
+
+        #get current weight
+        activebatchno = WeighingState.objects.filter(status=True).last().batchno
+        currentbox = Register.objects.filter(batchno = activebatchno, status = None).last()
+        if currentbox:
+            weight = Logging.objects.filter(datetime__gte=currentbox.createdon).last()
+            if weight:
+                print(activebatchno)
+                print(currentbox)
+                print(weight.status)
+                print(weight.weighing)
+                currentbox.weight = weight.weighing
+                currentbox.status = weight.status
+                currentbox.save()
         return JsonResponse(data, safe=False, status=200)
 
 def insertWeight(batchno):

@@ -43,4 +43,6 @@ urlpatterns = [
 
     path('uploadbatch', views.viewUploadBatch, name='viewuploadbatch'),
     path('delete-uploadbatch/<int:id>', views.deleteUploadBatch, name='deleteuploadbatch'),
+
+    path('scale-simulator', views.ScaleSimulator, name='viewsimulator'),
 ]

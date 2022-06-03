@@ -38,7 +38,7 @@ class Register(models.Model):
     status = models.IntegerField(null=True, default=None)
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
-    weight = models.ForeignKey(Logging, null=True, on_delete=models.DO_NOTHING)
+    weight = models.FloatField(null=True)
     createdby = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="createdby_rel")
     updatedby = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, blank=True, related_name="updatedby_rel")
     class Meta:

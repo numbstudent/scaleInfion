@@ -355,7 +355,7 @@ def editReportBody(request, id):
 @login_required(login_url=loginpage)
 def viewHistory(request):
     context = {}
-    datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
+    datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
         .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date', 'status').order_by('-input_date')
     hasFilter = False
     if request.method == "POST":
@@ -370,10 +370,10 @@ def viewHistory(request):
         if batchno:
             datamodel = datamodel.filter(batchno=batchno)
         if inputdatefrom:
-            datamodel = datamodel.filter(weight__datetime__gte=inputdatefrom)
+            datamodel = datamodel.filter(createdon__gte=inputdatefrom)
         if inputdateto:
             inputdateto = inputdateto + " 23:59"
-            datamodel = datamodel.filter(weight__datetime__lte=inputdateto)
+            datamodel = datamodel.filter(createdon__lte=inputdateto)
         if product or batchno or inputdatefrom or inputdateto:
             hasFilter = True
     else:
@@ -388,7 +388,7 @@ def viewHistory(request):
 @login_required(login_url=loginpage)
 def viewReportBatch(request):
     context = {}
-    datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
+    datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
         .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date').order_by('-input_date')
     hasFilter = False
     if request.method == "POST":
@@ -403,10 +403,10 @@ def viewReportBatch(request):
         if batchno:
             datamodel = datamodel.filter(batchno=batchno)
         if inputdatefrom:
-            datamodel = datamodel.filter(weight__datetime__gte=inputdatefrom)
+            datamodel = datamodel.filter(weight__gte=inputdatefrom)
         if inputdateto:
             inputdateto = inputdateto + " 23:59"
-            datamodel = datamodel.filter(weight__datetime__lte=inputdateto)
+            datamodel = datamodel.filter(createdon__lte=inputdateto)
         if product or batchno or inputdatefrom or inputdateto:
             hasFilter = True
     else:
@@ -423,7 +423,7 @@ def reportBatchCSV(request):
     #fetch data
     context = {}
     hasFilter = False
-    datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
+    datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
         .order_by('-input_date')
     if request.method == "GET":
         form = ReportBatchForm(request.GET)
@@ -437,10 +437,10 @@ def reportBatchCSV(request):
         if batchno:
             datamodel = datamodel.filter(batchno=batchno)
         if inputdatefrom:
-            datamodel = datamodel.filter(weight__datetime__gte=inputdatefrom)
+            datamodel = datamodel.filter(weight__gte=inputdatefrom)
         if inputdateto:
             inputdateto = inputdateto + " 23:59"
-            datamodel = datamodel.filter(weight__datetime__lte=inputdateto)
+            datamodel = datamodel.filter(createdon__lte=inputdateto)
         if product or batchno or inputdatefrom or inputdateto:
             hasFilter = True
     if hasFilter:
@@ -785,7 +785,7 @@ def closeWeighingState(request, id):
 @login_required(login_url=loginpage)
 def viewBatchHistory(request, batchno):
     context = {}
-    datamodel = Register.objects.filter(batchno=batchno).annotate(product_name=F('product__name'), iot_weight=F('weight__weighing'), input_date=F('weight__datetime'))\
+    datamodel = Register.objects.filter(batchno=batchno).annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
         .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date', 'status').order_by('-input_date')
     context['data'] = datamodel
     return render(request, 'batchno_history.html', context=context)

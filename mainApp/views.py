@@ -127,17 +127,18 @@ def ScaleView(request):
 
         #get current weight
         activebatchno = WeighingState.objects.filter(status=True).last().batchno
-        currentbox = Register.objects.filter(batchno = activebatchno, status = None).last()
-        if currentbox:
-            weight = Logging.objects.filter(datetime__gte=currentbox.createdon).last()
-            if weight:
-                print(activebatchno)
-                print(currentbox)
-                print(weight.status)
-                print(weight.weighing)
-                currentbox.weight = weight.weighing
-                currentbox.status = weight.status
-                currentbox.save()
+        if activebatchno:
+            currentbox = Register.objects.filter(batchno = activebatchno, status = None).last()
+            if currentbox:
+                weight = Logging.objects.filter(datetime__gte=currentbox.createdon).last()
+                if weight:
+                    print(activebatchno)
+                    print(currentbox)
+                    print(weight.status)
+                    print(weight.weighing)
+                    currentbox.weight = weight.weighing
+                    currentbox.status = weight.status
+                    currentbox.save()
         return JsonResponse(data, safe=False, status=200)
 
 def insertWeight(batchno):

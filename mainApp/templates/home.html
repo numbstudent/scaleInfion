@@ -39,15 +39,15 @@
             </div>
             <div class="modal-body">
                 <input class="form-control" type="hidden" id="registerid">
-                <label for="adjustment">Initial Weight</label>
-                <input class="form-control" type="text" id="currentweight" readonly>
-                <label for="adjustment">Weight Change</label>
-                <input class="form-control" type="text" id="differenceweight" readonly>
-                <label for="adjustment">Desired Weight</label>
-                <input class="form-control" type="text" id="finalweight">
+                <label>Initial Weight</label>
+                <input class="form-control" type="text" id="currentweight" readonly="readonly">
+                <label>Weight Change</label>
+                <input class="form-control" type="text" id="differenceweight" readonly="readonly">
+                <label>Desired Weight</label>
+                <input class="form-control" type="number" id="finalweight">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary float-left" id="btnlastbox" data-dismiss="modal">Submit</button>
+                <button type="button" class="btn btn-primary float-left" id="btnsubmitweightAdjustment" data-dismiss="modal">Submit</button>
             </div>
         </div>
     </div>
@@ -197,7 +197,7 @@
                                 <button class="btn btn-danger deleteBox" data-id="'+ record.id +'">\
                                     <i class="fas fa-times"></i>\
                                 </button>\
-                                <button class="btn btn-secondary btnweightAdjustment" data-weight="'+ weight +'">\
+                                <button class="btn btn-secondary btnweightAdjustment" data-id="'+ record.id +'" data-weight="'+ weight +'">\
                                     <i class="fa fa-edit"></i>\
                                 </button>\
                             </div>\
@@ -205,7 +205,7 @@
                                 <a href="javascript:void(0)" class="product-title">'+ status +'\
                                     <span class="display-4 float-right">'+ weight+' g </span></a>\
                                 <span class="product-description">\
-                                    BOX NO. '+record.boxno+'\
+                                    BOX NO. '+record.boxno+' - <small>Input: '+record.createdon.substring(0,16).replace("T", " ")+'</small>\
                                 </span>\
                             </div>\
                         </li>'
@@ -260,6 +260,22 @@
         })
     })
 
+    $("#btnsubmitweightAdjustment").click(function () {
+        var url = "{% url 'editregisterweight' %}"
+        var registerid = $("#registerid").val();
+        var finalweight = parseFloat($("#finalweight").val());
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: url,
+            data: JSON.stringify({"registerid": registerid, "finalweight": finalweight}),
+            success: function (data) {   // success callback function
+                alert(data.message)
+                updateBoxList()
+            }
+        })
+    })
+
     $("#btnlastbox").click(function () {
         var rejectboxid = $("#rejectboxid").val();
         var url = "{% url 'rejectbox' %}"
@@ -301,13 +317,14 @@
         $("#finalweight").val("")
         $("#weightAdjustmentModal").modal('show')
         $("#currentweight").val($(this).data('weight'))
+        $("#registerid").val($(this).data('id'))
     })
 
     $("#finalweight").keyup(function () {
         $("#differenceweight").val($("#finalweight").val() - $("#currentweight").val())
     });
 
-    $(document).on('keypress', function (e) {
+    $(document).not("#finalweight").on('keypress', function (e) {
         if (e.which == 13 && e.target.id == 'qr') {
             boxSubmit()
             $('#' + e.target.id).val("")

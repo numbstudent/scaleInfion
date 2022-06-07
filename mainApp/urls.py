@@ -10,6 +10,7 @@ urlpatterns = [
     # path('endbatch', views.viewEndBatch, name='endbatch'),
     path('registerqr', views.RegisterView, name='registerqr'),
     path('registerqr/<str:batchno>', views.RegisterView, name='registerbatchno'),
+    path('editregisterweight', views.editRegisterWeight, name='editregisterweight'),
     path('history', views.viewHistory, name='history'),
     path('rejectbox', views.RejectBox, name='rejectbox'),
 

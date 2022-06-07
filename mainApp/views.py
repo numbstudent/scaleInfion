@@ -83,7 +83,7 @@ def RegisterView(request, batchno=None):
             # if not box['status']:
             #     insertsuccess = "False"
             data = Register.objects.annotate(product_name=F('product__name'),iot_weight=F('weight'))\
-            .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight','status')\
+            .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight','status','createdon')\
             .filter(batchno=batchno, product__code=code).order_by('-createdon')
         else:
             data = Register.objects.all().values()
@@ -96,6 +96,22 @@ def RegisterView(request, batchno=None):
         obj = Register.objects.filter(id=registerid)
         obj.delete()
         return JsonResponse({"message": "Data berhasil dihapus"}, status=200)
+
+@csrf_exempt
+def editRegisterWeight(request):
+    if request.method == "POST":
+        body = json.loads(request.body)
+        registerid = body['registerid']
+        finalweight = body['finalweight']
+        obj = Register.objects.filter(id=registerid).first()
+        message = ""
+        if(((finalweight - obj.weight) < 1) and ((finalweight - obj.weight) > -1)):
+            obj.weight = finalweight
+            obj.save()
+            message = "Perubahan selesai."
+        else:
+            message = "Perubahan data melebihi 1 gram!"
+        return JsonResponse({"message": message}, status=200)
 
 @login_required(login_url=loginpage)
 def ScaleSimulator(request):

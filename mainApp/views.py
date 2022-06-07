@@ -117,7 +117,6 @@ def ScaleSimulator(request):
 
 @csrf_exempt
 def ScaleView(request):
-
     obj = Logging.objects.latest('id')
 
     if request.method == "GET":

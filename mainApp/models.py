@@ -41,11 +41,11 @@ class Register(models.Model):
     weight = models.FloatField(null=True)
     createdby = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="createdby_rel")
     updatedby = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, blank=True, related_name="updatedby_rel")
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['product', 'batchno', 'boxno'], name='productBatchnoBoxno')
-        ]
+    # class Meta:
+    #     constraints = [
+    #         models.UniqueConstraint(
+    #             fields=['product', 'batchno', 'boxno'], name='productBatchnoBoxno')
+    #     ]
 
 class PrintHeader(models.Model):
     name = models.CharField(max_length=50)

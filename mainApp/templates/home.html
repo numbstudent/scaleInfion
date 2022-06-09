@@ -193,14 +193,6 @@
                         } 
                         html += '\
                         <li class="item">\
-                            <div class="product-img" style="margin-right:7px">\
-                                <button class="btn btn-danger deleteBox" data-id="'+ record.id +'">\
-                                    <i class="fas fa-times"></i>\
-                                </button>\
-                                <button class="btn btn-secondary btnweightAdjustment" data-id="'+ record.id +'" data-weight="'+ weight +'">\
-                                    <i class="fa fa-edit"></i>\
-                                </button>\
-                            </div>\
                             <div class="product-info">\
                                 <a href="javascript:void(0)" class="product-title">'+ status +'\
                                     <span class="display-4 float-right">'+ weight+' g </span></a>\
@@ -210,6 +202,16 @@
                             </div>\
                         </li>'
                     }
+
+                    // <div class="product-img" style="margin-right:7px">\
+                    //     <button class="btn btn-danger deleteBox" data-id="'+ record.id +'">\
+                    //         <i class="fas fa-times"></i>\
+                    //     </button>\
+                    //     <button class="btn btn-secondary btnweightAdjustment" data-id="'+ record.id +'" data-weight="'+ weight +'">\
+                    //         <i class="fa fa-edit"></i>\
+                    //     </button>\
+                    // </div>\
+
                     // if(data.insertsuccess == "False"){
                     //     // $("#rejectedbox").text(data.)
                     //     $("#rejectboxid").val(data.id)

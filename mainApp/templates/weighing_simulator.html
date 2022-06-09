@@ -48,9 +48,9 @@
                                             <td>{{row.weighing}}</td>
                                             <td>
                                                 {% if row.status == 0 %}
-                                                OK
-                                                {% elif row.status == 1 %}
                                                 Reject
+                                                {% elif row.status == 1 %}
+                                                Approve
                                                 {% elif row.status == 2 %}
                                                 Last Box
                                                 {% endif %}

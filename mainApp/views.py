@@ -53,10 +53,10 @@ def RegisterView(request, batchno=None):
             boxno = request.POST.get('boxno')
             batchno = request.POST.get('batchno')
             productid = Product.objects.filter(code=code).first()
-            boxexists = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).exists()
+            boxexists = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).exclude(status=0).exists()
             boxkosongexists = Register.objects.filter(product=productid, batchno=batchno, status=None).exists()
             weighingstate = WeighingState.objects.filter(status=True, batchno=batchno, product=productid).exists()
-            print(weighingstate)
+            print(boxexists)
             if not weighingstate:
                 return JsonResponse({"message": "Box tidak sesuai dengan Batch."}, status=400)
             if boxexists or int(boxno) < 1:
@@ -379,17 +379,20 @@ def viewHistory(request):
         product = request.POST.get('productid')
         batchno = request.POST.get('batchno')
         inputdatefrom = request.POST.get('inputdatefrom')
-        inputdateto = request.POST.get('inputdateto')
-        context['form'] = list(form)
+        inputdateto = request.GET.get('inputdateto')
+        reporttype = request.GET.get('reporttype')
+        context['form'] = form
         if product:
             datamodel = datamodel.filter(product=product)
         if batchno:
             datamodel = datamodel.filter(batchno=batchno)
         if inputdatefrom:
-            datamodel = datamodel.filter(createdon__gte=inputdatefrom)
+            datamodel = datamodel.filter(weight__gte=inputdatefrom)
         if inputdateto:
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(createdon__lte=inputdateto)
+        if reporttype == 1:
+            datamodel = datamodel.filter(status=1)
         if product or batchno or inputdatefrom or inputdateto:
             hasFilter = True
     else:
@@ -405,14 +408,16 @@ def viewHistory(request):
 def viewReportBatch(request):
     context = {}
     datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
-        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date').order_by('-input_date')
+        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date','status').order_by('-input_date')
     hasFilter = False
     if request.method == "POST":
         form = ReportBatchForm(request.POST)
         product = request.POST.get('productid')
         batchno = request.POST.get('batchno')
         inputdatefrom = request.POST.get('inputdatefrom')
-        inputdateto = request.POST.get('inputdateto')
+        inputdateto = request.GET.get('inputdateto')
+        reporttype = request.GET.get('reporttype')
+        print(reporttype)
         context['form'] = form
         if product:
             datamodel = datamodel.filter(product=product)
@@ -423,6 +428,8 @@ def viewReportBatch(request):
         if inputdateto:
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(createdon__lte=inputdateto)
+        if reporttype == 1:
+            datamodel = datamodel.filter(status=1)
         if product or batchno or inputdatefrom or inputdateto:
             hasFilter = True
     else:
@@ -447,6 +454,7 @@ def reportBatchCSV(request):
         batchno = request.GET.get('batchno')
         inputdatefrom = request.GET.get('inputdatefrom')
         inputdateto = request.GET.get('inputdateto')
+        reporttype = request.GET.get('reporttype')
         context['form'] = form
         if product:
             datamodel = datamodel.filter(product=product)
@@ -457,6 +465,8 @@ def reportBatchCSV(request):
         if inputdateto:
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(createdon__lte=inputdateto)
+        if reporttype == 1:
+            datamodel = datamodel.filter(status=1)
         if product or batchno or inputdatefrom or inputdateto:
             hasFilter = True
     if hasFilter:

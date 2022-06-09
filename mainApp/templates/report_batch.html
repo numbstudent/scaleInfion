@@ -37,6 +37,7 @@
                             <th>Batch No</th>
                             <th>Box No</th>
                             <th>Weight</th>
+                            <th>Status</th>
                             <th>Input Date</th>
                         </tr>
                     </thead>
@@ -47,6 +48,13 @@
                             <td>{{row.batchno}}</td>
                             <td>{{row.boxno}}</td>
                             <td>{{row.iot_weight}}</td>
+                            <td>
+                                {% if row.status %}
+                                <i class="fas fa-check text-blue"></i>
+                                {% else %}
+                                <i class="fas fa-times text-red"></i>
+                                {% endif %}
+                            </td>
                             <td>{{row.input_date|date:"j/n/Y"}}</td>
                         </tr>
                         {%endfor%}
@@ -69,6 +77,7 @@
         var batchno = $("#id_batchno").val()
         var inputdatefrom = $("#id_inputdatefrom").val()
         var inputdateto = $("#id_inputdateto").val()
+        var reporttype = $("#id_reporttype").val()
         window.open(url + "?productid=" + productid + "&batchno=" + batchno + "&inputdatefrom=" + inputdatefrom + "&inputdateto=" + inputdateto)
     })
 
@@ -78,6 +87,7 @@
         var batchno = $("#id_batchno").val()
         var inputdatefrom = $("#id_inputdatefrom").val()
         var inputdateto = $("#id_inputdateto").val()
+        var reporttype = $("#id_reporttype").val()
         if (!productid || !batchno) {
             alert("Product dan Batch No harus diisi!")
         } else {

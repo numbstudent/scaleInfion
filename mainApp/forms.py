@@ -70,6 +70,11 @@ class ReportTitleForm(ModelForm):
         model = ReportTitle
         fields = ['id','title','subtitle']
 
+REPORTTYPE_CHOICES =(
+    ("1", "Final Report"),
+    ("2", "Full Report"),
+)
+
 class ReportBatchForm(forms.Form):
     import datetime
     productid = ProductModelChoiceField(
@@ -84,6 +89,7 @@ class ReportBatchForm(forms.Form):
     inputdateto = forms.DateField(required=False, label="To Date", widget=forms.DateInput(attrs={
         'class': 'form-control datepick'
     }))
+    reporttype = forms.ChoiceField(required=False, choices=REPORTTYPE_CHOICES)
 
 class UploadBatchForm(forms.Form):
     productid = ProductModelChoiceField(

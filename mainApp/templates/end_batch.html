@@ -48,7 +48,13 @@
                                             <td>{{row.product.name}}</td>
                                             <td>{{row.batchno}}</td>
                                             <td>{{row.status|yesno:'Pending, Close'}}</td>
-                                            <td>{{row.status|yesno:'Aktif, Tidak Aktif'}}</td>
+                                            <td>
+                                                {% if row.status %}
+                                                    <i class="fas fa-check text-blue"></i>
+                                                {% else %}
+                                                    <i class="fas fa-times text-red"></i>
+                                                {% endif %}
+                                            </td>
                                             <!-- <td>
                                                 <a class="btn btn-secondary" href="{% url 'editproduct' row.id %}"><i
                                                         class="fas fa-edit"></i></a>

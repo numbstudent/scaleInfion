@@ -95,5 +95,17 @@ class WeighingState(models.Model):
     pendingstatus = models.BooleanField(default=True,choices=PENDING_CHOICES) #pendingstatus true = masih belum close
     spvpabrik = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="spvpabrik", null=True) #boleh kosong di create awal batchno
     spvgudang = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="spvgudang", null=True) #boleh kosong di create awal batchno
+    operator = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="operator", null=True) #boleh kosong di create awal batchno
+    petugasgudang = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="petugasgudang", null=True) #boleh kosong di create awal batchno
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
+
+class ReportRegister(models.Model):
+    dnrev = models.IntegerField()
+    product = models.ForeignKey(Product, on_delete=models.RESTRICT)
+    batchno = models.CharField(max_length=15)
+    boxno = models.IntegerField()
+    status = models.IntegerField(null=True, default=None)
+    createdon = models.DateTimeField(auto_now_add=True)
+    weight = models.FloatField(null=True)
+    createdby = models.ForeignKey(User, on_delete=models.RESTRICT)

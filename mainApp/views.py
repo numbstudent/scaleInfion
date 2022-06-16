@@ -562,6 +562,7 @@ def reportBatchPDF(request):
         header = Report.objects.all().get(id=reportid)
         datamodel = datamodel.filter(batchno=header.batchno, product=header.product)
         datamodel2 = datamodel2.filter(batchno=header.batchno, product=header.product)
+        signature = WeighingState.objects.filter(batchno=header.batchno, product=header.product).first()
     else:
         datamodel = datamodel[0]
         datamodel2 = datamodel2[0]
@@ -570,8 +571,8 @@ def reportBatchPDF(request):
     else:
         rowlen = datamodel.count()//2+1
     # testing in windows
-    return render(request, 'report_batch_pdf_template2.html', context={'data': datamodel, 'data2': datamodel2, 'header': header, 'rowlen': rowlen})
-    html_string = render_to_string('report_batch_pdf_template.html', {'data': datamodel, 'data2': datamodel2, 'header':header, 'rowlen':rowlen})
+    return render(request, 'report_batch_pdf_template2.html', context={'data': datamodel, 'data2': datamodel2, 'header': header, 'rowlen': rowlen, 'signature':signature})
+    html_string = render_to_string('report_batch_pdf_template.html', {'data': datamodel, 'data2': datamodel2, 'header':header, 'rowlen':rowlen, 'signature':signature})
 
     html = HTML(string=html_string, base_url=request.build_absolute_uri())
     html.write_pdf(target='/tmp/REPORTBATCH.pdf');

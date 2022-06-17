@@ -202,7 +202,9 @@ def viewProduct(request):
         form = ProductForm(request.POST)
         context['form'] = form
         if form.is_valid():
-            form.save()
+            instance = form.save(commit=False)
+            instance.createdby = request.user
+            instance.save()
             return redirect('viewproduct')
     else:
         context['form'] = ProductForm()

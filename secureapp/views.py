@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.db.models import RestrictedError
 from .forms import *
+from .decorators import allowed_users
 
 # Create your views here.
 
@@ -38,6 +39,7 @@ def viewChangePassword(request):
 
 
 @login_required(login_url=loginpage)
+@allowed_users(allowed_roles=['administrator'])
 def viewUser(request):
     context = {}
     context['action'] = 'view'
@@ -58,6 +60,7 @@ def viewUser(request):
 
 
 @login_required(login_url=loginpage)
+@allowed_users(allowed_roles=['administrator'])
 def deleteUser(request, id):
     obj = User.objects.filter(id=id)
     try:
@@ -69,6 +72,7 @@ def deleteUser(request, id):
 
 
 @login_required(login_url=loginpage)
+@allowed_users(allowed_roles=['administrator'])
 def editUser(request, id):
     context = {}
     context['action'] = 'edit'
@@ -96,7 +100,7 @@ def editUser(request, id):
             # return redirect('userlist')
     return render(request, 'registration/userlist.html', context=context)
 
-
+@allowed_users(allowed_roles=['administrator'])
 def viewRegister(request):
     if request.POST == 'POST':
         form = UserCreationForm()
@@ -113,6 +117,7 @@ def viewRegister(request):
     return render(request, 'registration/register.html', context)
 
 @login_required(login_url=loginpage)
+@allowed_users(allowed_roles=['administrator'])
 def groupAdd(request, id):
     context = {}
     context['action'] = 'edit'

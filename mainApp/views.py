@@ -389,7 +389,7 @@ def viewHistory(request):
         if batchno:
             datamodel = datamodel.filter(batchno=batchno)
         if inputdatefrom:
-            datamodel = datamodel.filter(weight__gte=inputdatefrom)
+            datamodel = datamodel.filter(createdon__gte=inputdatefrom)
         if inputdateto:
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(createdon__lte=inputdateto)
@@ -426,7 +426,7 @@ def viewReportBatch(request):
         if batchno:
             datamodel = datamodel.filter(batchno=batchno)
         if inputdatefrom:
-            datamodel = datamodel.filter(weight__gte=inputdatefrom)
+            datamodel = datamodel.filter(createdon__gte=inputdatefrom)
         if inputdateto:
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(createdon__lte=inputdateto)
@@ -463,7 +463,7 @@ def reportBatchCSV(request):
         if batchno:
             datamodel = datamodel.filter(batchno=batchno)
         if inputdatefrom:
-            datamodel = datamodel.filter(weight__gte=inputdatefrom)
+            datamodel = datamodel.filter(createdon__gte=inputdatefrom)
         if inputdateto:
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(createdon__lte=inputdateto)

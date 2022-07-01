@@ -1,0 +1,29 @@
+1,home,Home
+37,editregisterweight,
+38,history,Weighing History
+39,rejectbox,
+40,viewproduct,Master Product
+41,deleteproduct,
+42,editproduct,
+43,viewdepartment,Master Department
+44,deletedepartment,
+45,editdepartment,
+46,viewreporttitle,Master Report Title
+47,deletereporttitle,
+48,editreporttitle,
+49,viewreportbody,Report
+50,deletereportbody,
+51,editreportbody,
+52,viewweighingstate,Batch No
+53,deleteweighingstate,
+54,editweighingstate,
+55,closeweighingstate,Close Batch
+56,activateweighingstate,Change Batch Active status
+57,viewbatchhistory,Batch History
+58,reportbatch,Report Batch
+59,reportbatchcsv,Print Batch CSV
+60,reportbatchpdf,Print Batch PDF
+61,viewuploadbatch,
+62,deleteuploadbatch,
+63,viewsimulator,
+64,weighing,Weighing

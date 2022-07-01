@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='weighing'),
-    path('product', views.ProductView, name='product'),
+    # path('product', views.ProductView, name='product'),
     path('scale', views.ScaleView, name='scale'),
     # path('startbatch', views.viewWeighingState, name='startbatch'),
     # path('endbatch', views.viewEndBatch, name='endbatch'),

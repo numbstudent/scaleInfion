@@ -40,6 +40,48 @@ def viewChangePassword(request):
 
 @login_required(login_url=loginpage)
 @allowed_users(allowed_roles=['administrator'])
+def viewFeatureAccess(request):
+    context = {}
+    context['action'] = 'view'
+    context['data'] = AccessList.objects.all()
+    context['isvalid'] = 'yes'
+    if request.method == "POST":
+        form = FeatureAccessForm(request.POST)
+        context['form'] = form
+        if form.is_valid():
+            form.save()
+            messages.success(request, '')
+        else:
+            context['isvalid'] = 'no'
+    else:
+        context['form'] = FeatureAccessForm()
+
+    return render(request, 'registration/featureaccesslist.html', context=context)
+
+@login_required(login_url=loginpage)
+@allowed_users(allowed_roles=['administrator'])
+def editFeatureAccess(request, id):
+    context = {}
+    context['action'] = 'edit'
+    context['id'] = id
+    context['message'] = None
+    if request.method == 'GET':
+        obj = AccessList.objects.get(id=id)
+        form = FeatureAccessForm(instance=obj)
+        context['data'] = AccessList.objects.all()
+        context['form'] = form
+    if request.method == 'POST':
+        obj = AccessList.objects.get(id=id)
+        form = FeatureAccessForm(request.POST, instance=obj)
+        context['data'] = AccessList.objects.all()
+        context['form'] = form
+        if form.is_valid():
+            form.save()
+            context['message'] = "Data berhasil disimpan."
+    return render(request, 'registration/featureaccesslist.html', context=context)
+
+@login_required(login_url=loginpage)
+@allowed_users(allowed_roles=['administrator'])
 def viewUser(request):
     context = {}
     context['action'] = 'view'

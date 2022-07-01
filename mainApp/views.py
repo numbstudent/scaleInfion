@@ -2,7 +2,7 @@ from itertools import product
 from math import prod
 from mainApp.models import *
 from mainApp.forms import *
-from secureapp.decorators import allowed_users
+from secureapp.decorators import allowed_users, allowed_check
 from django.shortcuts import get_list_or_404, render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.db.models import RestrictedError, Sum, Q, F
@@ -20,7 +20,8 @@ from datetime import datetime, timedelta
 loginpage = 'login'
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator','operator','supervisorgudang','supervisorpabrik','supervisorppic'])
+# @allowed_users(allowed_roles=['administrator','operator','supervisorgudang','supervisorpabrik','supervisorppic'])
+@allowed_check(feature_alias='home')
 def index(request):
     context = {}
     context ['state'] = WeighingState.objects.filter(status=True).first()
@@ -403,7 +404,7 @@ def viewHistory(request):
         inputdatefrom = request.POST.get('inputdatefrom')
         inputdateto = request.GET.get('inputdateto')
         reporttype = request.GET.get('reporttype')
-        context['form'] = form
+        context['form'] = list(form)
         if product:
             datamodel = datamodel.filter(product=product)
         if batchno:

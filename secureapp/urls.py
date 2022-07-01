@@ -13,4 +13,6 @@ urlpatterns = [
          views.deleteUser, name='deleteuser'),
     path('edit-user/<int:id>', views.editUser, name='edituser'),
     path('group-add/<int:id>', views.groupAdd, name='groupadd'),
+    path('featureaccess', views.viewFeatureAccess, name='featureacceess'),
+    path('edit-featureaccess/<int:id>', views.editFeatureAccess, name='editfeatureacceess'),
 ]

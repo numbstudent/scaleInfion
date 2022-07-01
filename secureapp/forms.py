@@ -21,3 +21,15 @@ class GroupAddForm(forms.Form):
         queryset=Group.objects.all(), label="Group", widget=forms.Select(attrs={
             'class': 'form-control select2bs4'
     }))
+
+class FeatureAccessForm(ModelForm):
+    class Meta:
+        model = AccessList
+        fields = ['feature_name', 'allowed_groups']
+        widgets = {
+            "feature_name": forms.DateInput(attrs={
+                'readonly': True
+            }),
+            "allowed_groups": forms.CheckboxSelectMultiple(),
+            
+        }

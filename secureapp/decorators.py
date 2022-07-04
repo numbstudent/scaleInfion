@@ -34,7 +34,10 @@ def allowed_check(feature_alias):
             if request.user.groups.exists():
                 group = request.user.groups.all()[0].id
 
-            allowed_group = AccessList.objects.filter(feature_alias=feature_alias).values_list('allowed_groups')[0]
+            print(group)
+
+            allowed_group = AccessList.objects.filter(feature_alias=feature_alias).values_list('allowed_groups', flat=True)
+            print(allowed_group)
             if group in allowed_group:
                 return view_func(request, *args, **kwargs)
             else:

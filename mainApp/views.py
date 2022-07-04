@@ -20,7 +20,6 @@ from datetime import datetime, timedelta
 loginpage = 'login'
 
 @login_required(login_url=loginpage)
-# @allowed_users(allowed_roles=['administrator','operator','supervisorgudang','supervisorpabrik','supervisorppic'])
 @allowed_check(feature_alias='home')
 def index(request):
     context = {}
@@ -117,7 +116,7 @@ def editRegisterWeight(request):
         return JsonResponse({"message": message}, status=200)
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='simulator')
 def ScaleSimulator(request):
     context = {}
     context['action'] = 'view'
@@ -198,7 +197,7 @@ def insertWeight(batchno):
 
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator','supervisorppic'])
+@allowed_check(feature_alias='masterproduct')
 def viewProduct(request):
     context = {}
     context['action'] = 'view'
@@ -218,7 +217,7 @@ def viewProduct(request):
 
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator','supervisorppic'])
+@allowed_check(feature_alias='masterproduct')
 def deleteProduct(request, id):
     obj = Product.objects.filter(id=id)
     try:
@@ -229,7 +228,7 @@ def deleteProduct(request, id):
     return redirect('viewproduct')
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator','supervisorppic'])
+@allowed_check(feature_alias='masterproduct')
 def editProduct(request, id):
     context = {}
     context['action'] = 'edit'
@@ -258,7 +257,7 @@ def editProduct(request, id):
 
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='masterdepartment')
 def viewDepartment(request):
     context = {}
     context['action'] = 'view'
@@ -278,7 +277,7 @@ def viewDepartment(request):
 
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='masterdepartment')
 def deleteDepartment(request, id):
     obj = Department.objects.filter(id=id)
     try:
@@ -289,7 +288,7 @@ def deleteDepartment(request, id):
     return redirect('viewdepartment')
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='masterdepartment')
 def editDepartment(request, id):
     context = {}
     context['action'] = 'edit'
@@ -314,7 +313,7 @@ def editDepartment(request, id):
 
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='masterreport')
 def viewReportBody(request):
     context = {}
     context['action'] = 'view'
@@ -354,7 +353,7 @@ def viewReportBody(request):
 
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='masterreport')
 def deleteReportBody(request, id):
     obj = Report.objects.filter(id=id)
     try:
@@ -365,7 +364,7 @@ def deleteReportBody(request, id):
     return redirect('viewreportbody')
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='masterreport')
 def editReportBody(request, id):
     context = {}
     context['action'] = 'edit'
@@ -391,7 +390,7 @@ def editReportBody(request, id):
 
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='history')
 def viewHistory(request):
     context = {}
     datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
@@ -428,7 +427,7 @@ def viewHistory(request):
 
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='reportpdf')
 def viewReportBatch(request):
     context = {}
     datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
@@ -466,6 +465,7 @@ def viewReportBatch(request):
 
 
 @csrf_exempt
+@allowed_check(feature_alias='reportcsv')
 def reportBatchCSV(request):
     #fetch data
     context = {}
@@ -516,7 +516,7 @@ def reportBatchCSV(request):
 
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='masterreport')
 def viewReportTitle(request):
     context = {}
     context['action'] = 'view'
@@ -537,7 +537,7 @@ def viewReportTitle(request):
 
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='masterreport')
 def deleteReportTitle(request, id):
     obj = ReportTitle.objects.filter(id=id)
     try:
@@ -548,7 +548,7 @@ def deleteReportTitle(request, id):
     return redirect('viewreporttitle')
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='masterreport')
 def editReportTitle(request, id):
     context = {}
     context['action'] = 'edit'
@@ -573,7 +573,7 @@ def editReportTitle(request, id):
     return render(request, 'master_reporttitle.html', context=context)
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='reportpdf')
 def reportBatchPDF(request):
     from django.core.files.storage import FileSystemStorage
     from django.http import HttpResponse
@@ -614,7 +614,7 @@ def reportBatchPDF(request):
     return response
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='batch')
 def viewUploadBatch(request):
     from io import StringIO
     context = {}
@@ -646,7 +646,7 @@ def viewUploadBatch(request):
     return render(request, 'upload_batch.html', context=context)
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='batch')
 def deleteUploadBatch(request, id):
     obj = UploadedRegister.objects.filter(id=id)
     try:
@@ -657,7 +657,7 @@ def deleteUploadBatch(request, id):
     return redirect('viewuploadbatch')
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='batch')
 def viewWeighingState(request): #startbatch
     context = {}
     context['action'] = 'view'
@@ -685,7 +685,7 @@ def viewWeighingState(request): #startbatch
     return render(request, 'weighingstate.html', context=context)
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='batch')
 def viewEndBatch(request): #endbatch
     context = {}
     context['action'] = 'view'
@@ -736,7 +736,7 @@ def RejectBox(request):
 
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='batch')
 def viewWeighingState(request):
     context = {}
     context['action'] = 'view'
@@ -761,7 +761,7 @@ def viewWeighingState(request):
 
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='batch')
 def deleteWeighingState(request, id):
     obj = WeighingState.objects.filter(id=id)
     try:
@@ -772,7 +772,7 @@ def deleteWeighingState(request, id):
     return redirect('viewweighingstate')
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='batch')
 def editWeighingState(request, id):
     context = {}
     context['action'] = 'edit'
@@ -797,7 +797,7 @@ def editWeighingState(request, id):
     return render(request, 'weighingstate.html', context=context)
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='batch')
 def activateWeighingState(request, id, status):
     context = {}
     context['action'] = 'edit'
@@ -816,7 +816,7 @@ def activateWeighingState(request, id, status):
 
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='batch')
 def closeWeighingState(request, id):
     context = {}
     context['action'] = 'edit'
@@ -847,7 +847,7 @@ def closeWeighingState(request, id):
 
 
 @login_required(login_url=loginpage)
-@allowed_users(allowed_roles=['administrator'])
+@allowed_check(feature_alias='batch')
 def viewBatchHistory(request, batchno):
     context = {}
     datamodel = Register.objects.filter(batchno=batchno).annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\

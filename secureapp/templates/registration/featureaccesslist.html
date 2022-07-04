@@ -35,7 +35,8 @@
                                 <table class="table dataTable">
                                     <thead>
                                         <tr>
-                                            <th>Alias</th>
+                                            <th>ID</th>
+                                            <th>Function</th>
                                             <th>Name</th>
                                             <th>Allowed Groups</th>
                                             <th>Action</th>
@@ -44,10 +45,12 @@
                                     <tbody>
                                         {%for row in data%}
                                         <tr>
+                                            <td>{{row.id}}</td>
                                             <td>{{row.feature_alias}}</td>
                                             <td>{{row.feature_name}}</td>
                                             <td>{% for group in row.allowed_groups.all %}
                                             {{ group.name }}
+                                            {% if not forloop.last %}, {% endif %}
                                             {% endfor %}</td>
                                             <td><a class="btn btn-secondary" href="{% url 'editfeatureacceess' row.id %}"><i
                                                         class="fas fa-edit"></i></a>

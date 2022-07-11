@@ -614,7 +614,7 @@ def reportBatchPDF(request):
     return response
 
 @login_required(login_url=loginpage)
-@allowed_check(feature_alias='batch')
+@allowed_check(feature_alias='viewendbatch')
 def viewUploadBatch(request):
     from io import StringIO
     context = {}
@@ -646,7 +646,7 @@ def viewUploadBatch(request):
     return render(request, 'upload_batch.html', context=context)
 
 @login_required(login_url=loginpage)
-@allowed_check(feature_alias='batch')
+@allowed_check(feature_alias='managebatch')
 def deleteUploadBatch(request, id):
     obj = UploadedRegister.objects.filter(id=id)
     try:
@@ -657,7 +657,7 @@ def deleteUploadBatch(request, id):
     return redirect('viewuploadbatch')
 
 @login_required(login_url=loginpage)
-@allowed_check(feature_alias='batch')
+@allowed_check(feature_alias='viewendbatch')
 def viewWeighingState(request): #startbatch
     context = {}
     context['action'] = 'view'
@@ -685,7 +685,7 @@ def viewWeighingState(request): #startbatch
     return render(request, 'weighingstate.html', context=context)
 
 @login_required(login_url=loginpage)
-@allowed_check(feature_alias='batch')
+@allowed_check(feature_alias='viewendbatch')
 def viewEndBatch(request): #endbatch
     context = {}
     context['action'] = 'view'
@@ -736,7 +736,7 @@ def RejectBox(request):
 
 
 @login_required(login_url=loginpage)
-@allowed_check(feature_alias='batch')
+@allowed_check(feature_alias='viewendbatch')
 def viewWeighingState(request):
     context = {}
     context['action'] = 'view'
@@ -761,7 +761,7 @@ def viewWeighingState(request):
 
 
 @login_required(login_url=loginpage)
-@allowed_check(feature_alias='batch')
+@allowed_check(feature_alias='managebatch')
 def deleteWeighingState(request, id):
     obj = WeighingState.objects.filter(id=id)
     try:
@@ -772,7 +772,7 @@ def deleteWeighingState(request, id):
     return redirect('viewweighingstate')
 
 @login_required(login_url=loginpage)
-@allowed_check(feature_alias='batch')
+@allowed_check(feature_alias='managebatch')
 def editWeighingState(request, id):
     context = {}
     context['action'] = 'edit'
@@ -797,7 +797,7 @@ def editWeighingState(request, id):
     return render(request, 'weighingstate.html', context=context)
 
 @login_required(login_url=loginpage)
-@allowed_check(feature_alias='batch')
+@allowed_check(feature_alias='managebatch')
 def activateWeighingState(request, id, status):
     context = {}
     context['action'] = 'edit'
@@ -816,7 +816,7 @@ def activateWeighingState(request, id, status):
 
 
 @login_required(login_url=loginpage)
-@allowed_check(feature_alias='batch')
+@allowed_check(feature_alias='viewendbatch')
 def closeWeighingState(request, id):
     context = {}
     context['action'] = 'edit'
@@ -826,7 +826,7 @@ def closeWeighingState(request, id):
         obj = WeighingState.objects.get(id=id)
         form = WeighingStateCloseForm(instance=obj)
         form.fields["spvpabrik"].queryset = User.objects.filter(
-            groups__name='supervisorpabrik')
+            groups__name='supervisorproduksi')
         form.fields["spvgudang"].queryset = User.objects.filter(
             groups__name='supervisorgudang')
         context['data'] = WeighingState.objects.all()
@@ -847,7 +847,7 @@ def closeWeighingState(request, id):
 
 
 @login_required(login_url=loginpage)
-@allowed_check(feature_alias='batch')
+@allowed_check(feature_alias='viewendbatch')
 def viewBatchHistory(request, batchno):
     context = {}
     datamodel = Register.objects.filter(batchno=batchno).annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\

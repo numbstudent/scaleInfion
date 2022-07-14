@@ -61,8 +61,8 @@ def RegisterView(request, batchno=None):
             print(boxexists)
             if not weighingstate:
                 return JsonResponse({"message": "Box tidak sesuai dengan Batch."}, status=400)
-            if boxexists or int(boxno) < 1:
-                return JsonResponse({"message": "Box sudah diinput. Hapus box terlebih dahulu untuk mereset."}, status=400)
+            # if boxexists or int(boxno) < 1:
+            #     return JsonResponse({"message": "Box sudah diinput. Hapus box terlebih dahulu untuk mereset."}, status=400)
             elif boxkosongexists:
                 return JsonResponse({"message": "Box kosong harus ditimbang terlebih dahulu."}, status=400)
             else:

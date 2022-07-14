@@ -397,28 +397,25 @@ def viewHistory(request):
         .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date', 'status').order_by('-input_date')
     hasFilter = False
     if request.method == "POST":
-        form = ReportBatchForm(request.POST)
+        form = HistoryForm(request.POST)
         product = request.POST.get('productid')
         batchno = request.POST.get('batchno')
         inputdatefrom = request.POST.get('inputdatefrom')
         inputdateto = request.GET.get('inputdateto')
-        reporttype = request.GET.get('reporttype')
         context['form'] = list(form)
         if product:
             datamodel = datamodel.filter(product=product)
         if batchno:
-            datamodel = datamodel.filter(batchno=batchno)
+            datamodel = datamodel.filter(batchno__icontains=batchno)
         if inputdatefrom:
             datamodel = datamodel.filter(createdon__gte=inputdatefrom)
         if inputdateto:
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(createdon__lte=inputdateto)
-        if reporttype == 1:
-            datamodel = datamodel.filter(status=1)
         if product or batchno or inputdatefrom or inputdateto:
             hasFilter = True
     else:
-        context['form'] = list(ReportBatchForm())
+        context['form'] = list(HistoryForm())
     if hasFilter:
        context['data'] = datamodel
     else:
@@ -430,7 +427,8 @@ def viewHistory(request):
 @allowed_check(feature_alias='reportpdf')
 def viewReportBatch(request):
     context = {}
-    datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
+    datamodel = Register.objects.filter(Q(status=1) | Q(status=2))\
+        .annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
         .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date','status').order_by('-input_date')
     hasFilter = False
     if request.method == "POST":

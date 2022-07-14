@@ -60,10 +60,12 @@
                                                 {% endif %}   
                                             </td>
                                             <td>
-                                                {% if row.status %}
-                                                    <i class="fas fa-check text-blue"></i>
+                                                {% if row.status == 1 %}
+                                                OK
+                                                {% elif row.status == 2 %}
+                                                Last Box
                                                 {% else %}
-                                                    <i class="fas fa-times text-red"></i>
+                                                <i class="fas fa-times text-red"></i>
                                                 {% endif %}
                                             </td>
                                             <td>

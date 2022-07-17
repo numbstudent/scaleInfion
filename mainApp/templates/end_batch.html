@@ -50,7 +50,7 @@
                                             <td>{{row.status|yesno:'Pending, Close'}}</td>
                                             <td>
                                                 {% if row.status == 1 %}
-                                                OK
+                                                <i class="fas fa-check text-blue"></i>
                                                 {% elif row.status == 2 %}
                                                 Last Box
                                                 {% else %}

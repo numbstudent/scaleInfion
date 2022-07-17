@@ -44,3 +44,19 @@ def allowed_check(feature_alias):
                 return HttpResponse('You are not authorized to view this page.')
         return wrapper_func
     return decorator
+
+
+def allowed_check_function(feature_alias, request):
+    group = None
+    if request.user.groups.exists():
+        group = request.user.groups.all()[0].id
+
+    print(group)
+
+    allowed_group = AccessList.objects.filter(
+        feature_alias=feature_alias).values_list('allowed_groups', flat=True)
+    print(allowed_group)
+    if group in allowed_group:
+        return True
+    else:
+        return False

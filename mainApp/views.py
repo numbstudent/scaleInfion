@@ -1,8 +1,9 @@
+import code
 from itertools import product
 from math import prod
 from mainApp.models import *
 from mainApp.forms import *
-from secureapp.decorators import allowed_users, allowed_check
+from secureapp.decorators import allowed_users, allowed_check, allowed_check_function
 from django.shortcuts import get_list_or_404, render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.db.models import RestrictedError, Sum, Q, F
@@ -19,8 +20,14 @@ from datetime import datetime, timedelta
 
 loginpage = 'login'
 
+
 @login_required(login_url=loginpage)
-@allowed_check(feature_alias='home')
+def front(request):
+    context = {}
+    return render(request, 'frontpage.html', context=context)
+
+@login_required(login_url=loginpage)
+@allowed_check(feature_alias='weighing')
 def index(request):
     context = {}
     context ['state'] = WeighingState.objects.filter(status=True).first()
@@ -195,6 +202,93 @@ def insertWeight(batchno):
                 #       str(newweight.first()[1])+",min="+str(obj.product.minweight)+"max="+str(obj.product.maxweight))
     return measuredbox
 
+@login_required(login_url=loginpage)
+@allowed_check(feature_alias='masterproduct')
+def viewUploadProduct(request):
+    from io import StringIO
+    context = {}
+    context['action'] = 'upload'    
+    # context['data'] = ProductUploadTemp.objects.all()
+    context['data'] = ProductUploadTemp.objects.raw('SELECT t.*, p.code cur_code, p.name cur_name, p.maxweight cur_maxweight, \
+        p.minweight cur_minweight, p.standardweight cur_standardweight,  \
+        case when p.code is null then \'New Data\'\
+        when t.name <> p.name or t.maxweight <> p.maxweight or t.minweight <> p.minweight or t.standardweight <> p.standardweight \
+        then \'Update\' else \'\'\
+        end description\
+        FROM mainapp_productuploadtemp t\
+        left join mainapp_product p on t.code = p.code \
+        order by description desc')
+    if request.method == "POST":
+        form = UploadProductForm(request.POST, request.FILES)
+        context['form'] = form
+        if form.is_valid():
+            file = request.FILES['file'].read().decode('utf-8')
+            reader = csv.reader(StringIO(file), delimiter=',')
+            next(reader) #skip header
+            ProductUploadTemp.objects.all().delete()
+            for row in reader:
+                obj = ProductUploadTemp(code=row[0], name=row[1], minweight=row[2],
+                                        maxweight=row[3], standardweight=row[4], createdby=request.user)
+                obj.save()
+            return redirect('uploadproduct')
+    else:
+        context['form'] = UploadProductForm()
+
+    return render(request, 'upload_product.html', context=context)
+
+
+@login_required(login_url=loginpage)
+@allowed_check(feature_alias='masterproduct')
+def updateProductByTemporary(request):
+    from io import StringIO
+    context = {}
+    context['action'] = 'update'    
+    # context['data'] = ProductUploadTemp.objects.all()
+    data = ProductUploadTemp.objects.raw('SELECT t.* \
+        FROM mainapp_productuploadtemp t \
+        left join mainapp_product p on t.code = p.code \
+        where p.code is null or t.name <> p.name or t.maxweight <> p.maxweight or \
+        t.minweight <> p.minweight or t.standardweight <> p.standardweight')
+
+    for item in data:
+        p = Product.objects.filter(code=item.code).first()
+        if p:
+            h = ProductHistory(code=p.code, name=p.name, maxweight=p.maxweight, minweight=p.minweight, standardweight=p.standardweight,
+                            createdon=p.createdon, updatedon=p.updatedon, status=p.status, createdby=p.createdby, updatedby=p.updatedby)
+            h.save()
+        obj, created = Product.objects.update_or_create(
+            code=item.code,
+            defaults={'name': item.name, 'maxweight': item.maxweight,
+                      'minweight': item.minweight, 'standardweight': item.standardweight, 'createdby': request.user},
+        )
+        ProductUploadTemp.objects.all().delete()
+
+    return redirect('uploadproduct')
+
+
+@login_required(login_url=loginpage)
+# @allowed_check(feature_alias='masterproduct')
+def downloadProductCSV(request):
+    #fetch data
+    context = {}
+    hasFilter = False
+    datamodel = Product.objects.all()
+    #writing to csv
+    output = []
+    response = HttpResponse(
+    )
+    response['Content-Disposition'] = 'attachment; filename="master_product_'+str(datetime.now())+'.csv"'
+
+    writer = csv.writer(response)
+    query_set = datamodel
+    #Table Header
+    writer.writerow(['Code', 'Product Name', 'Min. Weight', 'Max. Weight', 'Std. Weight'])
+    for record in query_set:
+        output.append([record.code, record.name,
+                      record.minweight, record.maxweight, record.standardweight])
+    #Table Data
+    writer.writerows(output)
+    return response
 
 @login_required(login_url=loginpage)
 @allowed_check(feature_alias='masterproduct')
@@ -313,7 +407,7 @@ def editDepartment(request, id):
 
 
 @login_required(login_url=loginpage)
-@allowed_check(feature_alias='masterreport')
+@allowed_check(feature_alias='reportpdf')
 def viewReportBody(request):
     context = {}
     context['action'] = 'view'
@@ -353,7 +447,7 @@ def viewReportBody(request):
 
 
 @login_required(login_url=loginpage)
-@allowed_check(feature_alias='masterreport')
+@allowed_check(feature_alias='reportpdf')
 def deleteReportBody(request, id):
     obj = Report.objects.filter(id=id)
     try:
@@ -364,7 +458,7 @@ def deleteReportBody(request, id):
     return redirect('viewreportbody')
 
 @login_required(login_url=loginpage)
-@allowed_check(feature_alias='masterreport')
+@allowed_check(feature_alias='reportpdf')
 def editReportBody(request, id):
     context = {}
     context['action'] = 'edit'
@@ -654,33 +748,33 @@ def deleteUploadBatch(request, id):
         return HttpResponse(error_message)
     return redirect('viewuploadbatch')
 
-@login_required(login_url=loginpage)
-@allowed_check(feature_alias='viewendbatch')
-def viewWeighingState(request): #startbatch
-    context = {}
-    context['action'] = 'view'
-    context['data'] = WeighingState.objects.filter(id=1, status=True)
-    noState = WeighingState.objects.filter(id=1, status=True).exists()
-    if not noState and request.method == "POST":
-        form = WeighingStateForm(request.POST)
-        context['form'] = form
-        if form.is_valid():
-            dataexist = WeighingState.objects.filter(id=1).exists()
-            if dataexist:
-                obj = WeighingState.objects.get(id=1)
-                obj.product = form.cleaned_data.get('product')
-                obj.batchno = form.cleaned_data.get('batchno')
-            else:
-                obj = WeighingState(id=1, product=form.cleaned_data.get(
-                    'product'), batchno=form.cleaned_data.get('batchno'))
-            # obj.status = form.cleaned_data.get('status')
-            obj.status = 1
-            obj.save()
-            return redirect('startbatch')
-    else:
-        context['form'] = WeighingStateForm()
+# @login_required(login_url=loginpage)
+# @allowed_check(feature_alias='viewendbatch')
+# def viewWeighingState(request): #startbatch
+#     context = {}
+#     context['action'] = 'view'
+#     context['data'] = WeighingState.objects.filter(id=1, status=True)
+#     noState = WeighingState.objects.filter(id=1, status=True).exists()
+#     if not noState and request.method == "POST":
+#         form = WeighingStateForm(request.POST)
+#         context['form'] = form
+#         if form.is_valid():
+#             dataexist = WeighingState.objects.filter(id=1).exists()
+#             if dataexist:
+#                 obj = WeighingState.objects.get(id=1)
+#                 obj.product = form.cleaned_data.get('product')
+#                 obj.batchno = form.cleaned_data.get('batchno')
+#             else:
+#                 obj = WeighingState(id=1, product=form.cleaned_data.get(
+#                     'product'), batchno=form.cleaned_data.get('batchno'))
+#             # obj.status = form.cleaned_data.get('status')
+#             obj.status = 1
+#             obj.save()
+#             return redirect('startbatch')
+#     else:
+#         context['form'] = WeighingStateForm()
 
-    return render(request, 'weighingstate.html', context=context)
+#     return render(request, 'weighingstate.html', context=context)
 
 @login_required(login_url=loginpage)
 @allowed_check(feature_alias='viewendbatch')
@@ -740,17 +834,22 @@ def viewWeighingState(request):
     context['action'] = 'view'
     context['data'] = WeighingState.objects.all()
     if request.method == "POST":
-        form = WeighingStateInitialForm(request.POST)
-        context['form'] = form
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.pendingstatus = True
-            instance.status = False
-            instance.batchno = form.cleaned_data.get('batchno').upper()
-            # batchnoobj = WeighingState.objects.all()
-            # batchnoobj.update(status=False)
-            instance.save()
-            return redirect('viewweighingstate')
+        privilegecheck = allowed_check_function('managebatch',request)
+        print(privilegecheck)
+        if privilegecheck:
+            form = WeighingStateInitialForm(request.POST)
+            context['form'] = form
+            if form.is_valid():
+                instance = form.save(commit=False)
+                instance.pendingstatus = True
+                instance.status = False
+                instance.batchno = form.cleaned_data.get('batchno').upper()
+                # batchnoobj = WeighingState.objects.all()
+                # batchnoobj.update(status=False)
+                instance.save()
+                return redirect('viewweighingstate')
+        else:
+            return HttpResponse('You are not authorized to view this page.')
     else:
         form = WeighingStateInitialForm()
         context['form'] = form
@@ -820,25 +919,45 @@ def closeWeighingState(request, id):
     context['action'] = 'edit'
     context['id'] = id
     context['message'] = None
+
+    group = request.user.groups.all()[0].name
+
     if request.method == 'GET':
         obj = WeighingState.objects.get(id=id)
-        form = WeighingStateCloseForm(instance=obj)
-        form.fields["spvpabrik"].queryset = User.objects.filter(
-            groups__name='supervisorproduksi')
-        form.fields["spvgudang"].queryset = User.objects.filter(
-            groups__name='supervisorgudang')
+        form = WeighingStateCloseForm(user=request.user,instance=obj)
+
+        if group == 'supervisorgudang':
+            form.fields["spvgudang"].queryset = User.objects.filter(
+                id = request.user.id)
+        elif group == 'supervisorproduksi':
+            form.fields["spvpabrik"].queryset = User.objects.filter(
+                id=request.user.id)
+        elif group == 'administrator':
+            form.fields["spvgudang"].queryset = User.objects.filter(
+                groups__name='supervisorgudang')
+            form.fields["spvpabrik"].queryset = User.objects.filter(
+                groups__name='supervisorproduksi')
+
         context['data'] = WeighingState.objects.all()
         context['form'] = list(form)
     if request.method == 'POST':
         obj = WeighingState.objects.get(id=id)
-        form = WeighingStateCloseForm(request.POST, instance=obj)
+        form = WeighingStateCloseForm(request.POST, user=request.user, instance=obj)
         context['data'] = WeighingState.objects.all()
         context['form'] = list(form)
         if form.is_valid():
-            obj.spvpabrik = form.cleaned_data.get('spvpabrik')
-            obj.spvgudang = form.cleaned_data.get('spvgudang')
-            obj.pendingstatus = False
+            if group == 'supervisorgudang':
+                obj.spvgudang = form.cleaned_data.get('spvgudang')
+            elif group == 'supervisorproduksi':
+                obj.spvpabrik = form.cleaned_data.get('spvpabrik')
+            elif group == 'administrator':
+                obj.spvgudang = form.cleaned_data.get('spvgudang')
+                obj.spvpabrik = form.cleaned_data.get('spvpabrik')
             obj.save()
+            reselectobj = WeighingState.objects.get(id=id)
+            if reselectobj.spvpabrik != None and reselectobj.spvgudang != None:
+                reselectobj.pendingstatus = False
+                reselectobj.save()
             context['message'] = "Data berhasil disimpan."
             return redirect('viewweighingstate')
     return render(request, 'weighingstateclose.html', context=context)

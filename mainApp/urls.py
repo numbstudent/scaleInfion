@@ -16,6 +16,9 @@ urlpatterns = [
 
 
     path('master/product', views.viewProduct, name='viewproduct'),
+    path('master/uploadproduct', views.viewUploadProduct, name='uploadproduct'),
+    path('master/updateproduct', views.updateProductByTemporary, name='updateproduct'),
+    path('master/downloadproduct', views.downloadProductCSV, name='downloadproduct'),
     path('master/delete-product/<int:id>', views.deleteProduct, name='deleteproduct'),
     path('master/edit-product/<int:id>', views.editProduct, name='editproduct'),
 

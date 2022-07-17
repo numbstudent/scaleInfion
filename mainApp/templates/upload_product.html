@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block titlepage %}
+<h1>Upload Product</h1>
+{% endblock %}
+{% block sidebar %}
+{% include "sidebar.html" %}
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <form action="{% url 'uploadproduct' %}" method="POST" autocomplete="off" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form | crispy }}
+                            <hr>
+                            <input class="btn btn-success" type="submit" value="Simpan">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body text-center align-middle" {% if not data %} style="display:none;"{% endif %}>
+                <a class="btn btn-success" href="{% url 'updateproduct' %}">Update Master Product</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h5 class="m-0">Temporary Data</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Min. Weight</th>
+                        <th>Max. Weight</th>
+                        <th>Std. Weight</th>
+                        <th>Cur. Name</th>
+                        <th>Cur. Min. Weight</th>
+                        <th>Cur. Max. Weight</th>
+                        <th>Cur. Std. Weight</th>
+                        <th>Desc</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {%for row in data%}
+                    <tr {% if row.description == "Update" %}class="table-danger"{% endif %}>
+                        <td>{{row.code}}</td>
+                        <td {% if row.name != row.cur_name and row.cur_name %}class="font-weight-bold"{% endif %}>{{row.name}}</td>
+                        <td {% if row.minweight != row.cur_minweight and row.cur_minweight %}class="font-weight-bold"{% endif %}>{{row.minweight}}</td>
+                        <td {% if row.maxweight != row.cur_maxweight and row.cur_maxweight %}class="font-weight-bold"{% endif %}>{{row.maxweight}}</td>
+                        <td {% if row.standardweight != row.cur_standardweight and row.cur_standardweight %}class="font-weight-bold"{% endif %}>{{row.standardweight}}</td>
+                        <td>{{row.cur_name|default_if_none:""}}</td>
+                        <td>{{row.cur_minweight|default_if_none:""}}</td>
+                        <td>{{row.cur_maxweight|default_if_none:""}}</td>
+                        <td>{{row.cur_standardweight|default_if_none:""}}</td>
+                        <td>{{row.description}}</td>
+                    </tr>
+                    {%endfor%}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block additionaljs %}
+<script>
+    {% if message %}
+    alert("{{message}}")
+    {% endif %}
+
+    $("#exportbatch").click(function () {
+        var url = "{% url 'reportbatchcsv' %}"
+        var productid = $("#id_productid").val()
+        var batchno = $("#id_batchno").val()
+        var inputdatefrom = $("#id_inputdatefrom").val()
+        var inputdateto = $("#id_inputdateto").val()
+        window.open(url + "?productid=" + productid + "&batchno=" + batchno + "&inputdatefrom=" + inputdatefrom + "&inputdateto=" + inputdateto)
+    })
+</script>
+{% endblock %}

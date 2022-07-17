@@ -115,6 +115,10 @@ class UploadBatchForm(forms.Form):
     file = forms.FileField()
 
 
+class UploadProductForm(forms.Form):
+    file = forms.FileField()
+
+
 class ReportBodyForm(forms.Form):
     batchno = BatchnoModelChoiceField(
         queryset=WeighingState.objects.filter(pendingstatus=False).order_by('-updatedon'), label="Batch No", widget=forms.Select(attrs={
@@ -188,9 +192,20 @@ class WeighingStateInitialForm(ModelForm):
 
 class WeighingStateCloseForm(ModelForm):
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        group = self.user.groups.all()[0].name
         super().__init__(*args, **kwargs)
-        self.fields['spvpabrik'].required = True
-        self.fields['spvgudang'].required = True
+        if group == 'supervisorgudang':
+            self.fields['spvgudang'].required = True
+            self.fields.pop("spvpabrik")
+        elif group == 'supervisorproduksi':
+            self.fields['spvpabrik'].required = True
+            self.fields.pop("spvgudang")
+        else:
+            self.fields['spvgudang'].required = True
+            self.fields['spvpabrik'].required = True
+        # self.fields['spvpabrik'].required = True
+        # self.fields['spvgudang'].required = True
 
     class Meta:
         model = WeighingState

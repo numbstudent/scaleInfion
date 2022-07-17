@@ -50,18 +50,20 @@
                                             <td>{{row.product.name}}</td>
                                             <td><a href="{% url 'viewbatchhistory' row.batchno %}">{{row.batchno}}</a></td>
                                             <td>{{row.pendingstatus|yesno:'Open, Close'}}
-                                                {% if not row.pendingstatus %}
+                                                {% if row.spvpabrik or row.spvgudang %}
                                                 <br>
-                                                <small>
-                                                Approval by: 
-                                                {{row.spvpabrik}}, 
-                                                {{row.spvgudang}}
-                                                </small>
-                                                {% endif %}   
+                                                <small>Closed by:</small>
+                                                {% endif %}
+                                                {% if row.spvpabrik %}
+                                                <small>{{row.spvpabrik}}</small>
+                                                {% endif %}
+                                                {% if row.spvgudang %}
+                                                <small>{{row.spvgudang}}</small>
+                                                {% endif %}
                                             </td>
                                             <td>
                                                 {% if row.status == 1 %}
-                                                OK
+                                                <i class="fas fa-check text-blue"></i>
                                                 {% elif row.status == 2 %}
                                                 Last Box
                                                 {% else %}

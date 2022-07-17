@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block titlepage %}
+{% endblock %}
+{% block sidebar %}
+{% include "sidebar.html" %}
+{% endblock %}
+{% block content %}
+
+<div class="card card-secondary card-tabs text-center" style="height: 475px;">
+    <img class="rounded mx-auto d-block w-25 p-3" src="{% static 'others/logo.png' %}">
+    <h1>INFION WEIGHING SYSTEM</h1>
+</div>
+
+{% endblock %}
+{% block additionaljs %}
+<script>
+    {% if message %}
+    alert("{{message}}")
+    {% endif %}
+</script>
+{% endblock %}

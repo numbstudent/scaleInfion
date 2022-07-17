@@ -36,7 +36,6 @@
                                     <thead>
                                         <tr>
                                             <th>Username</th>
-                                            <th>Name</th>
                                             <th>Group</th>
                                             <th>Action</th>
                                         </tr>
@@ -45,7 +44,6 @@
                                         {%for row in data%}
                                         <tr>
                                             <td>{{row.username}}</td>
-                                            <td>{{row.first_name}}</td>
                                             <td>{% for group in row.groups.all %}
                                             {{ group.name }}
                                             {% endfor %}</td>

@@ -20,6 +20,37 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+
+class ProductHistory(models.Model):
+    name = models.CharField(max_length=100)
+    code = models.CharField(max_length=30)
+    minweight = models.FloatField()
+    maxweight = models.FloatField()
+    standardweight = models.FloatField()
+    createdon = models.DateTimeField(auto_now_add=True)
+    updatedon = models.DateTimeField(auto_now=True)
+    status = models.BooleanField(default=True, choices=STATUS_CHOICES)
+    createdby = models.ForeignKey(
+        User, on_delete=models.RESTRICT, related_name="createdbyhistory")
+    updatedby = models.ForeignKey(
+        User, on_delete=models.RESTRICT, null=True, blank=True, related_name="updatedbyhistory")
+
+    def __str__(self):
+        return self.name
+
+
+class ProductUploadTemp(models.Model):
+    name = models.CharField(max_length=100)
+    code = models.CharField(max_length=30)
+    minweight = models.FloatField()
+    maxweight = models.FloatField()
+    standardweight = models.FloatField()
+    createdby = models.ForeignKey(
+        User, on_delete=models.RESTRICT, related_name="createdbytemp")
+    createdon = models.DateTimeField(auto_now_add=True, blank=True)
+    def __str__(self):
+        return self.name
+
 class Logging(models.Model):
     id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.
     datetime = models.DateTimeField(db_column='Datetime', auto_now=True)  # Field name made lowercase.

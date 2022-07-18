@@ -215,8 +215,8 @@ def viewUploadProduct(request):
         when t.name <> p.name or t.maxweight <> p.maxweight or t.minweight <> p.minweight or t.standardweight <> p.standardweight \
         then \'Update\' else \'\'\
         end description\
-        FROM mainapp_productuploadtemp t\
-        left join mainapp_product p on t.code = p.code \
+        FROM mainApp_productuploadtemp t\
+        left join mainApp_product p on t.code = p.code \
         order by description desc')
     if request.method == "POST":
         form = UploadProductForm(request.POST, request.FILES)
@@ -245,8 +245,8 @@ def updateProductByTemporary(request):
     context['action'] = 'update'    
     # context['data'] = ProductUploadTemp.objects.all()
     data = ProductUploadTemp.objects.raw('SELECT t.* \
-        FROM mainapp_productuploadtemp t \
-        left join mainapp_product p on t.code = p.code \
+        FROM mainApp_productuploadtemp t \
+        left join mainApp_product p on t.code = p.code \
         where p.code is null or t.name <> p.name or t.maxweight <> p.maxweight or \
         t.minweight <> p.minweight or t.standardweight <> p.standardweight')
 

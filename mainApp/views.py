@@ -412,6 +412,7 @@ def viewReportBody(request):
     context = {}
     context['action'] = 'view'
     context['data'] = Report.objects.all()
+
     if request.method == "POST":
         form = ReportBodyForm(request.POST)
         context['form'] = form
@@ -426,19 +427,25 @@ def viewReportBody(request):
             reviewdate = request.POST.get('reviewdate')
             effectivedate = request.POST.get('effectivedate')
             dnno = request.POST.get('dnno')
-            # prevreportexist = Register.objects.filter(batchno=batchno, product=product).exists()
-            # dnrev = 0
+            prevreportexist = Register.objects.filter(batchno=batchno, product=product).exists()
+            dnrev = 0
             # print(prevreportexist)
             # print(Report.objects.filter(batchno=batchno, product=product).values('dnrev').order_by('-dnrev').first()['dnrev'])
-            # if prevreportexist:
-            #     dnrev = Report.objects.filter(batchno=batchno, product=product).values('dnrev').order_by('-dnrev').first()['dnrev']
-            # dnrev = dnrev+1
+            if prevreportexist:
+                dnrev = Report.objects.filter(batchno=batchno, product=product).values('dnrev').order_by('-dnrev').first()['dnrev']
+            dnrev = dnrev+1
             # dnrev = request.POST.get('dnrev')
             
             obj = Report(product=product, batchno=batchno, reporttitle=reporttitle, department=department,
                    reviewdate=reviewdate, effectivedate=effectivedate, dnno=dnno, dnrev=dnrev)
-
             obj.save()
+
+            reportobj = Report.objects.last()
+            data = Register.objects.filter(batchno=reportobj.batchno, product=reportobj.product)
+            for row in data:
+                obj = ReportRegister(report=reportobj, dnrev=reportobj.dnrev, product=row.product, batchno=row.batchno, \
+                boxno=row.boxno, status=row.status, createdon=row.createdon, weight=row.weight, createdby=row.createdby)
+                obj.save()
             return redirect('viewreportbody')
     else:
         context['form'] = list(ReportBodyForm())
@@ -679,7 +686,8 @@ def reportBatchPDF(request):
     from weasyprint import HTML
 
     
-    datamodel = Register.objects.order_by('boxno')
+    # datamodel = Register.objects.order_by('boxno')
+    datamodel = ReportRegister.objects.order_by('boxno')
     datamodel2 = UploadedRegister.objects.order_by('boxno')
     group = request.user.groups.all()[0].name
     if group != 'administrator':
@@ -691,7 +699,8 @@ def reportBatchPDF(request):
         product = request.GET.get('productid')
         reportid = request.GET.get('id')
         header = Report.objects.all().get(id=reportid)
-        datamodel = datamodel.filter(batchno=header.batchno, product=header.product)
+        # datamodel = datamodel.filter(batchno=header.batchno, product=header.product)
+        datamodel = datamodel.filter(report = header)
         datamodel2 = datamodel2.filter(batchno=header.batchno, product=header.product)
         signature = WeighingState.objects.filter(batchno=header.batchno, product=header.product).first()
     else:

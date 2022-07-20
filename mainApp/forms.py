@@ -139,7 +139,7 @@ class ReportBodyForm(forms.Form):
         'class': 'form-control datepick'
     }))
     dnno = forms.CharField(label="DN No")
-    dnrev = forms.CharField(label="DN Rev")
+    # dnrev = forms.CharField(label="DN Rev")
 
 # class ReportBodyForm(ModelForm):
 #     # productid = ProductModelChoiceField(

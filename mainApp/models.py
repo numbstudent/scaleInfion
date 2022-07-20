@@ -132,6 +132,7 @@ class WeighingState(models.Model):
     updatedon = models.DateTimeField(auto_now=True)
 
 class ReportRegister(models.Model):
+    report = models.ForeignKey(Report, on_delete=models.RESTRICT)
     dnrev = models.IntegerField()
     product = models.ForeignKey(Product, on_delete=models.RESTRICT)
     batchno = models.CharField(max_length=15)

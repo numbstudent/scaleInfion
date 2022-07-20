@@ -61,7 +61,7 @@
                                                 <tr class="text-center">
                                                     <th>Tanggal Penimbangan</th>
                                                     <th>No. Karton</th>
-                                                    <th>Hasil Penimbangan</th>
+                                                    <th>Hasil Penimbangan (gram)</th>
                                                 </tr>
                                                 {% if not data %}
                                                 <tr class="text-center">
@@ -73,7 +73,7 @@
                                                 <tr>
                                                     <td>{{row.createdon|date:"d/m/Y h:i:s"}}</td>
                                                     <td>{{row.boxno}}</td>
-                                                    <td>{{row.weight}}</td>
+                                                    <td>{{row.weight}} {% if row.status == 0 %} (Reject){% elif row.status == 2 %} (Last Box){% endif %}</td>
                                                 </tr>
                                                 {% if forloop.counter|divisibleby:rowlen and forloop.counter != data.count %}
                                             </table>
@@ -83,7 +83,7 @@
                                                 <tr class="text-center">
                                                     <th>Tanggal Penimbangan</th>
                                                     <th>No. Karton</th>
-                                                    <th>Hasil Penimbangan</th>
+                                                    <th>Hasil Penimbangan (gram)</th>
                                                 </tr>
                                                 {% endif %}
                                                 {%endfor%}

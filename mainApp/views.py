@@ -282,7 +282,7 @@ def downloadProductCSV(request):
     writer = csv.writer(response)
     query_set = datamodel
     #Table Header
-    writer.writerow(['Code', 'Product Name', 'Min. Weight', 'Max. Weight', 'Std. Weight'])
+    writer.writerow(['Code', 'Product Name', 'Min. Weight (gram)', 'Max. Weight (gram)', 'Std. Weight (gram)'])
     for record in query_set:
         output.append([record.code, record.name,
                       record.minweight, record.maxweight, record.standardweight])
@@ -450,12 +450,18 @@ def viewReportBody(request):
 @allowed_check(feature_alias='reportpdf')
 def deleteReportBody(request, id):
     obj = Report.objects.filter(id=id)
-    try:
-        obj.delete()
-    except RestrictedError:
-        error_message = 'Data ini tidak dapat dihapus karena sedang digunakan oleh data lain. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>'
+
+    group = request.user.groups.all()[0].name
+    if group != 'operator':
+        try:
+            obj.delete()
+        except RestrictedError:
+            error_message = 'Data ini tidak dapat dihapus karena sedang digunakan oleh data lain. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>'
+            return HttpResponse(error_message)
+        return redirect('viewreportbody')
+    else:
+        error_message = 'Operator tidak boleh menghapus data! <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>'
         return HttpResponse(error_message)
-    return redirect('viewreportbody')
 
 @login_required(login_url=loginpage)
 @allowed_check(feature_alias='reportpdf')
@@ -544,7 +550,7 @@ def viewReportBatch(request):
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(createdon__lte=inputdateto)
         if reporttype == 1:
-            datamodel = datamodel.filter(status=1)
+            datamodel = datamodel.filter(Q(status=1) | Q(status=2))
         if product or batchno or inputdatefrom or inputdateto:
             hasFilter = True
     else:
@@ -582,7 +588,7 @@ def reportBatchCSV(request):
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(createdon__lte=inputdateto)
         if reporttype == 1:
-            datamodel = datamodel.filter(status=1)
+            datamodel = datamodel.filter(Q(status=1) | Q(status=2))
         if product or batchno or inputdatefrom or inputdateto:
             hasFilter = True
     if hasFilter:
@@ -672,8 +678,13 @@ def reportBatchPDF(request):
     from django.template.loader import render_to_string
     from weasyprint import HTML
 
+    
     datamodel = Register.objects.order_by('boxno')
     datamodel2 = UploadedRegister.objects.order_by('boxno')
+    group = request.user.groups.all()[0].name
+    if group != 'administrator':
+        datamodel = datamodel.filter(Q(status=1) | Q(status=2))
+
     product_name = ""
     if request.method == "GET":
         form = ReportBatchForm(request.GET)
@@ -849,7 +860,7 @@ def viewWeighingState(request):
                 instance.save()
                 return redirect('viewweighingstate')
         else:
-            return HttpResponse('You are not authorized to view this page.')
+            return HttpResponse('Anda tidak diizinkan untuk melihat halaman ini. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>')
     else:
         form = WeighingStateInitialForm()
         context['form'] = form

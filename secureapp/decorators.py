@@ -22,7 +22,7 @@ def allowed_users(allowed_roles=[]):
             if group in allowed_roles:
                 return view_func(request, *args, **kwargs)
             else:
-                return HttpResponse('You are not authorized to view this page.')
+                return HttpResponse('Anda tidak diizinkan untuk melihat halaman ini. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>')
         return wrapper_func
     return decorator
 
@@ -41,7 +41,7 @@ def allowed_check(feature_alias):
             if group in allowed_group:
                 return view_func(request, *args, **kwargs)
             else:
-                return HttpResponse('You are not authorized to view this page.')
+                return HttpResponse('Anda tidak diizinkan untuk melihat halaman ini. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>')
         return wrapper_func
     return decorator
 

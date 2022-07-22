@@ -108,19 +108,26 @@ def RegisterView(request, batchno=None):
 
 @csrf_exempt
 def editRegisterWeight(request):
-    if request.method == "POST":
-        body = json.loads(request.body)
-        registerid = body['registerid']
-        finalweight = body['finalweight']
-        obj = Register.objects.filter(id=registerid).first()
-        message = ""
-        if(((finalweight - obj.weight) < 1) and ((finalweight - obj.weight) > -1)):
-            obj.weight = finalweight
-            obj.save()
-            message = "Perubahan selesai."
-        else:
-            message = "Perubahan data melebihi 1 gram!"
-        return JsonResponse({"message": message}, status=200)
+    group = request.user.groups.all()[0].name
+    privilegecheck = allowed_check_function('managebatch',request)
+    if privilegecheck:
+        if request.method == "POST":
+            body = json.loads(request.body)
+            registerid = body['registerid']
+            finalweight = body['finalweight']
+            obj = Register.objects.filter(id=registerid).first()
+            message = ""
+            if(((finalweight - obj.weight) < 1) and ((finalweight - obj.weight) > -1)):
+                obj.weight = finalweight
+                obj.save()
+                message = "Perubahan selesai."
+            else:
+                message = "Perubahan data melebihi 1 gram!"
+            return JsonResponse({"message": message}, status=200)
+    else:
+        error_message = 'Anda tidak memiliki akses untuk ini!'
+        return JsonResponse({"message": error_message}, status=200)
+    
 
 @login_required(login_url=loginpage)
 @allowed_check(feature_alias='simulator')

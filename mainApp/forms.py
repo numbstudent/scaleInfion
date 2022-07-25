@@ -129,7 +129,7 @@ class ReportBodyForm(forms.Form):
             'class': 'form-control select2bs4'
     }))
     department = DepartmentModelChoiceField(
-        queryset=Department.objects.all(), label="Report Title", widget=forms.Select(attrs={
+        queryset=Department.objects.all(), label="Department Title", widget=forms.Select(attrs={
             'class': 'form-control select2bs4'
     }))
     reviewdate = forms.DateField(label="Review Date", widget=forms.DateInput(attrs={

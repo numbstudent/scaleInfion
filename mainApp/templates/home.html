@@ -44,7 +44,7 @@
                 <label>Weight Change</label>
                 <input class="form-control" type="text" id="differenceweight" readonly="readonly">
                 <label>Desired Weight</label>
-                <input class="form-control" type="number" id="finalweight">
+                <input class="form-control" type="text" id="finalweight" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary float-left" id="btnsubmitweightAdjustment" data-dismiss="modal">Submit</button>

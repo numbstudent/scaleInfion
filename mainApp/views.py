@@ -434,7 +434,7 @@ def viewReportBody(request):
             reviewdate = request.POST.get('reviewdate')
             effectivedate = request.POST.get('effectivedate')
             dnno = request.POST.get('dnno')
-            prevreportexist = Register.objects.filter(batchno=batchno, product=product).exists()
+            prevreportexist = ReportRegister.objects.filter(batchno=batchno, product=product).exists()
             dnrev = 0
             # print(prevreportexist)
             # print(Report.objects.filter(batchno=batchno, product=product).values('dnrev').order_by('-dnrev').first()['dnrev'])

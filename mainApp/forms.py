@@ -7,10 +7,11 @@ import datetime
 class ProductForm(ModelForm):
     class Meta:
         model = Product
-        fields = ['id', 'name', 'code', 'minweight', 'maxweight', 'standardweight', 'status']
-        widgets = {
-            'status': forms.RadioSelect
-        }
+        # fields = ['id', 'name', 'code', 'minweight', 'maxweight', 'standardweight', 'status']
+        fields = ['id', 'name', 'code', 'minweight', 'maxweight', 'standardweight']
+        # widgets = {
+        #     'status': forms.RadioSelect
+        # }
         labels = {
             "minweight": "Minimum Weight",
             "maxweight": "Maximum Weight",

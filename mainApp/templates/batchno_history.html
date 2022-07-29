@@ -29,7 +29,17 @@
                             <td>{{row.batchno}}</td>
                             <td>{{row.boxno}}</td>
                             <td>{{row.iot_weight}}</td>
-                            <td>{% if row.status != "" %}{{row.status|yesno:'OK, Reject'}}{% else %}Belum Ditimbang{% endif %}</td>
+                            <td>
+                                {% if row.status == 1 %}
+                                OK
+                                {% elif row.status == 2 %}
+                                Last Box
+                                {% elif row.status == 0 %}
+                                Reject
+                                {% else %}
+                                Belum Ditimbang
+                                {% endif %}
+                            </td>
                             <td>{{row.input_date|date:"j/n/Y"}}</td>
                         </tr>
                         {%endfor%}

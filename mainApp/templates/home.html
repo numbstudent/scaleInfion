@@ -336,7 +336,7 @@
         $("#differenceweight").val($("#finalweight").val() - $("#currentweight").val())
     });
 
-    $(document).not("#finalweight").on('keypress', function (e) {
+    $(document).on('keypress', function (e) {
         if (e.which == 13 && e.target.id == 'qr') {
             boxSubmit()
             $('#' + e.target.id).val("")

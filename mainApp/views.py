@@ -100,11 +100,17 @@ def RegisterView(request, batchno=None):
         return JsonResponse({"insertsuccess":insertsuccess, "batch":list(data)}, safe=False, status=200)
 
     elif is_ajax(request) and request.method == "PUT":
-        body = json.loads(request.body)
-        registerid = body['registerid']
-        obj = Register.objects.filter(id=registerid)
-        obj.delete()
-        return JsonResponse({"message": "Data berhasil dihapus"}, status=200)
+        group = request.user.groups.all()[0].name
+        privilegecheck = allowed_check_function('managebatch',request)
+        if privilegecheck:
+            body = json.loads(request.body)
+            registerid = body['registerid']
+            obj = Register.objects.filter(id=registerid)
+            obj.delete()
+            return JsonResponse({"message": "Data berhasil dihapus"}, status=200)
+        else:
+            error_message = 'Anda tidak memiliki akses untuk ini!'
+            return JsonResponse({"message": error_message}, status=200)
 
 @csrf_exempt
 def editRegisterWeight(request):

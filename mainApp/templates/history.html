@@ -7,6 +7,33 @@
 {% include "sidebar.html" %}
 {% endblock %}
 {% block content %}
+<div class="modal fade" id="weightAdjustmentModal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="weightAdjustment">Weight Adjustment</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input class="form-control" type="hidden" id="registerid">
+                <label>Initial Weight</label>
+                <input class="form-control" type="text" id="currentweight" readonly="readonly">
+                <label>Weight Change</label>
+                <input class="form-control" type="text" id="differenceweight" readonly="readonly">
+                <label>Desired Weight</label>
+                <input class="form-control" type="text" id="finalweight"
+                    onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary float-left" id="btnsubmitweightAdjustment"
+                    data-dismiss="modal">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-lg-12">
         <div class="card">
@@ -41,7 +68,7 @@
     <div class="card-body">
         <div class="row">
             <div class="col-lg-12">
-                <table class="table dataTable small">
+                <table class="table small" id="batchhistorylist">
                     <thead>
                         <tr>
                             <th>Product</th>
@@ -50,6 +77,7 @@
                             <th>Weight</th>
                             <th>Status</th>
                             <th>Input Date</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -60,7 +88,15 @@
                             <td>{{row.boxno}}</td>
                             <td>{{row.iot_weight}}</td>
                             <td>{% if row.status != "" %}{{row.status|yesno:'OK, Reject'}}{% else %}Belum Ditimbang{% endif %}</td>
-                            <td>{{row.input_date|date:"j/n/Y"}}</td>
+                            <td>{{row.input_date|date:"Y/n/j h:m:i"}}</td>
+                            <td>
+                                <button class="btn btn-danger deleteBox" data-id="{{row.id}}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                <button class="btn btn-secondary btnweightAdjustment" data-id="{{row.id}}" data-weight="{{row.iot_weight}}">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                            </td>
                         </tr>
                         {%endfor%}
                     </tbody>
@@ -72,8 +108,61 @@
 {% endblock %}
 {% block additionaljs %}
 <script>
+    $('#batchhistorylist').DataTable({
+        "paging": true,
+        "lengthChange": true,
+        "searching": true,
+        "ordering": true,
+        "info": false,
+        "autoWidth": false,
+        "responsive": true,
+        "order": [[5, 'desc']],
+    });
+
     {% if message %}
     alert("{{message}}")
     {% endif %}
+
+    var url = "{% url 'registerqr' %}"
+    var redirecturl = "{% url 'history' %}"
+
+    $("#batchhistorylist").on("click", ".btnweightAdjustment", function () {
+        $("#differenceweight").val("")
+        $("#finalweight").val("")
+        $("#weightAdjustmentModal").modal('show')
+        $("#currentweight").val($(this).data('weight'))
+        $("#registerid").val($(this).data('id'))
+    })
+    $("#batchhistorylist").on("click", ".deleteBox",function () {
+        var registerid = $(this).data('id');
+        var allow = confirm("Apakah anda yakin untuk menghapus data?")
+        if (allow){
+            $.ajax({
+                type: "PUT",
+                dataType: "json",
+                url: url,
+                data: JSON.stringify({ "registerid": registerid }),
+                success: function (data) {   // success callback function
+                    alert(data.message)
+                    window.location.replace(redirecturl);
+                }
+            })
+        }
+    })
+    $("#btnsubmitweightAdjustment").click(function () {
+        var url = "{% url 'editregisterweight' %}"
+        var registerid = $("#registerid").val();
+        var finalweight = parseFloat($("#finalweight").val());
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: url,
+            data: JSON.stringify({"registerid": registerid, "finalweight": finalweight}),
+            success: function (data) {   // success callback function
+                alert(data.message)
+                window.location.replace(redirecturl);
+            }
+        })
+    })
 </script>
 {% endblock %}

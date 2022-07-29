@@ -35,7 +35,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-lg-12">
-                                <table class="table dataTable">
+                                <table class="table" id="reportTable">
                                     <thead>
                                         <tr>
                                             <th>Product</th>
@@ -55,7 +55,7 @@
                                             <td>{{row.reporttitle}}</td>
                                             <td>{{row.dnno}}</td>
                                             <td>{{row.dnrev}}</td>
-                                            <td>{{row.createdon}}</td>
+                                            <td>{{row.createdon|date:"Y/n/j h:m:i"}}</td>
                                             <td><a data-toggle="tooltip" title="Export to PDF" target="_blank" class="btn btn-primary"
                                                     href="{% url 'reportbatchpdf' %}?id={{row.id}}"><i class="fas fa-file"></i></a>
                                                 <!-- <a data-toggle="tooltip" title="Edit" class="btn btn-secondary"
@@ -114,5 +114,16 @@
     {% if message %}
     alert("{{message}}")
     {% endif %}
+
+    $('#reportTable').DataTable({
+        "paging": true,
+        "lengthChange": true,
+        "searching": true,
+        "ordering": true,
+        "info": false,
+        "autoWidth": false,
+        "responsive": true,
+        "order": [[5, 'desc']],
+    });
 </script>
 {% endblock %}

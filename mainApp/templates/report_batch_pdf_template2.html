@@ -73,7 +73,17 @@
                                                 <tr>
                                                     <td>{{row.createdon|date:"d/m/Y h:i:s"}}</td>
                                                     <td>{{row.boxno}}</td>
-                                                    <td>{{row.weight}} {% if row.status == 0 %} (Reject){% elif row.status == 2 %} (Last Box){% endif %}</td>
+                                                    <td>{{row.weight}}
+                                                        {% if row.status == 1 %}
+                                                        OK
+                                                        {% elif row.status == 2 %}
+                                                        Reject
+                                                        {% elif row.status == 3 %}
+                                                        Last Box
+                                                        {% else %}
+                                                        Belum Ditimbang
+                                                        {% endif %}
+                                                    </td>
                                                 </tr>
                                                 {% if forloop.counter|divisibleby:rowlen and forloop.counter != data.count %}
                                             </table>

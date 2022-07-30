@@ -124,6 +124,7 @@ class WeighingState(models.Model):
     batchno = models.CharField(max_length=15, unique=True)
     status = models.BooleanField(default=True,choices=STATUS_CHOICES)
     pendingstatus = models.BooleanField(default=True,choices=PENDING_CHOICES) #pendingstatus true = masih belum close
+    weightadjustment = models.FloatField(default=0)
     spvpabrik = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="spvpabrik", null=True) #boleh kosong di create awal batchno
     spvgudang = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="spvgudang", null=True) #boleh kosong di create awal batchno
     operator = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="operator", null=True) #boleh kosong di create awal batchno

@@ -165,6 +165,7 @@ def ScaleView(request):
 
         #get current weight
         activebatchno = WeighingState.objects.filter(status=True).last().batchno
+        weightadjustment = WeighingState.objects.filter(status=True).last().weightadjustment
         if activebatchno:
             currentbox = Register.objects.filter(batchno = activebatchno, status = None).last()
             if currentbox:
@@ -174,7 +175,7 @@ def ScaleView(request):
                     print(currentbox)
                     print(weight.status)
                     print(weight.weighing)
-                    currentbox.weight = weight.weighing
+                    currentbox.weight = weight.weighing + weightadjustment
                     currentbox.status = weight.status
                     currentbox.save()
         return JsonResponse(data, safe=False, status=200)
@@ -923,7 +924,7 @@ def editWeighingState(request, id):
             obj.batchno = form.cleaned_data.get('batchno').upper()
             obj.save()
             context['message'] = "Data berhasil disimpan."
-            return redirect('viewWeighingState')
+            return redirect('viewweighingstate')
     return render(request, 'weighingstate.html', context=context)
 
 @login_required(login_url=loginpage)

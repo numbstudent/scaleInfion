@@ -67,6 +67,7 @@
                                 <!-- placeholder="CHLON0.5%-|ICLG19050|2|INF|BG|" -->
                                 <input type="hidden" id="code">
                                 <input type="hidden" id="batchno">
+                                <input type="hidden" id="weightadjustment">
                                 <!-- <input class="form-control" type="text" id="code">
                                 <input class="form-control" type="text" id="batchno"> -->
                             </div>
@@ -102,7 +103,7 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">{% if state.status %}NO. BATCH: {{state.batchno}}{% else %}Set Batch State terlebih dahulu!{% endif %} </h3>
+                <h3 class="card-title">{% if state.status %}NO. BATCH: {{state.batchno}}, ADJUSTMENT: {{state.weightadjustment}}{% else %}Set Batch State terlebih dahulu!{% endif %} </h3>
             </div>
             <div class="card-body" style="overflow-y: scroll; height:500px;">
                 <ul class="products-list product-list-in-card pl-2 pr-2" id="batchhistorylist">
@@ -184,9 +185,9 @@
                         var record = data.batch[row]
                         var weight = record.iot_weight == null? '-': record.iot_weight
                         var status = ""
-                        if (record.status==0) {
+                        if (record.status==2) {
                             status = 'REJECT'
-                        } else if (record.status==2){
+                        } else if (record.status==3){
                             status = 'LAST BOX'
                         } else if (record.status == 1) {
                             status = 'OK'

@@ -357,7 +357,7 @@ def editProduct(request, id):
             obj.code = form.cleaned_data.get('code')
             obj.minweight = form.cleaned_data.get('minweight')
             obj.maxweight = form.cleaned_data.get('maxweight')
-            obj.status = form.cleaned_data.get('status')
+            # obj.status = form.cleaned_data.get('status')
             obj.save()
             context['message'] = "Data berhasil disimpan."
             return redirect('viewproduct')

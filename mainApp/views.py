@@ -157,7 +157,10 @@ def ScaleSimulator(request):
 @csrf_exempt
 def ScaleView(request):
     obj = Logging.objects.latest('id')
-
+    configcheck = AdminConfig.objects.all().exists()
+    if not configcheck:
+        obj = AdminConfig(spvinterrupt=False)
+        obj.save()
     if request.method == "GET":
         curtime = datetime.now() - timedelta(minutes=1)
         data = Logging.objects.filter(datetime__gte=curtime).order_by('-id').values('id','weighing').first()
@@ -165,7 +168,7 @@ def ScaleView(request):
 
         #get current weight
         activebatchno = WeighingState.objects.filter(status=True).last().batchno
-        weightadjustment = WeighingState.objects.filter(status=True).last().weightadjustment
+        weightadjustment = AdminConfig.objects.last().weightadjustment
         if activebatchno:
             currentbox = Register.objects.filter(batchno = activebatchno, status = None).last()
             if currentbox:
@@ -179,6 +182,33 @@ def ScaleView(request):
                     currentbox.status = weight.status
                     currentbox.save()
         return JsonResponse(data, safe=False, status=200)
+
+@csrf_exempt
+def SupervisorApproval(request):
+    if request.method == "POST":
+        body_unicode = request.body.decode('utf-8')
+
+        print(json.loads(body_unicode))
+        body = json.loads(body_unicode)
+        username = body['username']
+        password = body['password']
+
+        from django.contrib.auth import authenticate
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            group = user.groups.all()[0].name
+            if str.__contains__(group, 'supervisor'):
+            # if str.__contains__(group, 'supervisor') or str.__contains__(group, 'administrator'):
+                expireddate = datetime.now() + timedelta(minutes=1)
+                config = AdminConfig.objects.first()
+                config.spvapproval = True
+                config.spvapprovalexpireddate = expireddate
+                config.save()
+                return JsonResponse({"message": "Akses Supervisor diberikan."}, status=200)
+            else:
+                return JsonResponse({"message": "Hanya akun Supervisor / Administrator yang diperbolehkan!"}, status=400)    
+        else:
+            return JsonResponse({"message": "Username / Password salah!"}, status=400)
 
 def insertWeight(batchno):
     # curtime = datetime.now() - timedelta(seconds=5)

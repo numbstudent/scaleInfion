@@ -13,6 +13,7 @@ urlpatterns = [
     path('editregisterweight', views.editRegisterWeight, name='editregisterweight'),
     path('history', views.viewHistory, name='history'),
     path('rejectbox', views.RejectBox, name='rejectbox'),
+    path('spvapproval', views.SupervisorApproval, name='spvapproval'),
 
 
     path('master/product', views.viewProduct, name='viewproduct'),

@@ -12,6 +12,7 @@ class Product(models.Model):
     minweight = models.FloatField()
     maxweight = models.FloatField()
     standardweight = models.FloatField()
+    jumlahkoli = models.IntegerField(default=0)
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
     status = models.BooleanField(default=True,choices=STATUS_CHOICES)
@@ -125,6 +126,7 @@ class WeighingState(models.Model):
     status = models.BooleanField(default=True,choices=STATUS_CHOICES)
     pendingstatus = models.BooleanField(default=True,choices=PENDING_CHOICES) #pendingstatus true = masih belum close
     weightadjustment = models.FloatField(default=0)
+    jumlahkoli = models.IntegerField(default=0)
     spvpabrik = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="spvpabrik", null=True) #boleh kosong di create awal batchno
     spvgudang = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="spvgudang", null=True) #boleh kosong di create awal batchno
     operator = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="operator", null=True) #boleh kosong di create awal batchno
@@ -142,3 +144,11 @@ class ReportRegister(models.Model):
     createdon = models.DateTimeField(auto_now_add=True)
     weight = models.FloatField(null=True)
     createdby = models.ForeignKey(User, on_delete=models.RESTRICT)
+
+
+class AdminConfig(models.Model):
+    spvapproval = models.BooleanField(default=False)
+    spvapprovalexpireddate = models.DateTimeField(blank=True, null=True, default=None)
+    reporttitle = models.ForeignKey(ReportTitle, on_delete=models.RESTRICT, null=True)
+    department = models.ForeignKey(Department, on_delete=models.RESTRICT, null=True)
+    weightadjustment = models.FloatField(default=0)

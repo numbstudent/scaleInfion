@@ -28,6 +28,7 @@ class ProductHistory(models.Model):
     minweight = models.FloatField()
     maxweight = models.FloatField()
     standardweight = models.FloatField()
+    jumlahkoli = models.IntegerField(default=0)
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
     status = models.BooleanField(default=True, choices=STATUS_CHOICES)
@@ -46,6 +47,7 @@ class ProductUploadTemp(models.Model):
     minweight = models.FloatField()
     maxweight = models.FloatField()
     standardweight = models.FloatField()
+    jumlahkoli = models.IntegerField(default=0)
     createdby = models.ForeignKey(
         User, on_delete=models.RESTRICT, related_name="createdbytemp")
     createdon = models.DateTimeField(auto_now_add=True, blank=True)
@@ -71,6 +73,8 @@ class Register(models.Model):
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
     weight = models.FloatField(null=True)
+    operator1 = models.CharField(max_length=50, default=None, null=True)
+    operator2 = models.CharField(max_length=50, default=None, null=True)
     createdby = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="createdby_rel")
     updatedby = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, blank=True, related_name="updatedby_rel")
     # class Meta:
@@ -149,6 +153,8 @@ class ReportRegister(models.Model):
 class AdminConfig(models.Model):
     spvapproval = models.BooleanField(default=False)
     spvapprovalexpireddate = models.DateTimeField(blank=True, null=True, default=None)
+    operator1 = models.CharField(max_length=50, default=None, null=True)
+    operator2 = models.CharField(max_length=50, default=None, null=True)
     reporttitle = models.ForeignKey(ReportTitle, on_delete=models.RESTRICT, null=True)
     department = models.ForeignKey(Department, on_delete=models.RESTRICT, null=True)
     weightadjustment = models.FloatField(default=0)

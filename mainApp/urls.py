@@ -14,6 +14,7 @@ urlpatterns = [
     path('history', views.viewHistory, name='history'),
     path('rejectbox', views.RejectBox, name='rejectbox'),
     path('spvapproval', views.SupervisorApproval, name='spvapproval'),
+    path('setoperator', views.SetOperator, name='setoperator'),
 
 
     path('master/product', views.viewProduct, name='viewproduct'),

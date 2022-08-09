@@ -28,6 +28,28 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="operatormodal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Set Operator</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="username">Operator 1:</label>
+                <input class="form-control" type="text" id="operator1">
+                <label for="password">Operator 2:</label>
+                <input class="form-control" type="password" id="operator2">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary float-left" id="btnsetoperator" data-dismiss="modal">Set</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="rejectModal" data-backdrop="static" tabindex="-1" role="dialog"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -80,7 +102,10 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">{% if state.status %}{{state.product}}{% else %}Set Batch State terlebih dahulu!{% endif %}</h3>
+                        <button id="btnoperatormodal" class="btn btn-danger float-right">SET OPERATOR</button>
+                        <h3 class="card-title">OPERATOR 1: <b id="operator1"></b></h3>
+                        <br>
+                        <h3 class="card-title">OPERATOR 2: <b id="operator2"></b></h3>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -99,7 +124,7 @@
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <button class="btn btn-block btn-success p-5" id="submitBoxno">PILIH BOX</button>
+                    <button class="btn btn-block btn-success" id="submitBoxno" style="height: 174px;">PILIH BOX</button>
                 </div>
             </div>
         </div>
@@ -125,8 +150,25 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">{% if state.status %}NO. BATCH: {{state.batchno}}, ADJUSTMENT: {{state.weightadjustment}}{% else %}Set Batch State terlebih dahulu!{% endif %} </h3>
-                <button id="btnapprovalmodal" class="btn btn-danger float-right">SPV Approval</button>
+                <button id="btnapprovalmodal" class="btn btn-danger float-right"><span id="spvapprovalstatus"></span></button>
+                <table>
+                    <tr>
+                        <td>PRODUK</td>
+                        <td>: {% if state.status %}<b>{{state.product}}</b>{% else %}Set Batch State terlebih dahulu!{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <td>NO. BATCH</td>
+                        <td>: {% if state.status %}<b>{{state.batchno}}</b></td>
+                    </tr>
+                    <tr>
+                        <td>ADJUSTMENT</td>
+                        <td>: <b>{{state.weightadjustment}}{% else %}Set Batch State terlebih dahulu!{% endif %}</b></b></td>
+                    </tr>
+                    <tr>
+                        <td>JUMLAH KOLI</td>
+                        <td>: <b id="jumlahkoli"></b></td>
+                    </tr>
+                </table>
             </div>
             <div class="card-body" style="overflow-y: scroll; height:500px;">
                 <ul class="products-list product-list-in-card pl-2 pr-2" id="batchhistorylist">
@@ -249,6 +291,14 @@
                     //     $("#rejectModal").modal('show')
                     // }
                     $('#batchhistorylist').html(html)
+                    $('#jumlahkoli').html(data.jumlahkoli)
+                    $('#operator1').html(data.operator1)
+                    $('#operator2').html(data.operator2)
+                    if (data.spvapproval) {
+                        $('#spvapprovalstatus').html("SPV APPROVAL: ON")
+                    } else {
+                        $('#spvapprovalstatus').html("SPV APPROVAL: OFF")
+                    }
                 }
             })
         }
@@ -352,21 +402,41 @@
         $("#spvapprovalmodal").modal('show')
     })
 
+    $("#btnoperatormodal").click(function () {
+        $("#operatormodal").modal('show')
+    })
+
     $("#btnapprove").click(function () {
+        var url = "{% url 'spvapproval' %}"
         var username = $("#spvusername").val();
         var password = $("#spvpassword").val();
-        var url = "{% url 'spvapproval' %}"
         $.ajax({
             type: "POST",
             dataType: "json",
             url: url,
-            data: { "username": username, "password": password },
+            data: JSON.stringify({ "username": username, "password": password }),
             success: function (data) {   // success callback function
                 alert(data.message)
-            },
-            error: function (jqXhr, textStatus, errorMessage) { // error callback 
+            }, error: function (jqXhr, textStatus, errorMessage) { // error callback 
                 alert(jqXhr.responseJSON.message)
-            },
+            }
+        })
+    })
+
+    $("#btnsetoperator").click(function () {
+        var url = "{% url 'setoperator' %}"
+        var operator1 = $("#operator1").val();
+        var operator2 = $("#operator2").val();
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: url,
+            data: JSON.stringify({ "username": username, "password": password }),
+            success: function (data) {   // success callback function
+                alert(data.message)
+            }, error: function (jqXhr, textStatus, errorMessage) { // error callback 
+                alert(jqXhr.responseJSON.message)
+            }
         })
     })
     

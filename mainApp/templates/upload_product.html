@@ -51,6 +51,7 @@
                         <th>Cur. Min. Weight (gram)</th>
                         <th>Cur. Max. Weight (gram)</th>
                         <th>Cur. Std. Weight (gram)</th>
+                        <th>Jumlah Koli</th>
                         <th>Desc</th>
                     </tr>
                     </thead>
@@ -66,6 +67,7 @@
                         <td>{{row.cur_minweight|default_if_none:""}}</td>
                         <td>{{row.cur_maxweight|default_if_none:""}}</td>
                         <td>{{row.cur_standardweight|default_if_none:""}}</td>
+                        <td>{{row.jumlahkoli|default_if_none:""}}</td>
                         <td>{{row.description}}</td>
                     </tr>
                     {%endfor%}

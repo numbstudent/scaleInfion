@@ -8,7 +8,7 @@ class ProductForm(ModelForm):
     class Meta:
         model = Product
         # fields = ['id', 'name', 'code', 'minweight', 'maxweight', 'standardweight', 'status']
-        fields = ['id', 'name', 'code', 'minweight', 'maxweight', 'standardweight']
+        fields = ['id', 'name', 'code', 'minweight', 'maxweight', 'standardweight', 'jumlahkoli']
         # widgets = {
         #     'status': forms.RadioSelect
         # }

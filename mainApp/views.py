@@ -96,8 +96,13 @@ def RegisterView(request, batchno=None):
             .filter(batchno=batchno, product__code=code).order_by('-createdon')
         else:
             data = Register.objects.all().values()
+        spvapproval = AdminConfig.objects.first().spvapproval
+        operator1 = AdminConfig.objects.first().operator1
+        operator2 = AdminConfig.objects.first().operator2
+        jumlahkoli = Register.objects.filter(batchno=batchno, product__code=code).filter(Q(status=1)).count()
+        # jumlahkoli =42
         # return JsonResponse({"insertsuccess":insertsuccess,"id":box['id'], "batch":list(data)}, safe=False, status=200)
-        return JsonResponse({"insertsuccess":insertsuccess, "batch":list(data)}, safe=False, status=200)
+        return JsonResponse({"insertsuccess":insertsuccess, "batch":list(data), "spvapproval":spvapproval, "jumlahkoli":jumlahkoli, "operator1":operator1, "operator2":operator2}, safe=False, status=200)
 
     elif is_ajax(request) and request.method == "PUT":
         group = request.user.groups.all()[0].name
@@ -181,6 +186,9 @@ def ScaleView(request):
                     currentbox.weight = weight.weighing + weightadjustment
                     currentbox.status = weight.status
                     currentbox.save()
+                    config = AdminConfig.objects.first()
+                    config.spvapproval = False
+                    config.save()
         return JsonResponse(data, safe=False, status=200)
 
 @csrf_exempt
@@ -197,8 +205,8 @@ def SupervisorApproval(request):
         user = authenticate(username=username, password=password)
         if user is not None:
             group = user.groups.all()[0].name
-            if str.__contains__(group, 'supervisor'):
-            # if str.__contains__(group, 'supervisor') or str.__contains__(group, 'administrator'):
+            # if str.__contains__(group, 'supervisor'):
+            if str.__contains__(group, 'supervisor') or str.__contains__(group, 'administrator'):
                 expireddate = datetime.now() + timedelta(minutes=1)
                 config = AdminConfig.objects.first()
                 config.spvapproval = True
@@ -209,6 +217,25 @@ def SupervisorApproval(request):
                 return JsonResponse({"message": "Hanya akun Supervisor / Administrator yang diperbolehkan!"}, status=400)    
         else:
             return JsonResponse({"message": "Username / Password salah!"}, status=400)
+
+@csrf_exempt
+def SetOperator(request):
+    if request.method == "POST":
+        body_unicode = request.body.decode('utf-8')
+
+        print(json.loads(body_unicode))
+        body = json.loads(body_unicode)
+        operator1 = body['operator1']
+        operator2 = body['operator2']
+
+        from django.contrib.auth import authenticate
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            config = AdminConfig.objects.first()
+            config.operator1 = operator1
+            config.operator2 = operator2
+            config.save()
+            return JsonResponse({"message": "Operator berhasil ditambahkan."}, status=200)
 
 def insertWeight(batchno):
     # curtime = datetime.now() - timedelta(seconds=5)
@@ -254,9 +281,9 @@ def viewUploadProduct(request):
     context['action'] = 'upload'    
     # context['data'] = ProductUploadTemp.objects.all()
     context['data'] = ProductUploadTemp.objects.raw('SELECT t.*, p.code cur_code, p.name cur_name, p.maxweight cur_maxweight, \
-        p.minweight cur_minweight, p.standardweight cur_standardweight,  \
+        p.minweight cur_minweight, p.standardweight cur_standardweight, p.jumlahkoli, \
         case when p.code is null then \'New Data\'\
-        when t.name <> p.name or t.maxweight <> p.maxweight or t.minweight <> p.minweight or t.standardweight <> p.standardweight \
+        when t.name <> p.name or t.maxweight <> p.maxweight or t.minweight <> p.minweight or t.standardweight <> p.standardweight or t.jumlahkoli <> p.jumlahkoli \
         then \'Update\' else \'\'\
         end description\
         FROM mainApp_productuploadtemp t\
@@ -272,7 +299,7 @@ def viewUploadProduct(request):
             ProductUploadTemp.objects.all().delete()
             for row in reader:
                 obj = ProductUploadTemp(code=row[0], name=row[1], minweight=row[2],
-                                        maxweight=row[3], standardweight=row[4], createdby=request.user)
+                                        maxweight=row[3], standardweight=row[4], jumlahkoli=row[5], createdby=request.user)
                 obj.save()
             return redirect('uploadproduct')
     else:
@@ -292,18 +319,18 @@ def updateProductByTemporary(request):
         FROM mainApp_productuploadtemp t \
         left join mainApp_product p on t.code = p.code \
         where p.code is null or t.name <> p.name or t.maxweight <> p.maxweight or \
-        t.minweight <> p.minweight or t.standardweight <> p.standardweight')
+        t.minweight <> p.minweight or t.standardweight <> p.standardweight or t.jumlahkoli <> p.jumlahkoli')
 
     for item in data:
         p = Product.objects.filter(code=item.code).first()
         if p:
-            h = ProductHistory(code=p.code, name=p.name, maxweight=p.maxweight, minweight=p.minweight, standardweight=p.standardweight,
+            h = ProductHistory(code=p.code, name=p.name, maxweight=p.maxweight, minweight=p.minweight, standardweight=p.standardweight, jumlahkoli=p.jumlahkoli,
                             createdon=p.createdon, updatedon=p.updatedon, status=p.status, createdby=p.createdby, updatedby=p.updatedby)
             h.save()
         obj, created = Product.objects.update_or_create(
             code=item.code,
             defaults={'name': item.name, 'maxweight': item.maxweight,
-                      'minweight': item.minweight, 'standardweight': item.standardweight, 'createdby': request.user},
+                      'minweight': item.minweight, 'standardweight': item.standardweight, 'jumlahkoli':item.jumlahkoli, 'createdby': request.user},
         )
         ProductUploadTemp.objects.all().delete()
 
@@ -326,10 +353,10 @@ def downloadProductCSV(request):
     writer = csv.writer(response)
     query_set = datamodel
     #Table Header
-    writer.writerow(['Code', 'Product Name', 'Min. Weight (gram)', 'Max. Weight (gram)', 'Std. Weight (gram)'])
+    writer.writerow(['Code', 'Product Name', 'Min. Weight (gram)', 'Max. Weight (gram)', 'Std. Weight (gram)', 'Jumlah Koli'])
     for record in query_set:
         output.append([record.code, record.name,
-                      record.minweight, record.maxweight, record.standardweight])
+                      record.minweight, record.maxweight, record.standardweight, record.jumlahkoli])
     #Table Data
     writer.writerows(output)
     return response
@@ -387,7 +414,7 @@ def editProduct(request, id):
             obj.code = form.cleaned_data.get('code')
             obj.minweight = form.cleaned_data.get('minweight')
             obj.maxweight = form.cleaned_data.get('maxweight')
-            # obj.status = form.cleaned_data.get('status')
+            obj.jumlahkoli = form.cleaned_data.get('jumlahkoli')
             obj.save()
             context['message'] = "Data berhasil disimpan."
             return redirect('viewproduct')

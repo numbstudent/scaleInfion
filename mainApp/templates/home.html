@@ -39,10 +39,10 @@
                 </button>
             </div>
             <div class="modal-body">
-                <label for="username">Operator 1:</label>
-                <input class="form-control" type="text" id="operator1">
-                <label for="password">Operator 2:</label>
-                <input class="form-control" type="password" id="operator2">
+                <label for="operator1">Operator 1:</label>
+                <input class="form-control" type="text" id="operator1txt">
+                <label for="operator2">Operator 2:</label>
+                <input class="form-control" type="text" id="operator2txt">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary float-left" id="btnsetoperator" data-dismiss="modal">Set</button>
@@ -102,7 +102,7 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">
-                        <button id="btnoperatormodal" class="btn btn-danger float-right">SET OPERATOR</button>
+                        <!-- <button id="btnoperatormodal" class="btn btn-danger float-right">SET OPERATOR</button> -->
                         <h3 class="card-title">OPERATOR 1: <b id="operator1"></b></h3>
                         <br>
                         <h3 class="card-title">OPERATOR 2: <b id="operator2"></b></h3>
@@ -425,13 +425,13 @@
 
     $("#btnsetoperator").click(function () {
         var url = "{% url 'setoperator' %}"
-        var operator1 = $("#operator1").val();
-        var operator2 = $("#operator2").val();
+        var operator1 = $("#operator1txt").val();
+        var operator2 = $("#operator2txt").val();
         $.ajax({
             type: "POST",
             dataType: "json",
             url: url,
-            data: JSON.stringify({ "username": username, "password": password }),
+            data: JSON.stringify({ "operator1": operator1, "operator2": operator2 }),
             success: function (data) {   // success callback function
                 alert(data.message)
             }, error: function (jqXhr, textStatus, errorMessage) { // error callback 
@@ -452,12 +452,12 @@
         $("#differenceweight").val($("#finalweight").val() - $("#currentweight").val())
     });
 
-    $(document).on('keypress', function (e) {
-        if (e.which == 13 && e.target.id == 'qr') {
-            boxSubmit()
-            $('#' + e.target.id).val("")
-        }
-        $('#qr').focus()
-    });
+    // $(document).on('keypress', function (e) {
+    //     if (e.which == 13 && e.target.id == 'qr') {
+    //         boxSubmit()
+    //         $('#' + e.target.id).val("")
+    //     }
+    //     $('#qr').focus()
+    // });
 </script>
 {% endblock %}

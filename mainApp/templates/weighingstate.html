@@ -38,6 +38,7 @@
                                             <th>Product Name</th>
                                             <th>Batch No</th>
                                             <th>Weight Adj.</th>
+                                            <th>Exp. Date</th>
                                             <th>Open Status</th>
                                             <th>Status</th>
                                             <th>Action</th>
@@ -51,6 +52,7 @@
                                             <td>{{row.product.name}}</td>
                                             <td><a href="{% url 'viewbatchhistory' row.batchno %}">{{row.batchno}}</a></td>
                                             <td>{{row.weightadjustment}}</td>
+                                            <td>{{row.expireddate}}</td>
                                             <td>{{row.pendingstatus|yesno:'Open, Close'}}
                                                 {% if row.spvpabrik or row.spvgudang %}
                                                 <br>

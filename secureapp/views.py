@@ -88,7 +88,7 @@ def viewUser(request):
     context['data'] = User.objects.all()
     context['isvalid'] = 'yes'
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = UserForm(request.POST)
         context['form'] = form
         if form.is_valid():
             form.save()
@@ -96,7 +96,7 @@ def viewUser(request):
         else:
             context['isvalid'] = 'no'
     else:
-        context['form'] = UserCreationForm()
+        context['form'] = UserForm()
 
     return render(request, 'registration/userlist.html', context=context)
 
@@ -122,12 +122,12 @@ def editUser(request, id):
     context['message'] = None
     if request.method == 'GET':
         obj = User.objects.get(id=id)
-        form = UserCreationForm(instance=obj)
+        form = UserForm(instance=obj)
         context['data'] = User.objects.all()
         context['form'] = form
     if request.method == 'POST':
         obj = User.objects.get(id=id)
-        form = UserCreationForm(request.POST, instance=obj)
+        form = UserForm(request.POST, instance=obj)
         context['data'] = User.objects.all()
         context['form'] = form
         if form.is_valid():
@@ -145,14 +145,14 @@ def editUser(request, id):
 @allowed_users(allowed_roles=['administrator'])
 def viewRegister(request):
     if request.POST == 'POST':
-        form = UserCreationForm()
+        form = UserForm()
         if form.is_valid():
             form.save()
             # user_group = Group.objects.get(name='my_group_name') 
             # user_group.user_set.add(your_user)
             messages.success(request, 'Account created successfully')
     else:
-        form = UserCreationForm()
+        form = UserForm()
     context = {
         'form': form
     }

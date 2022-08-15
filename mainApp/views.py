@@ -23,6 +23,11 @@ loginpage = 'login'
 
 @login_required(login_url=loginpage)
 def front(request):
+    obj = AdminConfig.objects.first()
+    obj.spvapproval = False
+    # obj.operator1 = None
+    # obj.operator2 = None
+    obj.save()
     context = {}
     return render(request, 'frontpage.html', context=context)
 
@@ -65,8 +70,12 @@ def RegisterView(request, batchno=None):
             boxexists = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).exclude(status=0).exists()
             boxkosongexists = Register.objects.filter(product=productid, batchno=batchno, status=None).exists()
             weighingstate = WeighingState.objects.filter(status=True, batchno=batchno, product=productid).exists()
+            operator = WeighingState.objects.filter(status=True, batchno=batchno, product=productid).first().operator
+            petugasgudang = WeighingState.objects.filter(status=True, batchno=batchno, product=productid).first().petugasgudang
             print(boxexists)
-            if not weighingstate:
+            if (not operator) or (not petugasgudang):
+                return JsonResponse({"message": "Isikan nama operator terlebih dahulu."}, status=400)
+            elif not weighingstate:
                 return JsonResponse({"message": "Box tidak sesuai dengan Batch."}, status=400)
             # if boxexists or int(boxno) < 1:
             #     return JsonResponse({"message": "Box sudah diinput. Hapus box terlebih dahulu untuk mereset."}, status=400)
@@ -76,6 +85,8 @@ def RegisterView(request, batchno=None):
                 instance = form.save(commit=False)
                 instance.product = productid
                 instance.createdby = request.user
+                instance.operator = operator
+                instance.petugasgudang = petugasgudang
                 instance.save()
                 # ser_instance = serializers.serialize('json', [instance, ])
                 return JsonResponse({"message": "Data berhasil diinput"}, status=200)
@@ -97,12 +108,14 @@ def RegisterView(request, batchno=None):
         else:
             data = Register.objects.all().values()
         spvapproval = AdminConfig.objects.first().spvapproval
-        operator1 = AdminConfig.objects.first().operator1
-        operator2 = AdminConfig.objects.first().operator2
+        # operator1 = AdminConfig.objects.first().operator1
+        # operator2 = AdminConfig.objects.first().operator2
         jumlahkoli = Register.objects.filter(batchno=batchno, product__code=code).filter(Q(status=1)).count()
         # jumlahkoli =42
         # return JsonResponse({"insertsuccess":insertsuccess,"id":box['id'], "batch":list(data)}, safe=False, status=200)
-        return JsonResponse({"insertsuccess":insertsuccess, "batch":list(data), "spvapproval":spvapproval, "jumlahkoli":jumlahkoli, "operator1":operator1, "operator2":operator2}, safe=False, status=200)
+        return JsonResponse({"insertsuccess":insertsuccess, "batch":list(data), "spvapproval":spvapproval, "jumlahkoli":jumlahkoli
+        # , "operator1":operator1, "operator2":operator2
+        }, safe=False, status=200)
 
     elif is_ajax(request) and request.method == "PUT":
         group = request.user.groups.all()[0].name
@@ -164,7 +177,7 @@ def ScaleView(request):
     obj = Logging.objects.latest('id')
     configcheck = AdminConfig.objects.all().exists()
     if not configcheck:
-        obj = AdminConfig(spvinterrupt=False)
+        obj = AdminConfig(spvapproval=False)
         obj.save()
     if request.method == "GET":
         curtime = datetime.now() - timedelta(minutes=1)
@@ -228,14 +241,11 @@ def SetOperator(request):
         operator1 = body['operator1']
         operator2 = body['operator2']
 
-        from django.contrib.auth import authenticate
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            config = AdminConfig.objects.first()
-            config.operator1 = operator1
-            config.operator2 = operator2
-            config.save()
-            return JsonResponse({"message": "Operator berhasil ditambahkan."}, status=200)
+        config = AdminConfig.objects.first()
+        config.operator1 = operator1
+        config.operator2 = operator2
+        config.save()
+        return JsonResponse({"message": "Operator berhasil ditambahkan."}, status=200)
 
 def insertWeight(batchno):
     # curtime = datetime.now() - timedelta(seconds=5)
@@ -515,7 +525,7 @@ def viewReportBody(request):
             data = Register.objects.filter(batchno=reportobj.batchno, product=reportobj.product)
             for row in data:
                 obj = ReportRegister(report=reportobj, dnrev=reportobj.dnrev, product=row.product, batchno=row.batchno, \
-                boxno=row.boxno, status=row.status, createdon=row.createdon, weight=row.weight, createdby=row.createdby)
+                boxno=row.boxno, status=row.status, createdon=row.createdon, weight=row.weight, createdby=row.createdby, operator=row.operator, petugasgudang=row.petugasgudang)
                 obj.save()
             return redirect('viewreportbody')
     else:
@@ -682,10 +692,10 @@ def reportBatchCSV(request):
     writer = csv.writer(response)
     query_set = context['data']
     #Table Header
-    writer.writerow(['Product Name', 'Batch No', 'Box No', 'Weight', 'Date'])
+    writer.writerow(['Product Name', 'Batch No', 'Box No', 'Weight', 'Date', 'Operator', 'Petugas Gudang'])
     for record in query_set:
         output.append([record.product_name, record.batchno,
-                      record.boxno, record.iot_weight, record.input_date])
+                      record.boxno, record.iot_weight, record.input_date, record.operator, record.petugasgudang])
     #Table Data
     writer.writerows(output)
     return response

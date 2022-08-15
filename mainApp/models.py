@@ -73,8 +73,10 @@ class Register(models.Model):
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
     weight = models.FloatField(null=True)
-    operator1 = models.CharField(max_length=50, default=None, null=True)
-    operator2 = models.CharField(max_length=50, default=None, null=True)
+    # operator1 = models.CharField(max_length=50, default=None, null=True)
+    # operator2 = models.CharField(max_length=50, default=None, null=True)
+    operator = models.CharField(max_length=50, default=None, null=True)
+    petugasgudang = models.CharField(max_length=50, default=None, null=True)
     createdby = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="createdby_rel")
     updatedby = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, blank=True, related_name="updatedby_rel")
     # class Meta:
@@ -134,7 +136,8 @@ class WeighingState(models.Model):
     spvpabrik = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="spvpabrik", null=True) #boleh kosong di create awal batchno
     spvgudang = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="spvgudang", null=True) #boleh kosong di create awal batchno
     operator = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="operator", null=True) #boleh kosong di create awal batchno
-    petugasgudang = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="petugasgudang", null=True) #boleh kosong di create awal batchno
+    petugasgudang = models.CharField(max_length=50, default=None, null=True)
+    expireddate = models.CharField(max_length=20)
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
 
@@ -145,6 +148,10 @@ class ReportRegister(models.Model):
     batchno = models.CharField(max_length=15)
     boxno = models.IntegerField()
     status = models.IntegerField(null=True, default=None)
+    # operator1 = models.CharField(max_length=50, default=None, null=True)
+    # operator2 = models.CharField(max_length=50, default=None, null=True)
+    operator = models.CharField(max_length=50, default=None, null=True)
+    petugasgudang = models.CharField(max_length=50, default=None, null=True)
     createdon = models.DateTimeField(auto_now_add=True)
     weight = models.FloatField(null=True)
     createdby = models.ForeignKey(User, on_delete=models.RESTRICT)
@@ -153,8 +160,8 @@ class ReportRegister(models.Model):
 class AdminConfig(models.Model):
     spvapproval = models.BooleanField(default=False)
     spvapprovalexpireddate = models.DateTimeField(blank=True, null=True, default=None)
-    operator1 = models.CharField(max_length=50, default=None, null=True)
-    operator2 = models.CharField(max_length=50, default=None, null=True)
+    # operator1 = models.CharField(max_length=50, default=None, null=True)
+    # operator2 = models.CharField(max_length=50, default=None, null=True)
     reporttitle = models.ForeignKey(ReportTitle, on_delete=models.RESTRICT, null=True)
     department = models.ForeignKey(Department, on_delete=models.RESTRICT, null=True)
     weightadjustment = models.FloatField(default=0)

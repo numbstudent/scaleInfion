@@ -108,6 +108,11 @@ def RegisterView(request, batchno=None):
         else:
             data = Register.objects.all().values()
         spvapproval = AdminConfig.objects.first().spvapproval
+        spvapprovalexpireddate = AdminConfig.objects.first().spvapprovalexpireddate
+        if datetime.now() > spvapprovalexpireddate:
+            configobj = AdminConfig.objects.first()
+            configobj.spvapproval = False
+            configobj.save()
         # operator1 = AdminConfig.objects.first().operator1
         # operator2 = AdminConfig.objects.first().operator2
         jumlahkoli = Register.objects.filter(batchno=batchno, product__code=code).filter(Q(status=1)).count()
@@ -119,7 +124,11 @@ def RegisterView(request, batchno=None):
 
     elif is_ajax(request) and request.method == "PUT":
         group = request.user.groups.all()[0].name
-        privilegecheck = allowed_check_function('managebatch',request)
+        privilegecheck = True
+        # privilegecheck = allowed_check_function('managebatch',request)
+        group = request.user.groups.all()[0].name 
+        if group != 'administrator': #fungsi baru
+            privilegecheck = False
         if privilegecheck:
             body = json.loads(request.body)
             registerid = body['registerid']
@@ -133,7 +142,11 @@ def RegisterView(request, batchno=None):
 @csrf_exempt
 def editRegisterWeight(request):
     group = request.user.groups.all()[0].name
-    privilegecheck = allowed_check_function('managebatch',request)
+    privilegecheck = True
+    # privilegecheck = allowed_check_function('managebatch',request) #fungsi lama
+    group = request.user.groups.all()[0].name 
+    if group != 'administrator': #fungsi baru
+        privilegecheck = False
     if privilegecheck:
         if request.method == "POST":
             body = json.loads(request.body)
@@ -141,12 +154,12 @@ def editRegisterWeight(request):
             finalweight = body['finalweight']
             obj = Register.objects.filter(id=registerid).first()
             message = ""
-            if(((finalweight - obj.weight) < 1) and ((finalweight - obj.weight) > -1)):
+            if(((finalweight - obj.weight) < 3) and ((finalweight - obj.weight) > -3)):
                 obj.weight = finalweight
                 obj.save()
-                message = "Perubahan selesai."
+                message = "Data berhasil diubah."
             else:
-                message = "Perubahan data melebihi 1 gram!"
+                message = "Perubahan data melebihi 3 gram!"
             return JsonResponse({"message": message}, status=200)
     else:
         error_message = 'Anda tidak memiliki akses untuk ini!'
@@ -503,8 +516,10 @@ def viewReportBody(request):
             product = Product.objects.get(weighingstate__id=batchnoid)
             batchno = WeighingState.objects.filter(id=batchnoid).values('batchno').first()['batchno']
             print(batchno)
-            reporttitle = ReportTitle.objects.get(id=request.POST.get('reporttitle'))
-            department = Department.objects.get(id=request.POST.get('department'))
+            # reporttitle = ReportTitle.objects.get(id=request.POST.get('reporttitle'))
+            # department = Department.objects.get(id=request.POST.get('department'))
+            reporttitle = AdminConfig.objects.first().reporttitle
+            department = AdminConfig.objects.first().department
             reviewdate = request.POST.get('reviewdate')
             effectivedate = request.POST.get('effectivedate')
             dnno = request.POST.get('dnno')
@@ -615,10 +630,13 @@ def viewHistory(request):
 @allowed_check(feature_alias='reportpdf')
 def viewReportBatch(request):
     context = {}
-    datamodel = Register.objects.filter(Q(status=1) | Q(status=2))\
+    datamodel = Register.objects.all()\
         .annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
         .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date','status').order_by('-input_date')
     hasFilter = False
+    group = request.user.groups.all()[0].name
+    if group != 'administrator':
+        datamodel = datamodel.filter(Q(status=1) | Q(status=3))
     if request.method == "POST":
         form = ReportBatchForm(request.POST)
         product = request.POST.get('productid')
@@ -638,7 +656,7 @@ def viewReportBatch(request):
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(createdon__lte=inputdateto)
         if reporttype == 1:
-            datamodel = datamodel.filter(Q(status=1) | Q(status=2))
+            datamodel = datamodel.filter(Q(status=1) | Q(status=3))
         if product or batchno or inputdatefrom or inputdateto:
             hasFilter = True
     else:
@@ -676,7 +694,7 @@ def reportBatchCSV(request):
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(createdon__lte=inputdateto)
         if reporttype == 1:
-            datamodel = datamodel.filter(Q(status=1) | Q(status=2))
+            datamodel = datamodel.filter(Q(status=1) | Q(status=3))
         if product or batchno or inputdatefrom or inputdateto:
             hasFilter = True
     if hasFilter:
@@ -772,7 +790,7 @@ def reportBatchPDF(request):
     datamodel2 = UploadedRegister.objects.order_by('boxno')
     group = request.user.groups.all()[0].name
     if group != 'administrator':
-        datamodel = datamodel.filter(Q(status=1) | Q(status=2))
+        datamodel = datamodel.filter(Q(status=1) | Q(status=3))
 
     product_name = ""
     if request.method == "GET":
@@ -886,6 +904,7 @@ def viewEndBatch(request): #endbatch
     noState = WeighingState.objects.filter(id=1, status=False).exists()
     if not noState and request.method == "POST":
         form = WeighingStateForm(request.POST)
+        form.fields["operator"].queryset = User.objects.filter(groups__name='operator')
         context['form'] = form
         if form.is_valid():
             obj = WeighingState.objects.get(id=1)
@@ -899,6 +918,7 @@ def viewEndBatch(request): #endbatch
         batchno = activestate['batchno']
         productid = activestate['product']
         form = WeighingStateForm()
+        form.fields["operator"].queryset = User.objects.filter(groups__name='operator')
         # form.fields["product"].queryset = Product.objects.filter(id=1)
         # form.fields["batchno"].initial = batchno
         context['form'] = form
@@ -933,12 +953,19 @@ def RejectBox(request):
 def viewWeighingState(request):
     context = {}
     context['action'] = 'view'
-    context['data'] = WeighingState.objects.all()
+    # context['data'] = WeighingState.objects.all()
+    context['data'] = WeighingState.objects.raw('SELECT t.*, ifnull(koli_register,0) koli_register  \
+        FROM mainApp_weighingstate t \
+        left join ( select product_id, batchno, count(*) koli_register from mainApp_register \
+        where status = 1 or status = 3 group by product_id, batchno) \
+         r on t.product_id = r.product_id and \
+        t.batchno = r.batchno')
     if request.method == "POST":
         privilegecheck = allowed_check_function('managebatch',request)
         print(privilegecheck)
         if privilegecheck:
             form = WeighingStateInitialForm(request.POST)
+            form.fields["operator"].queryset = User.objects.filter(groups__name='operator')
             context['form'] = form
             if form.is_valid():
                 instance = form.save(commit=False)
@@ -953,6 +980,7 @@ def viewWeighingState(request):
             return HttpResponse('Anda tidak diizinkan untuk melihat halaman ini. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>')
     else:
         form = WeighingStateInitialForm()
+        form.fields["operator"].queryset = User.objects.filter(groups__name='operator')
         context['form'] = form
 
     return render(request, 'weighingstate.html', context=context)
@@ -976,15 +1004,22 @@ def editWeighingState(request, id):
     context['action'] = 'edit'
     context['id'] = id
     context['message'] = None
+    # context['data'] = WeighingState.objects.all()
+    context['data'] = WeighingState.objects.raw('SELECT t.*, ifnull(koli_register,0) koli_register  \
+        FROM mainApp_weighingstate t \
+        left join ( select product_id, batchno, count(*) koli_register from mainApp_register \
+        where status = 1 or status = 3 group by product_id, batchno) \
+         r on t.product_id = r.product_id and \
+        t.batchno = r.batchno')
     if request.method == 'GET':
         obj = WeighingState.objects.get(id=id)
         form = WeighingStateForm(instance=obj)
-        context['data'] = WeighingState.objects.all()
+        form.fields["operator"].queryset = User.objects.filter(groups__name='operator')
         context['form'] = list(form)
     if request.method == 'POST':
         obj = WeighingState.objects.get(id=id)
         form = WeighingStateForm(request.POST, instance=obj)
-        context['data'] = WeighingState.objects.all()
+        form.fields["operator"].queryset = User.objects.filter(groups__name='operator')
         context['form'] = list(form)
         if form.is_valid():
             # obj.title = form.cleaned_data.get('title').upper()
@@ -1044,7 +1079,13 @@ def closeWeighingState(request, id):
     if request.method == 'POST':
         obj = WeighingState.objects.get(id=id)
         form = WeighingStateCloseForm(request.POST, user=request.user, instance=obj)
-        context['data'] = WeighingState.objects.all()
+        # context['data'] = WeighingState.objects.all()
+        context['data'] = WeighingState.objects.raw('SELECT t.*, ifnull(koli_register,0) koli_register  \
+        FROM mainApp_weighingstate t \
+        left join ( select product_id, batchno, count(*) koli_register from mainApp_register \
+        where status = 1 or status = 3 group by product_id, batchno) \
+         r on t.product_id = r.product_id and \
+        t.batchno = r.batchno')
         context['form'] = list(form)
         if form.is_valid():
             if group == 'supervisorgudang':
@@ -1068,7 +1109,28 @@ def closeWeighingState(request, id):
 @allowed_check(feature_alias='viewendbatch')
 def viewBatchHistory(request, batchno):
     context = {}
-    datamodel = Register.objects.filter(batchno=batchno).annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
+    datamodel = Register.objects.filter(batchno=batchno).filter(Q(status=1) | Q(status=3)).annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
         .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date', 'status').order_by('-input_date')
     context['data'] = datamodel
     return render(request, 'batchno_history.html', context=context)
+
+@login_required(login_url=loginpage)
+@allowed_users(allowed_roles=['administrator'])
+def viewConfig(request):
+    context = {}
+    obj = AdminConfig.objects.filter(reporttitle=None, department=None)
+    obj.delete()
+    obj = AdminConfig.objects.all().first()
+    context['form'] = ConfigForm(instance=obj)
+    context['data'] = AdminConfig.objects.all()
+    # context['data'] = obj
+    if request.method == "POST":
+        form = ConfigForm(request.POST, instance=obj)
+        if form.is_valid():
+            weightadjustment = form.cleaned_data.get('weightadjustment')
+            if weightadjustment > 0.0005 or weightadjustment < 0:
+                context['message'] = 'Perubahan harus diantara 0 - 0.0005.'    
+            else:
+                form.save()
+                context['message'] = 'Data berhasil diubah.'
+    return render(request, 'config.html', context=context)

@@ -247,14 +247,14 @@ class ReportBodyForm(forms.Form):
         queryset=WeighingState.objects.filter(pendingstatus=False).order_by('-updatedon'), label="Batch No", widget=forms.Select(attrs={
             'class': 'form-control select2bs4'
     }))
-    reporttitle = ReportTitleModelChoiceField(
-        queryset=ReportTitle.objects.all(), label="Report Title", widget=forms.Select(attrs={
-            'class': 'form-control select2bs4'
-    }))
-    department = DepartmentModelChoiceField(
-        queryset=Department.objects.all(), label="Department Title", widget=forms.Select(attrs={
-            'class': 'form-control select2bs4'
-    }))
+    # reporttitle = ReportTitleModelChoiceField(
+    #     queryset=ReportTitle.objects.all(), label="Report Title", widget=forms.Select(attrs={
+    #         'class': 'form-control select2bs4'
+    # }))
+    # department = DepartmentModelChoiceField(
+    #     queryset=Department.objects.all(), label="Department Title", widget=forms.Select(attrs={
+    #         'class': 'form-control select2bs4'
+    # }))
     reviewdate = forms.DateField(label="Review Date", widget=forms.DateInput(attrs={
         'class': 'form-control datepick'
     }))
@@ -345,3 +345,8 @@ class SimulatorForm(ModelForm):
     class Meta:
         model = Logging
         fields = ['status', 'weighing']
+
+class ConfigForm(ModelForm):
+    class Meta:
+        model = AdminConfig
+        fields = ['reporttitle', 'department','weightadjustment']

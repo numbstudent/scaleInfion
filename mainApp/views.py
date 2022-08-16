@@ -67,7 +67,7 @@ def RegisterView(request, batchno=None):
             boxno = request.POST.get('boxno')
             batchno = request.POST.get('batchno')
             productid = Product.objects.filter(code=code).first()
-            boxexists = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).exclude(status=0).exists()
+            boxexists = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).filter(Q(status=1) | Q(status=3)).exists()
             boxkosongexists = Register.objects.filter(product=productid, batchno=batchno, status=None).exists()
             weighingstate = WeighingState.objects.filter(status=True, batchno=batchno, product=productid).exists()
             operator = WeighingState.objects.filter(status=True, batchno=batchno, product=productid).first().operator
@@ -77,8 +77,8 @@ def RegisterView(request, batchno=None):
                 return JsonResponse({"message": "Isikan nama operator terlebih dahulu."}, status=400)
             elif not weighingstate:
                 return JsonResponse({"message": "Box tidak sesuai dengan Batch."}, status=400)
-            # if boxexists or int(boxno) < 1:
-            #     return JsonResponse({"message": "Box sudah diinput. Hapus box terlebih dahulu untuk mereset."}, status=400)
+            if boxexists or int(boxno) < 1:
+                return JsonResponse({"message": "Box ini sudah pernah diinput!"}, status=400)
             elif boxkosongexists:
                 return JsonResponse({"message": "Box kosong harus ditimbang terlebih dahulu."}, status=400)
             else:

@@ -25,8 +25,8 @@ loginpage = 'login'
 def front(request):
     obj = AdminConfig.objects.first()
     obj.spvapproval = False
-    # obj.operator1 = None
-    # obj.operator2 = None
+    obj.operator = None
+    obj.petugasgudang = None
     obj.save()
     context = {}
     return render(request, 'frontpage.html', context=context)
@@ -57,6 +57,11 @@ def ProductView(request):
         data = Product.objects.all().order_by('name').values()
         return JsonResponse(list(data), safe=False, status=200)
 
+@csrf_exempt
+def OperatorListView(request):
+    if request.method == "GET":
+        data = User.objects.filter(groups__name='operator').values('first_name', 'last_name', 'username')        
+        return JsonResponse(list(data), safe=False, status=200)
 
 @csrf_exempt
 def RegisterView(request, batchno=None):
@@ -70,26 +75,29 @@ def RegisterView(request, batchno=None):
             boxexists = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).filter(Q(status=1) | Q(status=3)).exists()
             boxkosongexists = Register.objects.filter(product=productid, batchno=batchno, status=None).exists()
             weighingstate = WeighingState.objects.filter(status=True, batchno=batchno, product=productid).exists()
-            operator = WeighingState.objects.filter(status=True, batchno=batchno, product=productid).first().operator
-            petugasgudang = WeighingState.objects.filter(status=True, batchno=batchno, product=productid).first().petugasgudang
-            print(boxexists)
-            if (not operator) or (not petugasgudang):
-                return JsonResponse({"message": "Isikan nama operator terlebih dahulu."}, status=400)
-            elif not weighingstate:
+            
+            if not weighingstate:
                 return JsonResponse({"message": "Box tidak sesuai dengan Batch."}, status=400)
-            if boxexists or int(boxno) < 1:
-                return JsonResponse({"message": "Box ini sudah pernah diinput!"}, status=400)
-            elif boxkosongexists:
-                return JsonResponse({"message": "Box kosong harus ditimbang terlebih dahulu."}, status=400)
             else:
-                instance = form.save(commit=False)
-                instance.product = productid
-                instance.createdby = request.user
-                instance.operator = operator
-                instance.petugasgudang = petugasgudang
-                instance.save()
-                # ser_instance = serializers.serialize('json', [instance, ])
-                return JsonResponse({"message": "Data berhasil diinput"}, status=200)
+                # operator = WeighingState.objects.filter(status=True, batchno=batchno, product=productid).first().operator
+                # petugasgudang = WeighingState.objects.filter(status=True, batchno=batchno, product=productid).first().petugasgudang
+                operator = AdminConfig.objects.first().operator
+                petugasgudang = AdminConfig.objects.first().petugasgudang
+                if (not operator) or (not petugasgudang):
+                    return JsonResponse({"message": "Isikan nama operator terlebih dahulu."}, status=400)
+                elif boxexists or int(boxno) < 1:
+                    return JsonResponse({"message": "Box ini sudah pernah diinput!"}, status=400)
+                elif boxkosongexists:
+                    return JsonResponse({"message": "Box kosong harus ditimbang terlebih dahulu."}, status=400)
+                else:
+                    instance = form.save(commit=False)
+                    instance.product = productid
+                    instance.createdby = request.user
+                    instance.operator = operator
+                    instance.petugasgudang = petugasgudang
+                    instance.save()
+                    # ser_instance = serializers.serialize('json', [instance, ])
+                    return JsonResponse({"message": "Data berhasil diinput"}, status=200)
         else:
             return JsonResponse({"message": "Isikan parameter."}, status=400)
 
@@ -113,13 +121,13 @@ def RegisterView(request, batchno=None):
             configobj = AdminConfig.objects.first()
             configobj.spvapproval = False
             configobj.save()
-        # operator1 = AdminConfig.objects.first().operator1
-        # operator2 = AdminConfig.objects.first().operator2
+        operator = AdminConfig.objects.first().operator
+        petugasgudang = AdminConfig.objects.first().petugasgudang
         jumlahkoli = Register.objects.filter(batchno=batchno, product__code=code).filter(Q(status=1)).count()
         # jumlahkoli =42
         # return JsonResponse({"insertsuccess":insertsuccess,"id":box['id'], "batch":list(data)}, safe=False, status=200)
         return JsonResponse({"insertsuccess":insertsuccess, "batch":list(data), "spvapproval":spvapproval, "jumlahkoli":jumlahkoli
-        # , "operator1":operator1, "operator2":operator2
+        , "operator":operator, "petugasgudang":petugasgudang
         }, safe=False, status=200)
 
     elif is_ajax(request) and request.method == "PUT":
@@ -255,10 +263,13 @@ def SetOperator(request):
         operator2 = body['operator2']
 
         config = AdminConfig.objects.first()
-        config.operator1 = operator1
-        config.operator2 = operator2
+        config.operator = operator1.title()
+        config.petugasgudang = operator2.title()
         config.save()
-        return JsonResponse({"message": "Operator berhasil ditambahkan."}, status=200)
+        if (not operator1) or (not operator2):
+            return JsonResponse({"message": "Isikan nama operator terlebih dahulu."}, status=400)
+        else:
+            return JsonResponse({"message": "Operator berhasil ditambahkan."}, status=200)
 
 def insertWeight(batchno):
     # curtime = datetime.now() - timedelta(seconds=5)
@@ -597,7 +608,7 @@ def editReportBody(request, id):
 def viewHistory(request):
     context = {}
     datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
-        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date', 'status').order_by('-input_date')
+        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date', 'status', 'operator', 'petugasgudang').order_by('-input_date')
     hasFilter = False
     if request.method == "POST":
         form = HistoryForm(request.POST)
@@ -632,7 +643,7 @@ def viewReportBatch(request):
     context = {}
     datamodel = Register.objects.all()\
         .annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
-        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date','status').order_by('-input_date')
+        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date','status', 'operator', 'petugasgudang').order_by('-input_date')
     hasFilter = False
     group = request.user.groups.all()[0].name
     if group != 'administrator':
@@ -642,9 +653,8 @@ def viewReportBatch(request):
         product = request.POST.get('productid')
         batchno = request.POST.get('batchno')
         inputdatefrom = request.POST.get('inputdatefrom')
-        inputdateto = request.GET.get('inputdateto')
-        reporttype = request.GET.get('reporttype')
-        print(reporttype)
+        inputdateto = request.POST.get('inputdateto')
+        reporttype = request.POST.get('reporttype')
         context['form'] = form
         if product:
             datamodel = datamodel.filter(product=product)
@@ -655,7 +665,7 @@ def viewReportBatch(request):
         if inputdateto:
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(createdon__lte=inputdateto)
-        if reporttype == 1:
+        if reporttype == '1':
             datamodel = datamodel.filter(Q(status=1) | Q(status=3))
         if product or batchno or inputdatefrom or inputdateto:
             hasFilter = True
@@ -693,9 +703,9 @@ def reportBatchCSV(request):
         if inputdateto:
             inputdateto = inputdateto + " 23:59"
             datamodel = datamodel.filter(createdon__lte=inputdateto)
-        if reporttype == 1:
+        if reporttype == '1':
             datamodel = datamodel.filter(Q(status=1) | Q(status=3))
-        if product or batchno or inputdatefrom or inputdateto:
+        if product or batchno or inputdatefrom or inputdateto or reporttype:
             hasFilter = True
     if hasFilter:
        context['data'] = datamodel
@@ -710,10 +720,17 @@ def reportBatchCSV(request):
     writer = csv.writer(response)
     query_set = context['data']
     #Table Header
-    writer.writerow(['Product Name', 'Batch No', 'Box No', 'Weight', 'Date', 'Operator', 'Petugas Gudang'])
+    writer.writerow(['Product Name', 'Batch No', 'Box No', 'Weight', 'Status', 'Date', 'Operator', 'Petugas Gudang'])
     for record in query_set:
+        status = "Belum Ditimbang"
+        if record.status == 1:
+            status = "OK"
+        elif record.status == 2:
+            status = "Reject"
+        elif record.status == 3:
+            status = "Last Box"
         output.append([record.product_name, record.batchno,
-                      record.boxno, record.iot_weight, record.input_date, record.operator, record.petugasgudang])
+                      record.boxno, record.iot_weight, status, record.input_date, record.operator, record.petugasgudang])
     #Table Data
     writer.writerows(output)
     return response
@@ -799,7 +816,7 @@ def reportBatchPDF(request):
         reportid = request.GET.get('id')
         header = Report.objects.all().get(id=reportid)
         # datamodel = datamodel.filter(batchno=header.batchno, product=header.product)
-        datamodel = datamodel.filter(report = header)
+        datamodel = datamodel.filter(report = header).filter(Q(status=1) | Q(status=3))
         datamodel2 = datamodel2.filter(batchno=header.batchno, product=header.product)
         signature = WeighingState.objects.filter(batchno=header.batchno, product=header.product).first()
     else:

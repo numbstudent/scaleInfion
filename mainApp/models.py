@@ -160,8 +160,8 @@ class ReportRegister(models.Model):
 class AdminConfig(models.Model):
     spvapproval = models.BooleanField(default=False)
     spvapprovalexpireddate = models.DateTimeField(blank=True, null=True, default=None)
-    # operator1 = models.CharField(max_length=50, default=None, null=True)
-    # operator2 = models.CharField(max_length=50, default=None, null=True)
+    operator = models.CharField(max_length=50, default=None, null=True)
+    petugasgudang = models.CharField(max_length=50, default=None, null=True)
     reporttitle = models.ForeignKey(ReportTitle, on_delete=models.RESTRICT, null=True)
     department = models.ForeignKey(Department, on_delete=models.RESTRICT, null=True)
     weightadjustment = models.FloatField(default=0)

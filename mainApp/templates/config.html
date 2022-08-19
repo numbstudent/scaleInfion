@@ -35,6 +35,7 @@
                         <th>Report Title</th>
                         <th>Department</th>
                         <th>Weight Adjustment</th>
+                        <th>Petugas Timbang / Gudang</th>
                         <th>SPV Approval</th>
                     </tr>
                     </thead>
@@ -44,6 +45,7 @@
                         <td>{{row.reporttitle}}</td>
                         <td>{{row.department}}</td>
                         <td>{{row.weightadjustment}}</td>
+                        <td>{{row.operator}} / {{row.petugasgudang}}</td>
                         <td>{{row.spvapproval}} <br> Exp: {{row.spvapprovalexpireddate}}</td>
                     </tr>
                     {%endfor%}

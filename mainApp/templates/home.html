@@ -39,9 +39,12 @@
                 </button>
             </div>
             <div class="modal-body">
-                <label for="operator1">Operator 1:</label>
-                <input class="form-control" type="text" id="operator1txt">
-                <label for="operator2">Operator 2:</label>
+                <label for="operator1">Ptgs Timbang:</label>
+                <select class="form-control" id="operator1txt">
+
+                </select>
+                <!-- <input class="form-control" type="text" id="operator1txt"> -->
+                <label for="operator2">Ptgs Gudang:</label>
                 <input class="form-control" type="text" id="operator2txt">
             </div>
             <div class="modal-footer">
@@ -102,10 +105,10 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">
-                        <!-- <button id="btnoperatormodal" class="btn btn-danger float-right">SET OPERATOR</button> -->
-                        <h3 class="card-title">OPERATOR 1: <b id="operator1"></b></h3>
+                        <button id="btnoperatormodal" class="btn btn-danger float-right">SET OPERATOR</button>
+                        <h3 class="card-title">PTGS TIMBANG: <b id="operator1"></b></h3>
                         <br>
-                        <h3 class="card-title">OPERATOR 2: <b id="operator2"></b></h3>
+                        <h3 class="card-title">PTGS GUDANG: <b id="operator2"></b></h3>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -186,6 +189,19 @@
     var url = "{% url 'registerqr' %}"
     $("#submitBoxno").click(function () {
         boxSubmit()
+    })
+
+    $.ajax({
+        type: "GET",
+        dataType: "json",
+        url: "{% url 'operatorlist' %}",
+        success: function (data) {   // success callback function
+            $.each(data, function (key, value) {
+                $("#operator1txt").append('<option>' + value.first_name + ' ' + value.last_name +'</option>');
+            });
+        }, error: function (jqXhr, textStatus, errorMessage) { // error callback 
+            alert(jqXhr.responseJSON.message)
+        }
     })
 
     function boxSubmit() {
@@ -292,8 +308,8 @@
                     // }
                     $('#batchhistorylist').html(html)
                     $('#jumlahkoli').html(data.jumlahkoli)
-                    $('#operator1').html(data.operator1)
-                    $('#operator2').html(data.operator2)
+                    $('#operator1').html(data.operator)
+                    $('#operator2').html(data.petugasgudang)
                     if (data.spvapproval) {
                         $('#spvapprovalstatus').html("SPV APPROVAL: ON")
                     } else {

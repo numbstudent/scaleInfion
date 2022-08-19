@@ -7,6 +7,7 @@ urlpatterns = [
     # path('product', views.ProductView, name='product'),
     path('config', views.viewConfig, name='config'),
     path('scale', views.ScaleView, name='scale'),
+    path('operatorlist', views.OperatorListView, name='operatorlist'),
     # path('startbatch', views.viewWeighingState, name='startbatch'),
     # path('endbatch', views.viewEndBatch, name='endbatch'),
     path('registerqr', views.RegisterView, name='registerqr'),

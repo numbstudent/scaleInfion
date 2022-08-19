@@ -100,8 +100,8 @@ class ReportTitleForm(ModelForm):
         fields = ['id','title','subtitle']
 
 REPORTTYPE_CHOICES =(
-    ("1", "Final Report"),
-    ("2", "Full Report"),
+    ("1", "OK / LAST BOX ONLY"),
+    ("2", "AUDIT TRAIL"),
 )
 MONTH_CHOICES =(
     ('JAN', 'JAN'),

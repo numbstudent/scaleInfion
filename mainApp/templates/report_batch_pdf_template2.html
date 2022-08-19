@@ -37,7 +37,7 @@
                             <td><i>{{header.department.name}}</i></td>
                         </tr>
                         <tr class="text-center align-middle h5">
-                            <td><i>DN: {{header.dnno}}</i><br>Eff. Date: {{header.effectivedate|date:"d-m-Y"}}</td>
+                            <td><i>DN: {{header.dnno}}</i><br>Eff. Date: {{header.effectivedate|date:"d b Y"|upper}}</td>
                             <td><i>This document will be reviewed on:
                                     <br>{{header.reviewdate|date:"F Y"}}</i></td>
                             <td><i>Rev of DN: {{header.dnrev}}<br>Date: {{header.createdon|date:"d-m-Y"}}</i></td>
@@ -74,18 +74,8 @@
                                                 <tr>
                                                     <td>{{row.createdon|date:"d/m/Y h:i:s"}}</td>
                                                     <td>{{row.boxno}}</td>
-                                                    <td>{{row.weight}}
-                                                        {% if row.status == 1 %}
-                                                        OK
-                                                        {% elif row.status == 2 %}
-                                                        Reject
-                                                        {% elif row.status == 3 %}
-                                                        Last Box
-                                                        {% else %}
-                                                        Belum Ditimbang
-                                                        {% endif %}
-                                                    </td>
-                                                    <td>{{row.operator1}}<br>{{row.operator2}}</td>
+                                                    <td class="text-right">{{row.weight}}</td>
+                                                    <td>{{row.operator}}<br>{{row.petugasgudang}}</td>
                                                 </tr>
                                                 {% if forloop.counter|divisibleby:rowlen and forloop.counter != data.count %}
                                             </table>
@@ -129,8 +119,8 @@
                         <tr>
                             <td>Nama: {{signature.operator.first_name}} {{signature.operator.last_name}}</td>
                             <td>Nama: {{signature.petugasgudang|default_if_none:"-"}}</td>
-                            <td>Nama: {{signature.spvgudang.first_name}} {{signature.spvgudang.last_name}}</td>
                             <td>Nama: {{signature.spvpabrik.first_name}} {{signature.spvpabrik.last_name}}</td>
+                            <td>Nama: {{signature.spvgudang.first_name}} {{signature.spvgudang.last_name}}</td>
                         </tr>
                         <tr>
                             <td>Tanggal:</td>

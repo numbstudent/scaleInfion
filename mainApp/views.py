@@ -101,7 +101,7 @@ def RegisterView(request, batchno=None):
         else:
             return JsonResponse({"message": "Isikan parameter."}, status=400)
 
-    elif is_ajax(request) and request.method == "GET":
+    elif request.method == "GET":
         batchno = request.GET.get('batchno')
         code = request.GET.get('code')
         insertsuccess = "True"
@@ -116,11 +116,6 @@ def RegisterView(request, batchno=None):
         else:
             data = Register.objects.all().values()
         spvapproval = AdminConfig.objects.first().spvapproval
-        spvapprovalexpireddate = AdminConfig.objects.first().spvapprovalexpireddate
-        if datetime.now() > spvapprovalexpireddate:
-            configobj = AdminConfig.objects.first()
-            configobj.spvapproval = False
-            configobj.save()
         operator = AdminConfig.objects.first().operator
         petugasgudang = AdminConfig.objects.first().petugasgudang
         jumlahkoli = Register.objects.filter(batchno=batchno, product__code=code).filter(Q(status=1)).count()
@@ -988,6 +983,8 @@ def viewWeighingState(request):
                 instance = form.save(commit=False)
                 instance.pendingstatus = True
                 instance.status = False
+                productid = form.cleaned_data.get('product')
+                instance.jumlahkoli = Product.objects.filter(id=productid).last().jumlahkoli
                 instance.batchno = form.cleaned_data.get('batchno').upper()
                 # batchnoobj = WeighingState.objects.all()
                 # batchnoobj.update(status=False)

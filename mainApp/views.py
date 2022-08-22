@@ -23,6 +23,10 @@ loginpage = 'login'
 
 @login_required(login_url=loginpage)
 def front(request):
+    configcheck = AdminConfig.objects.all().exists()
+    if not configcheck:
+        obj = AdminConfig(spvapproval=False)
+        obj.save()
     obj = AdminConfig.objects.first()
     obj.spvapproval = False
     obj.operator = None
@@ -73,6 +77,7 @@ def RegisterView(request, batchno=None):
             batchno = request.POST.get('batchno')
             productid = Product.objects.filter(code=code).first()
             boxexists = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).filter(Q(status=1) | Q(status=3)).exists()
+            boxrejectexists = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).filter(status=2).exists()
             boxkosongexists = Register.objects.filter(product=productid, batchno=batchno, status=None).exists()
             weighingstate = WeighingState.objects.filter(status=True, batchno=batchno, product=productid).exists()
             
@@ -83,12 +88,21 @@ def RegisterView(request, batchno=None):
                 # petugasgudang = WeighingState.objects.filter(status=True, batchno=batchno, product=productid).first().petugasgudang
                 operator = AdminConfig.objects.first().operator
                 petugasgudang = AdminConfig.objects.first().petugasgudang
+                spvapproval = AdminConfig.objects.first().spvapproval
                 if (not operator) or (not petugasgudang):
                     return JsonResponse({"message": "Isikan nama operator terlebih dahulu."}, status=400)
                 elif boxexists or int(boxno) < 1:
                     return JsonResponse({"message": "Box ini sudah pernah diinput!"}, status=400)
                 elif boxkosongexists:
                     return JsonResponse({"message": "Box kosong harus ditimbang terlebih dahulu."}, status=400)
+                elif boxrejectexists and spvapproval:
+                    boxreject = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).filter(status=2).last()
+                    obj = Register(product=productid, batchno=batchno, boxno=boxno, createdby = request.user, operator = operator, petugasgudang = petugasgudang, weight = boxreject.weight, status=3)
+                    obj.save()
+                    config = AdminConfig.objects.first()
+                    config.spvapproval = False
+                    config.save()
+                    return JsonResponse({"message": "Input last box dengan persetujuan supervisor berhasil ditambahkan."}, status=200)
                 else:
                     instance = form.save(commit=False)
                     instance.product = productid
@@ -191,10 +205,6 @@ def ScaleSimulator(request):
 @csrf_exempt
 def ScaleView(request):
     obj = Logging.objects.latest('id')
-    configcheck = AdminConfig.objects.all().exists()
-    if not configcheck:
-        obj = AdminConfig(spvapproval=False)
-        obj.save()
     if request.method == "GET":
         curtime = datetime.now() - timedelta(minutes=1)
         data = Logging.objects.filter(datetime__gte=curtime).order_by('-id').values('id','weighing').first()
@@ -983,7 +993,7 @@ def viewWeighingState(request):
                 instance = form.save(commit=False)
                 instance.pendingstatus = True
                 instance.status = False
-                productid = form.cleaned_data.get('product')
+                productid = form.cleaned_data.get('product').id
                 instance.jumlahkoli = Product.objects.filter(id=productid).last().jumlahkoli
                 instance.batchno = form.cleaned_data.get('batchno').upper()
                 # batchnoobj = WeighingState.objects.all()

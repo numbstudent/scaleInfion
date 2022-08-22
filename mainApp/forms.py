@@ -85,9 +85,9 @@ class ReportTitleModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.title
 
-class DepartmentModelChoiceField(ModelChoiceField):
+class UserModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
-        return obj.name
+        return obj.first_name+" "+obj.last_name
 
 class DepartmentForm(ModelForm):
     class Meta:
@@ -300,7 +300,10 @@ class ReportBodyForm(forms.Form):
 
 class WeighingStateForm(ModelForm):
     expireddate = MultiExampleField()
-
+    operator = UserModelChoiceField(
+        queryset=User.objects.filter(groups__name="operator"), label="Operator", widget=forms.Select(attrs={
+            'class': 'form-control select2bs4'
+    }))
     class Meta:
         model = WeighingState
         fields = ['id', 'product','batchno', 'expireddate', 'operator','petugasgudang']
@@ -311,12 +314,24 @@ class WeighingStateForm(ModelForm):
 
 class WeighingStateInitialForm(ModelForm):
     expireddate = MultiExampleField()
+    operator = UserModelChoiceField(
+        queryset=User.objects.filter(groups__name="operator"), label="Operator", widget=forms.Select(attrs={
+            'class': 'form-control select2bs4'
+    }))
     class Meta:
         model = WeighingState
         fields = ['id', 'product', 'batchno', 'expireddate','operator','petugasgudang']
 
 
 class WeighingStateCloseForm(ModelForm):
+    spvpabrik = UserModelChoiceField(
+        queryset=User.objects.filter(groups__name="spvpabrik"), label="Supervisor Produksi", widget=forms.Select(attrs={
+            'class': 'form-control select2bs4'
+    }))
+    spvgudang = UserModelChoiceField(
+        queryset=User.objects.filter(groups__name="spvgudang"), label="Supervisor Gudang", widget=forms.Select(attrs={
+            'class': 'form-control select2bs4'
+    }))
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         group = self.user.groups.all()[0].name

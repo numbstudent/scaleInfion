@@ -20,6 +20,7 @@
                             <th>Weight</th>
                             <th>Status</th>
                             <th>Input Date</th>
+                            <th>Petugas Penimbangan/Gudang</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -41,6 +42,7 @@
                                 {% endif %}
                             </td>
                             <td>{{row.input_date|date:"j/n/Y"}}</td>
+                            <td>{{row.operator}}<br>{{row.petugasgudang}}</td>
                         </tr>
                         {%endfor%}
                     </tbody>

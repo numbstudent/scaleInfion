@@ -325,11 +325,11 @@ class WeighingStateInitialForm(ModelForm):
 
 class WeighingStateCloseForm(ModelForm):
     spvpabrik = UserModelChoiceField(
-        queryset=User.objects.filter(groups__name="spvpabrik"), label="Supervisor Produksi", widget=forms.Select(attrs={
+        queryset=User.objects.filter(groups__name="supervisorproduksi"), label="Supervisor Produksi", widget=forms.Select(attrs={
             'class': 'form-control select2bs4'
     }))
     spvgudang = UserModelChoiceField(
-        queryset=User.objects.filter(groups__name="spvgudang"), label="Supervisor Gudang", widget=forms.Select(attrs={
+        queryset=User.objects.filter(groups__name="supervisorgudang"), label="Supervisor Gudang", widget=forms.Select(attrs={
             'class': 'form-control select2bs4'
     }))
     def __init__(self, *args, **kwargs):

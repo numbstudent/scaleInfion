@@ -28,8 +28,7 @@
       <p class="login-box-msg">Login untuk masuk ke aplikasi.</p>
       <form method="post">
         {% csrf_token %}
-        {{ form.username | as_crispy_field }}
-        {{ form.password | as_crispy_field }}
+        {{form | crispy}}
         <div class="row">
           <div class="col-8">
           </div>

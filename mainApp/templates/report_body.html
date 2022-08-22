@@ -82,6 +82,7 @@
                             <div class="card-body">
                                 <form action="{% url 'viewreportbody' %}" method="POST" autocomplete="off">
                                     <div class="row">
+                                        {{ message }}
                                         {% csrf_token %}
                                         <div class="col-lg-6">
                                             {% for field in form|slice:":4" %}

@@ -77,7 +77,6 @@
                                                 {% if row.pendingstatus and not row.status %}
                                                 <a class="btn btn-danger" href="{% url 'closeweighingstate' row.id %}"><i class="fas fa-minus-circle"></i></a>
                                                 {% endif %}
-                                                {{row.spvgudang}}
                                             </td>
                                         </tr>
                                         {%endfor%}

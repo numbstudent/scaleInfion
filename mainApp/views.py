@@ -4,11 +4,13 @@ from math import prod
 from mainApp.models import *
 from mainApp.forms import *
 from secureapp.decorators import allowed_users, allowed_check, allowed_check_function
+from secureapp.models import AccessList
 from django.shortcuts import get_list_or_404, render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.db.models import RestrictedError, Sum, Q, F
 from django.db.models.functions import Coalesce
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User, Group
 from django import template
 from django.db import IntegrityError
 from django.core import serializers
@@ -23,6 +25,32 @@ loginpage = 'login'
 
 @login_required(login_url=loginpage)
 def front(request):
+    userexists = User.objects.all().exists()
+    if not userexists:
+        new_group, created = Group.objects.get_or_create(name='administrator')
+        new_group, created = Group.objects.get_or_create(name='supervisorgudang')
+        new_group, created = Group.objects.get_or_create(name='supervisorproduksi')
+        new_group, created = Group.objects.get_or_create(name='supervisorppic')
+        new_group, created = Group.objects.get_or_create(name='operator')
+
+        new_group, created = AccessList.objects.get_or_create(feature_alias='weighing', feature_name='Weighing')
+        new_group, created = AccessList.objects.get_or_create(feature_alias='simulator', feature_name='Simulator')
+        new_group, created = AccessList.objects.get_or_create(feature_alias='masterproduct', feature_name='Master Product')
+        new_group, created = AccessList.objects.get_or_create(feature_alias='masterdepartment', feature_name='Master Department')
+        new_group, created = AccessList.objects.get_or_create(feature_alias='masterreport', feature_name='Master Report')
+        new_group, created = AccessList.objects.get_or_create(feature_alias='history', feature_name='History')
+        new_group, created = AccessList.objects.get_or_create(feature_alias='reportcsv', feature_name='Report CSV')
+        new_group, created = AccessList.objects.get_or_create(feature_alias='reportpdf', feature_name='Report PDF')
+        new_group, created = AccessList.objects.get_or_create(feature_alias='managebatch', feature_name='Manage Batch')
+        new_group, created = AccessList.objects.get_or_create(feature_alias='viewendbatch', feature_name='View and End Batch')
+        
+        user = User.objects.create_user('admininfion', 'admin@admin.com', 'admin')
+        user.is_staff = True
+        user.is_admin = True
+        user.is_superuser = True
+        user.save()
+        my_group = Group.objects.get(name='administrator') 
+        my_group.user_set.add(user)
     configcheck = AdminConfig.objects.all().exists()
     if not configcheck:
         obj = AdminConfig(spvapproval=False)
@@ -108,7 +136,7 @@ def RegisterView(request, batchno=None):
                     instance.product = productid
                     instance.createdby = request.user
                     instance.operator = operator
-                    instance.petugasgudang = petugasgudang
+                    instance.petugasgudang = petugasgudang.title()
                     instance.save()
                     # ser_instance = serializers.serialize('json', [instance, ])
                     return JsonResponse({"message": "Data berhasil diinput"}, status=200)
@@ -525,6 +553,7 @@ def viewReportBody(request):
     context = {}
     context['action'] = 'view'
     context['data'] = Report.objects.all()
+    context['message'] = ''
 
     if request.method == "POST":
         form = ReportBodyForm(request.POST)
@@ -563,7 +592,13 @@ def viewReportBody(request):
                 obj.save()
             return redirect('viewreportbody')
     else:
-        context['form'] = list(ReportBodyForm())
+        reporttitle = AdminConfig.objects.first().reporttitle
+        department = AdminConfig.objects.first().department
+        if not reporttitle or not department:
+            context['form'] = None
+            context['message'] = 'Isikan Report Title & Department terlebih dahulu di menu Configuration!'
+        else:
+            context['form'] = list(ReportBodyForm())
 
     return render(request, 'report_body.html', context=context)
 
@@ -1089,17 +1124,17 @@ def closeWeighingState(request, id):
         obj = WeighingState.objects.get(id=id)
         form = WeighingStateCloseForm(user=request.user,instance=obj)
 
-        if group == 'supervisorgudang':
-            form.fields["spvgudang"].queryset = User.objects.filter(
-                id = request.user.id)
-        elif group == 'supervisorproduksi':
-            form.fields["spvpabrik"].queryset = User.objects.filter(
-                id=request.user.id)
-        elif group == 'administrator':
-            form.fields["spvgudang"].queryset = User.objects.filter(
-                groups__name='supervisorgudang')
-            form.fields["spvpabrik"].queryset = User.objects.filter(
-                groups__name='supervisorproduksi')
+        # if group == 'supervisorgudang':
+        #     form.fields["spvgudang"].queryset = User.objects.filter(
+        #         id = request.user.id)
+        # elif group == 'supervisorproduksi':
+        #     form.fields["spvpabrik"].queryset = User.objects.filter(
+        #         id=request.user.id)
+        # elif group == 'administrator':
+        #     form.fields["spvgudang"].queryset = User.objects.filter(
+        #         groups__name='supervisorgudang')
+        #     form.fields["spvpabrik"].queryset = User.objects.filter(
+        #         groups__name='supervisorproduksi')
 
         context['data'] = WeighingState.objects.all()
         context['form'] = list(form)
@@ -1137,7 +1172,7 @@ def closeWeighingState(request, id):
 def viewBatchHistory(request, batchno):
     context = {}
     datamodel = Register.objects.filter(batchno=batchno).filter(Q(status=1) | Q(status=3)).annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
-        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date', 'status').order_by('-input_date')
+        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date', 'status','operator','petugasgudang').order_by('-input_date')
     context['data'] = datamodel
     return render(request, 'batchno_history.html', context=context)
 

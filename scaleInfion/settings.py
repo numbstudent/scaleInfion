@@ -165,3 +165,6 @@ USE_TZ = False
 STATIC_URL = '/static/'
 STATIC_ROOT = '/home/spil/.bina/scaleInfion/mainApp/static/'
 DATE_INPUT_FORMATS = ('%d/%m/%Y','%Y-%m-%d')
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 691200

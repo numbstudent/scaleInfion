@@ -211,7 +211,10 @@ def ScaleView(request):
         # data = Logging.objects.order_by('-id').values('id','weighing').first()
 
         #get current weight
-        activebatchno = WeighingState.objects.filter(status=True).last().batchno
+        activebatchnoexists = WeighingState.objects.filter(status=True).exists()
+        activebatchno = None
+        if activebatchnoexists:
+            activebatchno = WeighingState.objects.filter(status=True).last().batchno
         weightadjustment = AdminConfig.objects.last().weightadjustment
         if activebatchno:
             currentbox = Register.objects.filter(batchno = activebatchno, status = None).last()

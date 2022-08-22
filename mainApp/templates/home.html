@@ -433,8 +433,12 @@
             data: JSON.stringify({ "username": username, "password": password }),
             success: function (data) {   // success callback function
                 alert(data.message)
+                $("#spvusername").val("")
+                $("#spvpassword").val("")
             }, error: function (jqXhr, textStatus, errorMessage) { // error callback 
                 alert(jqXhr.responseJSON.message)
+                $("#spvusername").val("")
+                $("#spvpassword").val("")
             }
         })
     })
@@ -450,8 +454,12 @@
             data: JSON.stringify({ "operator1": operator1, "operator2": operator2 }),
             success: function (data) {   // success callback function
                 alert(data.message)
+                $("#operator1txt").val("")
+                $("#operator2txt").val("")
             }, error: function (jqXhr, textStatus, errorMessage) { // error callback 
                 alert(jqXhr.responseJSON.message)
+                $("#operator1txt").val("")
+                $("#operator2txt").val("")
             }
         })
     })

@@ -22,19 +22,54 @@ def login(request):
 
 def viewChangePassword(request):
     if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
+        obj = User.objects.get(id=request.user.id)
+        form = ChangePasswordForm(request.POST, instance=obj)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
             messages.success(
-                request, 'Your password was successfully updated!')
-            return redirect('changepwd')
+                request, 'Password berhasil diubah!')
+            # return redirect('changepwd')
         else:
-            messages.error(request, 'Please correct the error below.')
+            messages.error(request, 'Mohon perbaiki kesalahan di bawah.')
+    # if request.method == 'POST':
+    #     form = PasswordChangeForm(request.user, request.POST)
+    #     if form.is_valid():
+    #         user = form.save()
+    #         update_session_auth_hash(request, user)  # Important!
+    #         messages.success(
+    #             request, 'Your password was successfully updated!')
+    #         return redirect('changepwd')
+    #     else:
+    #         messages.error(request, 'Please correct the error below.')
     else:
-        form = PasswordChangeForm(request.user)
+        # form = PasswordChangeForm(request.user)
+        form = ChangePasswordForm()
     return render(request, 'registration/change_password.html', {
         'form': form
+    })
+
+def viewChangeOthersPassword(request, id):
+    if request.method == 'POST':
+        userexists = User.objects.filter(id=id).exists()
+        if userexists:
+            obj = User.objects.get(id=id)
+            form = ChangePasswordForm(request.POST, instance=obj)
+            if form.is_valid():
+                print(obj)
+                user = form.save()
+                update_session_auth_hash(request, user)  # Important!
+                messages.success(
+                    request, 'Password berhasil diubah!')
+                # return redirect('changepwd')
+            else:
+                messages.error(request, 'Mohon perbaiki kesalahan di bawah.')
+        else:
+            messages.error(request, 'Data user tidak ditemukan.')
+    else:
+        form = ChangePasswordForm()
+    return render(request, 'registration/change_other_password.html', {
+        'form': form, 'id':id
     })
 
 
@@ -122,21 +157,15 @@ def editUser(request, id):
     context['message'] = None
     if request.method == 'GET':
         obj = User.objects.get(id=id)
-        form = UserForm(instance=obj)
+        form = UserEditForm(instance=obj)
         context['data'] = User.objects.all()
         context['form'] = form
     if request.method == 'POST':
         obj = User.objects.get(id=id)
-        form = UserForm(request.POST, instance=obj)
+        form = UserEditForm(request.POST, instance=obj)
         context['data'] = User.objects.all()
         context['form'] = form
         if form.is_valid():
-            # obj.name = form.cleaned_data.get('name')
-            # obj.code = form.cleaned_data.get('code')
-            # obj.minweight = form.cleaned_data.get('minweight')
-            # obj.maxweight = form.cleaned_data.get('maxweight')
-            # obj.status = form.cleaned_data.get('status')
-            # obj.save()
             form.save()
             context['message'] = "Data berhasil disimpan."
             # return redirect('userlist')

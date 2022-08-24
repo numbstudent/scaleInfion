@@ -3,7 +3,7 @@ from django.contrib.auth.models import User, Group
 
 from django import forms
 from django.forms import ModelForm, ModelChoiceField 
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
 import datetime
 
@@ -44,3 +44,14 @@ class UserForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('first_name','last_name', 'username', 'password1' ,'password2' )
+
+class UserEditForm(UserChangeForm):
+    password = None
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'username')
+
+class ChangePasswordForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ('password1' ,'password2' )

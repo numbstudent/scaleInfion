@@ -162,6 +162,15 @@ def RegisterView(request, batchno=None):
         spvapproval = AdminConfig.objects.first().spvapproval
         operator = AdminConfig.objects.first().operator
         petugasgudang = AdminConfig.objects.first().petugasgudang
+
+        expireddate = AdminConfig.objects.first().spvapprovalexpireddate 
+        if expireddate:
+            if datetime.now() > expireddate:
+                config = AdminConfig.objects.first()
+                config.spvapproval = False
+                config.spvapprovalexpireddate = None
+                config.save()
+
         jumlahkoli = Register.objects.filter(batchno=batchno, product__code=code).filter(Q(status=1)).count()
         # jumlahkoli =42
         # return JsonResponse({"insertsuccess":insertsuccess,"id":box['id'], "batch":list(data)}, safe=False, status=200)
@@ -1198,3 +1207,14 @@ def viewConfig(request):
                 form.save()
                 context['message'] = 'Data berhasil diubah.'
     return render(request, 'config.html', context=context)
+
+## printing
+@csrf_exempt
+def printWeightCurrentBox(request):
+    if request.method == "GET":
+        data = Register.objects.filter(id=2).values()
+        print(data)
+        return JsonResponse({'data':list(data)}, safe=False, status=200)
+    else:
+        data = ['Wrong page!']
+        return JsonResponse(list(data), safe=False, status=200)

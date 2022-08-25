@@ -29,7 +29,7 @@ def viewChangePassword(request):
             update_session_auth_hash(request, user)  # Important!
             messages.success(
                 request, 'Password berhasil diubah!')
-            # return redirect('changepwd')
+            return redirect('changepwd')
         else:
             messages.error(request, 'Mohon perbaiki kesalahan di bawah.')
     # if request.method == 'POST':

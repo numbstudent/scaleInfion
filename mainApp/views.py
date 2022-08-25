@@ -26,13 +26,15 @@ loginpage = 'login'
 @login_required(login_url=loginpage)
 def front(request):
     userexists = User.objects.all().exists()
-    if not userexists:
+    groupexists = Group.objects.all().exists()
+    accesslistexists = AccessList.objects.all().exists()
+    if not groupexists:
         new_group, created = Group.objects.get_or_create(name='administrator')
         new_group, created = Group.objects.get_or_create(name='supervisorgudang')
         new_group, created = Group.objects.get_or_create(name='supervisorproduksi')
         new_group, created = Group.objects.get_or_create(name='supervisorppic')
         new_group, created = Group.objects.get_or_create(name='operator')
-
+    if not accesslistexists:
         new_group, created = AccessList.objects.get_or_create(feature_alias='weighing', feature_name='Weighing')
         new_group, created = AccessList.objects.get_or_create(feature_alias='simulator', feature_name='Simulator')
         new_group, created = AccessList.objects.get_or_create(feature_alias='masterproduct', feature_name='Master Product')
@@ -43,7 +45,7 @@ def front(request):
         new_group, created = AccessList.objects.get_or_create(feature_alias='reportpdf', feature_name='Report PDF')
         new_group, created = AccessList.objects.get_or_create(feature_alias='managebatch', feature_name='Manage Batch')
         new_group, created = AccessList.objects.get_or_create(feature_alias='viewendbatch', feature_name='View and End Batch')
-        
+    if not userexists:        
         user = User.objects.create_user('admininfion', 'admin@admin.com', 'admin')
         user.is_staff = True
         user.is_admin = True

@@ -1214,10 +1214,15 @@ def printWeightCurrentBox(request):
     if request.method == "GET":
         batchno = request.GET.get('batchno')
         boxno = request.GET.get('boxno')
-        data = Register.objects.filter(batchno=batchno, boxno=boxno).filter(Q(status=1) | Q(status=3)).values()
-        # if data == None:
-        #     data = {"No data found."}
-        return JsonResponse(list(data), safe=False, status=200)
+        print(batchno)
+        print(boxno)
+        if boxno and batchno:
+            data = list(Register.objects.filter(batchno=batchno, boxno=boxno).filter(Q(status=1) | Q(status=3)).values())
+        elif not boxno and not batchno:
+            data = list(Register.objects.values().order_by('-id'))[0]
+        else:
+            data = list({"Complete batchno and boxno!"})
+        return JsonResponse(data, safe=False, status=200)
     else:
         data = ['Wrong page!']
         return JsonResponse(data, safe=False, status=200)

@@ -73,7 +73,7 @@
                                 
                                                 {%for row in data%}
                                                 <tr>
-                                                    <td>{{row.createdon|date:"d/m/Y h:i:s"}}</td>
+                                                    <td>{{row.createdon|date:"d/m/Y H:i:s"}}</td>
                                                     <td>{{row.boxno}}</td>
                                                     <td class="text-right">{{row.weight|floatformat:4}}</td>
                                                 </tr>

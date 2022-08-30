@@ -152,7 +152,7 @@ class ReportRegister(models.Model):
     # operator2 = models.CharField(max_length=50, default=None, null=True)
     operator = models.CharField(max_length=50, default=None, null=True)
     petugasgudang = models.CharField(max_length=50, default=None, null=True)
-    createdon = models.DateTimeField(auto_now_add=True)
+    createdon = models.DateTimeField(null=True)
     weight = models.FloatField(null=True)
     createdby = models.ForeignKey(User, on_delete=models.RESTRICT)
 

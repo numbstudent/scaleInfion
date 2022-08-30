@@ -40,7 +40,7 @@
                             <td class="text-left"><i>DN: {{header.dnno}}</i><br>Eff. Date: {{header.effectivedate|date:"d b Y"|upper}}</td>
                             <td class="text-center"><i>This document will be reviewed on:
                                     <br>{{header.reviewdate|date:"F Y"}}</i></td>
-                            <td class="text-left"><i>Rev of DN: {{header.dnrev}}<br>Date: {{header.createdon|date:"d-m-Y"}}</i></td>
+                            <td class="text-left"><i>Rev of DN: {{header.dnrev|stringformat:"02d"}}<br>Date: {{header.createdon|date:"d-m-Y"}}</i></td>
                         </tr>
                         <tr>
                             <td colspan="3">
@@ -75,7 +75,7 @@
                                                 <tr>
                                                     <td>{{row.createdon|date:"d/m/Y h:i:s"}}</td>
                                                     <td>{{row.boxno}}</td>
-                                                    <td class="text-right">{{row.weight}}</td>
+                                                    <td class="text-right">{{row.weight|floatformat:4}}</td>
                                                 </tr>
                                                 {% if forloop.counter|divisibleby:rowlen and forloop.counter != data.count %}
                                             </table>

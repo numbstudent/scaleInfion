@@ -1212,9 +1212,12 @@ def viewConfig(request):
 @csrf_exempt
 def printWeightCurrentBox(request):
     if request.method == "GET":
-        data = Register.objects.filter(id=2).values()
-        print(data)
-        return JsonResponse({'data':list(data)}, safe=False, status=200)
+        batchno = request.GET.get('batchno')
+        boxno = request.GET.get('boxno')
+        data = Register.objects.filter(batchno=batchno, boxno=boxno).filter(Q(status=1) | Q(status=3)).values()
+        # if data == None:
+        #     data = {"No data found."}
+        return JsonResponse(list(data), safe=False, status=200)
     else:
         data = ['Wrong page!']
-        return JsonResponse(list(data), safe=False, status=200)
+        return JsonResponse(data, safe=False, status=200)

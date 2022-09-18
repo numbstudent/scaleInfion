@@ -364,4 +364,5 @@ class SimulatorForm(ModelForm):
 class ConfigForm(ModelForm):
     class Meta:
         model = AdminConfig
-        fields = ['reporttitle', 'department','weightadjustment']
+        exclude = ['petugasgudang', 'operator',
+                   'spvapprovalexpireddate', 'spvapproval']

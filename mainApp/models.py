@@ -165,3 +165,25 @@ class AdminConfig(models.Model):
     reporttitle = models.ForeignKey(ReportTitle, on_delete=models.RESTRICT, null=True)
     department = models.ForeignKey(Department, on_delete=models.RESTRICT, null=True)
     weightadjustment = models.FloatField(default=0)
+    nama_produk = models.CharField(max_length=50, default="Nama Produk", null=False)
+    no_batch = models.CharField(max_length=50, default="No Batch", null=False)
+    expired_date = models.CharField(max_length=50, default="Expired Date", null=False)
+    tanggal_penimbangan = models.CharField(max_length=50, default="Tanggal Penimbangan", null=False)
+    no_karton = models.CharField(max_length=50, default="No Karton", null=False)
+    hasil_penimbangan = models.CharField(
+        max_length=50, default="Hasil Penimbangan", null=False)
+    dilakukan_oleh = models.CharField(max_length=50, default="Dilakukan oleh", null=False)
+    diperiksa_oleh = models.CharField(max_length=50, default="Diperiksa oleh", null=False)
+    diverifikasi_oleh = models.CharField(
+        max_length=50, default="Diverifikasi oleh", null=False)
+    user_1 = models.CharField(
+        max_length=50, default="Petugas Penimbangan", null=False)
+    user_2 = models.CharField(
+        max_length=50, default="Petugas Gudang", null=False)
+    user_3 = models.CharField(
+        max_length=50, default="Supervisor Produksi", null=False)
+    user_4 = models.CharField(max_length=50, default="user 4", null=False)
+    paraf = models.CharField(max_length=50, default="Paraf", null=False)
+    nama = models.CharField(max_length=50, default="Nama", null=False)
+    tanggal_paraf = models.CharField(
+        max_length=50, default="Supervisor DS&S", null=False)

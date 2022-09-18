@@ -853,12 +853,13 @@ def reportBatchPDF(request):
     from django.core.files.storage import FileSystemStorage
     from django.http import HttpResponse
     from django.template.loader import render_to_string
-    from weasyprint import HTML
+    # from weasyprint import HTML
 
     
     # datamodel = Register.objects.order_by('boxno')
     datamodel = ReportRegister.objects.order_by('boxno')
     datamodel2 = UploadedRegister.objects.order_by('boxno')
+    config = AdminConfig.objects.all().first()
     group = request.user.groups.all()[0].name
     if group != 'administrator':
         datamodel = datamodel.filter(Q(status=1) | Q(status=3))
@@ -881,7 +882,7 @@ def reportBatchPDF(request):
     else:
         rowlen = datamodel.count()//2+1
     # testing in windows
-    return render(request, 'report_batch_pdf_template2.html', context={'data': datamodel, 'data2': datamodel2, 'header': header, 'rowlen': rowlen, 'signature':signature})
+    return render(request, 'report_batch_pdf_template2.html', context={'data': datamodel, 'data2': datamodel2, 'header': header, 'config':config,'rowlen': rowlen, 'signature':signature})
     html_string = render_to_string('report_batch_pdf_template.html', {'data': datamodel, 'data2': datamodel2, 'header':header, 'rowlen':rowlen, 'signature':signature})
 
     html = HTML(string=html_string, base_url=request.build_absolute_uri())

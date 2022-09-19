@@ -871,7 +871,7 @@ def reportBatchPDF(request):
         reportid = request.GET.get('id')
         header = Report.objects.all().get(id=reportid)
         # datamodel = datamodel.filter(batchno=header.batchno, product=header.product)
-        datamodel = datamodel.filter(report = header).filter(Q(status=1) | Q(status=3))
+        datamodel = datamodel.filter(report = header).filter(Q(status=1) | Q(status=3)).order_by('boxno')
         datamodel2 = datamodel2.filter(batchno=header.batchno, product=header.product)
         signature = WeighingState.objects.filter(batchno=header.batchno, product=header.product).first()
     else:
@@ -1192,10 +1192,13 @@ def viewBatchHistory(request, batchno):
 @allowed_users(allowed_roles=['administrator'])
 def viewConfig(request):
     context = {}
-    obj = AdminConfig.objects.filter(reporttitle=None, department=None)
+    obj = AdminConfig.objects.filter(pdf_reporttitle=None, pdf_department=None)
     obj.delete()
     obj = AdminConfig.objects.all().first()
-    context['form'] = ConfigForm(instance=obj)
+    form = list(ConfigForm(instance=obj))
+    halflen = -(len(form) // -2)
+    context['form'] = form[:halflen]
+    context['form2'] = form[halflen:]
     context['data'] = AdminConfig.objects.all()
     # context['data'] = obj
     if request.method == "POST":
@@ -1215,11 +1218,10 @@ def printWeightCurrentBox(request):
     if request.method == "GET":
         batchno = request.GET.get('batchno')
         boxno = request.GET.get('boxno')
-        print(batchno)
-        print(boxno)
-        if boxno and batchno:
-            data = list(Register.objects.filter(batchno=batchno, boxno=boxno).filter(Q(status=1) | Q(status=3)).values())
-        elif not boxno and not batchno:
+        productcode = request.GET.get('product')
+        if boxno and batchno and productcode:
+            data = list(Register.objects.filter(batchno=batchno, boxno=boxno, product__code=productcode).filter(Q(status=1) | Q(status=3)).values())
+        elif not boxno and not batchno and not productcode:
             data = list(Register.objects.values().order_by('-id'))[0]
         else:
             data = list({"Complete batchno and boxno!"})

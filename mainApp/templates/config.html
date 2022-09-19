@@ -8,19 +8,22 @@
 {% endblock %}
 {% block content %}
 <div class="row">
-    <div class="col-lg-6">
+    <div class="col-lg-12">
         <div class="card">
             <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <form action="{% url 'config' %}" method="POST" autocomplete="off" enctype="multipart/form-data">
+                <form action="{% url 'config' %}" method="POST" autocomplete="off" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-lg-6">
                             {% csrf_token %}
-                            {{ form | crispy }}
-                            <hr>
+                            {{ form | crispy }}<hr>
                             <input class="btn btn-success" type="submit" value="Simpan">
-                        </form>
+                        </div>
+                        <div class="col-lg-6">
+                            {% csrf_token %}
+                            {{ form2 | crispy }}
+                        </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
@@ -31,22 +34,22 @@
             <div class="col-lg-12">
                 <table class="table dataTable">
                     <thead>
-                    <tr>
-                        <th>Report Title</th>
-                        <th>Department</th>
-                        <th>Weight Adjustment</th>
-                        <th>Petugas Penimbangan / Gudang Aktif</th>
-                    </tr>
+                        <tr>
+                            <th>Report Title</th>
+                            <th>Department</th>
+                            <th>Weight Adjustment</th>
+                            <th>Petugas Penimbangan / Gudang Aktif</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    {%for row in data%}
-                    <tr>
-                        <td>{{row.reporttitle}}</td>
-                        <td>{{row.department}}</td>
-                        <td>{{row.weightadjustment}}</td>
-                        <td>{{row.operator}} / {{row.petugasgudang}}</td>
-                    </tr>
-                    {%endfor%}
+                        {%for row in data%}
+                        <tr>
+                            <td>{{row.pdf_reporttitle}}</td>
+                            <td>{{row.pdf_department}}</td>
+                            <td>{{row.weightadjustment}}</td>
+                            <td>{{row.operator}} / {{row.petugasgudang}}</td>
+                        </tr>
+                        {%endfor%}
                     </tbody>
                 </table>
             </div>

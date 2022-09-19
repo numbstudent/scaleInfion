@@ -577,8 +577,8 @@ def viewReportBody(request):
             print(batchno)
             # reporttitle = ReportTitle.objects.get(id=request.POST.get('reporttitle'))
             # department = Department.objects.get(id=request.POST.get('department'))
-            reporttitle = AdminConfig.objects.first().reporttitle
-            department = AdminConfig.objects.first().department
+            reporttitle = AdminConfig.objects.first().pdf_reporttitle
+            department = AdminConfig.objects.first().pdf_department
             reviewdate = request.POST.get('reviewdate')
             effectivedate = request.POST.get('effectivedate')
             dnno = request.POST.get('dnno')
@@ -603,8 +603,8 @@ def viewReportBody(request):
                 obj.save()
             return redirect('viewreportbody')
     else:
-        reporttitle = AdminConfig.objects.first().reporttitle
-        department = AdminConfig.objects.first().department
+        reporttitle = AdminConfig.objects.first().pdf_reporttitle
+        department = AdminConfig.objects.first().pdf_department
         if not reporttitle or not department:
             context['form'] = None
             context['message'] = 'Isikan Report Title & Department terlebih dahulu di menu Configuration!'

@@ -113,6 +113,7 @@ class Report(models.Model):
     effectivedate = models.DateTimeField(blank=True, null=True)
     dnno = models.CharField(max_length=20,blank=True, null=True)
     dnrev = models.IntegerField()
+    signingdate = models.DateTimeField(blank=True, null=True)
     createdon = models.DateTimeField(auto_now_add=True)
     updatedon = models.DateTimeField(auto_now=True)
 
@@ -167,8 +168,11 @@ class AdminConfig(models.Model):
     # report pdf
     pdf_form = models.CharField(max_length=50, default="FORM", null=False)
     pdf_dn = models.CharField(max_length=50, default="DN", null=False)
+    pdf_dn_value = models.CharField(max_length=20,blank=True, default="NOT ASSIGNED")
     pdf_eff_date = models.CharField(max_length=50, default="Eff. Date", null=False)
+    pdf_eff_date_value = models.DateTimeField(blank=True, null=True)
     pdf_will_be_reviewed = models.CharField(max_length=50, default="This document will be reviewed on", null=False)
+    pdf_will_be_reviewed_value = models.DateTimeField(blank=True, null=True)
     pdf_rev_of_dn = models.CharField(max_length=50, default="Rev. of DN", null=False)
     pdf_reporttitle = models.ForeignKey(ReportTitle, on_delete=models.RESTRICT, null=True)
     pdf_department = models.ForeignKey(Department, on_delete=models.RESTRICT, null=True)

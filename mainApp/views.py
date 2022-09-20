@@ -579,9 +579,12 @@ def viewReportBody(request):
             # department = Department.objects.get(id=request.POST.get('department'))
             reporttitle = AdminConfig.objects.first().pdf_reporttitle
             department = AdminConfig.objects.first().pdf_department
-            reviewdate = request.POST.get('reviewdate')
-            effectivedate = request.POST.get('effectivedate')
-            dnno = request.POST.get('dnno')
+            reviewdate = AdminConfig.objects.first().pdf_will_be_reviewed_value
+            effectivedate = AdminConfig.objects.first().pdf_eff_date_value
+            dnno = AdminConfig.objects.first().pdf_dn_value
+            # reviewdate = request.POST.get('reviewdate')
+            # effectivedate = request.POST.get('effectivedate')
+            # dnno = request.POST.get('dnno')
             prevreportexist = ReportRegister.objects.filter(batchno=batchno, product=product).exists()
             dnrev = 0
             # print(prevreportexist)

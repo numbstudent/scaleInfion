@@ -255,11 +255,14 @@ class ReportBodyForm(forms.Form):
     #     queryset=Department.objects.all(), label="Department Title", widget=forms.Select(attrs={
     #         'class': 'form-control select2bs4'
     # }))
-    dnno = forms.CharField(label="DN No")
-    effectivedate = forms.DateField(label="Effective Date", widget=forms.DateInput(attrs={
-        'class': 'form-control datepick'
-    }))
-    reviewdate = forms.DateField(label="Review Date", widget=forms.DateInput(attrs={
+    # dnno = forms.CharField(label="DN No")
+    # effectivedate = forms.DateField(label="Effective Date", widget=forms.DateInput(attrs={
+    #     'class': 'form-control datepick'
+    # }))
+    # reviewdate = forms.DateField(label="Review Date", widget=forms.DateInput(attrs={
+    #     'class': 'form-control datepick'
+    # }))
+    signingdate = forms.DateField(label="Signing Date", widget=forms.DateInput(attrs={
         'class': 'form-control datepick'
     }))
     # dnrev = forms.CharField(label="DN Rev")
@@ -367,7 +370,7 @@ class ConfigForm(ModelForm):
         exclude = ['petugasgudang', 'operator',
                    'spvapprovalexpireddate', 'spvapproval']
         field_order = ['spvapproval','spvapprovalexpireddate','operator','petugasgudang','weightadjustment',
-'pdf_form','pdf_dn','pdf_eff_date','pdf_will_be_reviewed','pdf_rev_of_dn','pdf_reporttitle',
+'pdf_form','pdf_dn','pdf_dn_value','pdf_eff_date','pdf_eff_date_value','pdf_will_be_reviewed','pdf_will_be_reviewed_value','pdf_rev_of_dn','pdf_reporttitle',
 'pdf_department','pdf_nama_produk','pdf_no_batch','pdf_expired_date','pdf_tanggal_penimbangan',
 'pdf_no_karton','pdf_hasil_penimbangan','pdf_dilakukan_oleh','pdf_diperiksa_oleh',
 'pdf_diverifikasi_oleh','pdf_user_1','pdf_user_2','pdf_user_3','pdf_user_4','pdf_paraf','pdf_nama','pdf_tanggal_paraf']

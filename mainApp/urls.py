@@ -55,4 +55,5 @@ urlpatterns = [
     path('scale-simulator', views.ScaleSimulator, name='viewsimulator'),
 
     path('printweightcurrentbox', views.printWeightCurrentBox, name='printweightcurrentbox'),
+    path('runconveyorbc', views.runConveyorBC, name='runconveyorbc'),
 ]

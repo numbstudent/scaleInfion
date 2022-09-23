@@ -15,6 +15,7 @@ from django import template
 from django.db import IntegrityError
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
+from .conveyor import run_conveyor
 import json
 import csv
 from datetime import datetime, timedelta
@@ -1231,4 +1232,22 @@ def printWeightCurrentBox(request):
         return JsonResponse(data, safe=False, status=200)
     else:
         data = ['Wrong page!']
-        return JsonResponse(data, safe=False, status=200)
+        return JsonResponse(data, safe=False, status=400)
+
+## printing
+@csrf_exempt
+def runConveyorBC(request):
+    if request.method == "GET":
+        result = run_conveyor()
+        msg = ''
+        status = 200
+        if result:
+            msg = "Conveyor is running!"
+        else:
+            msg = "Cannot run the conveyor!"
+            status = 400
+        data = [msg]
+        return JsonResponse(data, safe=False, status=status)
+    else:
+        data = ['Wrong page!']
+        return JsonResponse(data, safe=False, status=400)

@@ -1244,7 +1244,7 @@ def runConveyorBC(request):
         if result:
             msg = "Conveyor is running!"
         else:
-            msg = "Cannot run the conveyor!"
+            msg = "Cannot run the conveyor! PLC Connection error"
             status = 400
         data = [msg]
         return JsonResponse(data, safe=False, status=status)

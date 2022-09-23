@@ -128,7 +128,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <button class="btn btn-block btn-success" id="submitBoxno" style="height: 174px;">PILIH BOX</button>
-                    <a class="btn btn-block btn-danger" href="{% url 'runconveyorbc' %}" class="product-title">RUN CONVEYOR</a>
+                    <a class="btn btn-block btn-danger" id="btnrunconveyorbc" class="product-title">RUN CONVEYOR</a>
                 </div>
             </div>
         </div>
@@ -341,6 +341,21 @@
             }
         })
     }
+
+    $("#btnrunconveyorbc").click(function () {
+        var url = "{% url 'runconveyorbc' %}"
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: url,
+            success: function (data) {   // success callback function
+                console.log(data)
+            }, 
+            error: function (jqXhr, textStatus, errorMessage) { // error callback 
+                alert(jqXhr.responseJSON)
+            },
+        })
+    })
 
     const interval2 = setInterval(function () {
         updateWeight()

@@ -14,6 +14,6 @@ def run_conveyor():
     ser.write(msg)
     ser.close()
 
-    # return True
+    return True
     # except:
     #     return False

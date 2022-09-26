@@ -126,14 +126,30 @@ def RegisterView(request, batchno=None):
                     return JsonResponse({"message": "Box ini sudah pernah diinput!"}, status=400)
                 elif boxkosongexists:
                     return JsonResponse({"message": "Box kosong harus ditimbang terlebih dahulu."}, status=400)
-                elif boxrejectexists and spvapproval:
-                    boxreject = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).filter(status=2).last()
-                    obj = Register(product=productid, batchno=batchno, boxno=boxno, createdby = request.user, operator = operator, petugasgudang = petugasgudang, weight = boxreject.weight, status=3)
-                    obj.save()
-                    config = AdminConfig.objects.first()
-                    config.spvapproval = False
-                    config.save()
-                    return JsonResponse({"message": "Input last box dengan persetujuan supervisor berhasil ditambahkan."}, status=200)
+                elif boxrejectexists:
+                    if spvapproval:
+                        boxreject = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).filter(status=2).last()
+                        boxreject.delete()
+                        config = AdminConfig.objects.first()
+                        config.spvapproval = False
+                        config.save()
+                        instance = form.save(commit=False)
+                        instance.product = productid
+                        instance.createdby = request.user
+                        instance.operator = operator
+                        instance.petugasgudang = petugasgudang.title()
+                        instance.save()
+                        # ser_instance = serializers.serialize('json', [instance, ])
+                        return JsonResponse({"message": "Data berhasil diinput"}, status=200)
+                        # boxreject = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).filter(status=2).last()
+                        # obj = Register(product=productid, batchno=batchno, boxno=boxno, createdby = request.user, operator = operator, petugasgudang = petugasgudang, weight = boxreject.weight, status=3)
+                        # obj.save()
+                        # config = AdminConfig.objects.first()
+                        # config.spvapproval = False
+                        # config.save()
+                        # return JsonResponse({"message": "Input last box dengan persetujuan supervisor berhasil ditambahkan."}, status=200)
+                    else :
+                        return JsonResponse({"message": "Box ini sudah pernah diinput!"}, status=400)
                 else:
                     instance = form.save(commit=False)
                     instance.product = productid
@@ -271,6 +287,8 @@ def ScaleView(request):
                     config = AdminConfig.objects.first()
                     config.spvapproval = False
                     config.save()
+                    if weight.status == 3:
+                        run_conveyor()
         return JsonResponse(data, safe=False, status=200)
 
 @csrf_exempt
@@ -1238,15 +1256,26 @@ def printWeightCurrentBox(request):
 @csrf_exempt
 def runConveyorBC(request):
     if request.method == "GET":
-        result = run_conveyor()
+        spvapproval = AdminConfig.objects.first().spvapproval
         msg = ''
         status = 200
-        if result:
-            msg = "Conveyor is running!"
+        if spvapproval:
+            result = run_conveyor()
+            if result:
+                msg = "Conveyor berjalan!"
+            else:
+                msg = "Conveyor tidak dapat berjalan!"
+                status = 400
+            data = [msg]
+
+            config = AdminConfig.objects.first()
+            config.spvapproval = False
+            config.save()
         else:
-            msg = "Cannot run the conveyor! PLC Connection error"
+            msg = "Aktifkan SPV Approval terlebih dahulu!"
             status = 400
-        data = [msg]
+            data = [msg]
+            
         return JsonResponse(data, safe=False, status=status)
     else:
         data = ['Wrong page!']

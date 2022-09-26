@@ -1232,6 +1232,7 @@ def viewConfig(request):
             else:
                 form.save()
                 context['message'] = 'Data berhasil diubah.'
+                return redirect('config')
     return render(request, 'config.html', context=context)
 
 ## printing
@@ -1275,7 +1276,7 @@ def runConveyorBC(request):
             msg = "Aktifkan SPV Approval terlebih dahulu!"
             status = 400
             data = [msg]
-            
+
         return JsonResponse(data, safe=False, status=status)
     else:
         data = ['Wrong page!']

@@ -374,3 +374,16 @@ class ConfigForm(ModelForm):
 'pdf_department','pdf_nama_produk','pdf_no_batch','pdf_expired_date','pdf_tanggal_penimbangan',
 'pdf_no_karton','pdf_hasil_penimbangan','pdf_dilakukan_oleh','pdf_diperiksa_oleh',
 'pdf_diverifikasi_oleh','pdf_user_1','pdf_user_2','pdf_user_3','pdf_user_4','pdf_paraf','pdf_nama','pdf_tanggal_paraf']
+        widgets = {
+            "pdf_will_be_reviewed_value": forms.DateInput(attrs={
+                'class': 'form-control datepick'
+            }),
+            "pdf_eff_date_value": forms.DateInput(attrs={
+                'class': 'form-control datepick'
+            }),
+        }
+        labels = {
+            "pdf_will_be_reviewed_value": "Pdf will be reviewed (VALUE)",
+            "pdf_eff_date_value": "Pdf eff date (VALUE)",
+            "pdf_dn_value": "Pdf dn (VALUE)",
+        }

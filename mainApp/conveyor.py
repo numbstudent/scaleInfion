@@ -15,7 +15,6 @@ def run_conveyor():
         ser.write(msg)
         ser.close()
         result = True
-        nousb = i
     except:
         result = False
     return result
@@ -33,4 +32,3 @@ def debug_conveyor():
     ser.write(msg)
     ser.close()
     result = True
-    nousb = i

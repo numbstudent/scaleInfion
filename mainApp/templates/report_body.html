@@ -126,5 +126,10 @@
         "responsive": true,
         "order": [[5, 'desc']],
     });
+
+    $('#id_signingdate').attr('readonly',true)
+    var d = new Date();
+    var strDate = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+    $('#id_signingdate').val(strDate);
 </script>
 {% endblock %}

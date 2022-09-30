@@ -262,10 +262,11 @@ class ReportBodyForm(forms.Form):
     # reviewdate = forms.DateField(label="Review Date", widget=forms.DateInput(attrs={
     #     'class': 'form-control datepick'
     # }))
-    signingdate = forms.DateField(label="Signing Date", widget=forms.DateInput(attrs={
-        'class': 'form-control datepick'
-    }))
-    # dnrev = forms.CharField(label="DN Rev")
+    # signingdate = forms.DateField(label="Signing Date", widget=forms.DateInput(attrs={
+    #     'class': 'form-control datepick'
+    # }))
+    signingdate = forms.DateField(label="Signing Date", widget=forms.DateInput())
+    dnrev = forms.IntegerField(label="DN Rev")
 
 # class ReportBodyForm(ModelForm):
 #     # productid = ProductModelChoiceField(

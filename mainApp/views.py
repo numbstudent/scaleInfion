@@ -287,8 +287,8 @@ def ScaleView(request):
                     config = AdminConfig.objects.first()
                     config.spvapproval = False
                     config.save()
-                    if weight.status == 3:
-                        run_conveyor()
+                    # if weight.status == 3:
+                    #     run_conveyor()
         return JsonResponse(data, safe=False, status=200)
 
 @csrf_exempt

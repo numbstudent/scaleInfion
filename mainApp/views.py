@@ -16,6 +16,8 @@ from django.db import IntegrityError
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from .conveyor import run_conveyor
+from .relay2off import relay_off
+from .relay2on import relay_on
 import json
 import csv
 from datetime import datetime, timedelta
@@ -1269,6 +1271,65 @@ def runConveyorBC(request):
                 msg = "Conveyor berjalan!"
             else:
                 msg = "Conveyor tidak dapat berjalan!"
+                status = 400
+            data = [msg]
+
+            config = AdminConfig.objects.first()
+            config.spvapproval = False
+            config.save()
+        else:
+            msg = "Aktifkan SPV Approval terlebih dahulu!"
+            status = 400
+            data = [msg]
+
+        return JsonResponse(data, safe=False, status=status)
+    else:
+        data = ['Wrong page!']
+        return JsonResponse(data, safe=False, status=400)
+
+
+## relay
+@csrf_exempt
+def turn_relay_on(request):
+    if request.method == "GET":
+        spvapproval = AdminConfig.objects.first().spvapproval
+        msg = ''
+        status = 200
+        if spvapproval:
+            result = relay_on()
+            if result:
+                msg = "Relay On!"
+            else:
+                msg = "Relay tidak dapat berjalan!"
+                status = 400
+            data = [msg]
+
+            config = AdminConfig.objects.first()
+            config.spvapproval = False
+            config.save()
+        else:
+            msg = "Aktifkan SPV Approval terlebih dahulu!"
+            status = 400
+            data = [msg]
+
+        return JsonResponse(data, safe=False, status=status)
+    else:
+        data = ['Wrong page!']
+        return JsonResponse(data, safe=False, status=400)
+
+
+@csrf_exempt
+def turn_relay_off(request):
+    if request.method == "GET":
+        spvapproval = AdminConfig.objects.first().spvapproval
+        msg = ''
+        status = 200
+        if spvapproval:
+            result = relay_off()
+            if result:
+                msg = "Relay Off!"
+            else:
+                msg = "Relay tidak dapat berjalan!"
                 status = 400
             data = [msg]
 

@@ -294,6 +294,13 @@ def ScaleView(request):
         return JsonResponse(data, safe=False, status=200)
 
 @csrf_exempt
+def ReprintView(request):
+    context = {}
+    context['action'] = 'view'
+    context['data'] = Logging.objects.all().order_by('-id')[:10]
+    return render(request, 'reprint.html', context=context)
+
+@csrf_exempt
 def SupervisorApproval(request):
     if request.method == "POST":
         body_unicode = request.body.decode('utf-8')

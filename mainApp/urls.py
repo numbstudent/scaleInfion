@@ -57,4 +57,6 @@ urlpatterns = [
 
     path('printweightcurrentbox', views.printWeightCurrentBox, name='printweightcurrentbox'),
     path('runconveyorbc', views.runConveyorBC, name='runconveyorbc'),
+    path('runrelayoff', views.turn_relay_off, name='runrelayoff'),
+    path('runrelayon', views.turn_relay_on, name='runrelayon'),
 ]

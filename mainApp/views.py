@@ -1321,25 +1321,35 @@ def runConveyorBC(request):
 @csrf_exempt
 def turn_relay_on(request):
     if request.method == "GET":
-        spvapproval = AdminConfig.objects.first().spvapproval
+        # spvapproval = AdminConfig.objects.first().spvapproval
+        # msg = ''
+        # status = 200
+        # if spvapproval:
+        #     result = relay_on()
+        #     if result:
+        #         msg = "Relay On!"
+        #     else:
+        #         msg = "Relay tidak dapat berjalan!"
+        #         status = 400
+        #     data = [msg]
+
+        #     config = AdminConfig.objects.first()
+        #     config.spvapproval = False
+        #     config.save()
+        # else:
+        #     msg = "Aktifkan SPV Approval terlebih dahulu!"
+        #     status = 400
+        #     data = [msg]
         msg = ''
         status = 200
-        if spvapproval:
-            result = relay_on()
-            if result:
-                msg = "Relay On!"
-            else:
-                msg = "Relay tidak dapat berjalan!"
-                status = 400
-            data = [msg]
-
-            config = AdminConfig.objects.first()
-            config.spvapproval = False
-            config.save()
+        result = relay_on()
+        if result:
+            msg = "Relay On!"
         else:
-            msg = "Aktifkan SPV Approval terlebih dahulu!"
+            msg = "Relay tidak dapat berjalan!"
             status = 400
-            data = [msg]
+        data = [msg]
+        return JsonResponse(data, safe=False, status=status)
 
         return JsonResponse(data, safe=False, status=status)
     else:
@@ -1350,26 +1360,34 @@ def turn_relay_on(request):
 @csrf_exempt
 def turn_relay_off(request):
     if request.method == "GET":
-        spvapproval = AdminConfig.objects.first().spvapproval
+        # spvapproval = AdminConfig.objects.first().spvapproval
+        # msg = ''
+        # status = 200
+        # if spvapproval:
+        #     result = relay_off()
+        #     if result:
+        #         msg = "Relay Off!"
+        #     else:
+        #         msg = "Relay tidak dapat berjalan!"
+        #         status = 400
+        #     data = [msg]
+
+        #     config = AdminConfig.objects.first()
+        #     config.spvapproval = False
+        #     config.save()
+        # else:
+        #     msg = "Aktifkan SPV Approval terlebih dahulu!"
+        #     status = 400
+        #     data = [msg]
         msg = ''
         status = 200
-        if spvapproval:
-            result = relay_off()
-            if result:
-                msg = "Relay Off!"
-            else:
-                msg = "Relay tidak dapat berjalan!"
-                status = 400
-            data = [msg]
-
-            config = AdminConfig.objects.first()
-            config.spvapproval = False
-            config.save()
+        result = relay_off()
+        if result:
+            msg = "Relay Off!"
         else:
-            msg = "Aktifkan SPV Approval terlebih dahulu!"
+            msg = "Relay tidak dapat berjalan!"
             status = 400
-            data = [msg]
-
+        data = [msg]
         return JsonResponse(data, safe=False, status=status)
     else:
         data = ['Wrong page!']

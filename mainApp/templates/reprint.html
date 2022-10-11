@@ -39,6 +39,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <button class="btn btn-block btn-success" type="submit" style="height: 194px;">PILIH BOX</button>
+                    <button class="btn btn-block btn-success" id="btnrelayoff">FORCE STOP CONVEYOR</button>
                 </div>
             </div>
             </div>
@@ -141,5 +142,20 @@
         //     }
         // })
     }
+
+    $("#btnrelayoff").click(function () {
+        var url = "{% url 'runrelayon' %}"
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: url,
+            success: function (data) {   // success callback function
+                console.log(data)
+            },
+            error: function (jqXhr, textStatus, errorMessage) { // error callback 
+                alert(jqXhr.responseJSON)
+            },
+        })
+    })
 </script>
 {% endblock %}

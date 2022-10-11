@@ -202,3 +202,4 @@ class AdminConfig(models.Model):
 class ReprintList(models.Model):
     register = models.ForeignKey(Register, on_delete=models.RESTRICT)
     createdon = models.DateTimeField(auto_now_add=True)
+    status = models.IntegerField(default=0)

@@ -388,3 +388,6 @@ class ConfigForm(ModelForm):
             "pdf_eff_date_value": "Pdf eff date (VALUE)",
             "pdf_dn_value": "Pdf dn (VALUE)",
         }
+
+class ReprintForm(forms.Form):
+    qr = forms.CharField(label="Input QR")

@@ -198,3 +198,7 @@ class AdminConfig(models.Model):
     pdf_nama = models.CharField(max_length=50, default="Nama", null=False)
     pdf_tanggal_paraf = models.CharField(
         max_length=50, default="Supervisor DS&S", null=False)
+
+class ReprintList(models.Model):
+    register = models.ForeignKey(Register, on_delete=models.RESTRICT)
+    createdon = models.DateTimeField(auto_now_add=True)

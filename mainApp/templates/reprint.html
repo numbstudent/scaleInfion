@@ -6,120 +6,31 @@
 {% include "sidebar.html" %}
 {% endblock %}
 {% block content %}
-<div class="modal fade" id="spvapprovalmodal" data-backdrop="static" tabindex="-1" role="dialog"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Approval</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <label for="username">Username:</label>
-                <input class="form-control" type="text" id="spvusername">
-                <label for="password">Password:</label>
-                <input class="form-control" type="password" id="spvpassword">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary float-left" id="btnapprove" data-dismiss="modal">Approve</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="operatormodal" data-backdrop="static" tabindex="-1" role="dialog"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Set Operator</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <label for="operator1">Ptgs Timbang:</label>
-                <select class="form-control" id="operator1txt">
-
-                </select>
-                <!-- <input class="form-control" type="text" id="operator1txt"> -->
-                <label for="operator2">Ptgs Gudang:</label>
-                <input class="form-control" type="text" id="operator2txt">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary float-left" id="btnsetoperator" data-dismiss="modal">Set</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="rejectModal" data-backdrop="static" tabindex="-1" role="dialog"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Reject Box</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <label for="rejectbox">Berat box tidak memenuhi standar berat produk. <br>Pilih status untuk box ini:</label>
-                <input class="form-control" type="hidden" id="rejectboxid">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary float-left" id="btnlastbox" data-dismiss="modal">Last Box</button>
-                <button type="button" class="btn btn-primary float-right" id="btnreject" data-dismiss="modal">Reject</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="weightAdjustmentModal" data-backdrop="static" tabindex="-1" role="dialog"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="weightAdjustment">Weight Adjustment</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <input class="form-control" type="hidden" id="registerid">
-                <label>Initial Weight</label>
-                <input class="form-control" type="text" id="currentweight" readonly="readonly">
-                <label>Weight Change</label>
-                <input class="form-control" type="text" id="differenceweight" readonly="readonly">
-                <label>Desired Weight</label>
-                <input class="form-control" type="text" id="finalweight" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary float-left" id="btnsubmitweightAdjustment" data-dismiss="modal">Submit</button>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="row">
     <div class="col-md-6">
-        <div class="row">
+        <form action="{% url 'reprint' %}" method="POST" autocomplete="on">
+            <div class="row">
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">
-                        <button id="btnoperatormodal" class="btn btn-danger float-right">SET OPERATOR</button>
-                        <h3 class="card-title">PTGS TIMBANG: <b id="operator1"></b></h3>
-                        <br>
-                        <h3 class="card-title">PTGS GUDANG: <b id="operator2"></b></h3>
+                        <h3>REPRINT</h3>
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-lg-12 display-4">
-                                <input class="form-control" type="text" id="qr">
+                            <div class="col-lg-12">
+                                {% csrf_token %}
+                                {{form | crispy}}
                                 <!-- placeholder="CHLON0.5%-|ICLG19050|2|INF|BG|" -->
                                 <input type="hidden" id="code">
                                 <input type="hidden" id="batchno">
                                 <input type="hidden" id="weightadjustment">
                                 <!-- <input class="form-control" type="text" id="code">
                                 <input class="form-control" type="text" id="batchno"> -->
+                                {% if messages %}
+                                    {% for message in messages %}
+                                    {{ message }}
+                                    {% endfor %}
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -127,37 +38,58 @@
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <button class="btn btn-block btn-success" id="submitBoxno" style="height: 174px;">PILIH BOX</button>
-                    <a class="btn btn-block btn-danger" id="btnrunconveyorbc" class="product-title">RUN CONVEYOR</a>
+                    <button class="btn btn-block btn-success" type="submit" style="height: 194px;">PILIH BOX</button>
+                </div>
+            </div>
+            </div>
+        </form>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">CURRENT BOX REPRINT</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-12 strong text-right display-1">
+                                <strong><span id="weight">-</span></strong>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
+
     </div>
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <button id="btnapprovalmodal" class="btn btn-danger float-right"><span id="spvapprovalstatus">----</span></button>
-                <table>
-                    <tr>
-                        <td>PRODUK</td>
-                        <td>: {% if state.status %}<b>{{state.product}}</b>{% else %}Set Batch State terlebih dahulu!{% endif %}</td>
-                    </tr>
-                    <tr>
-                        <td>NO. BATCH</td>
-                        <td>: {% if state.status %}<b>{{state.batchno}}</b></td>
-                    </tr>
-                    <tr>
-                        <td>ADJUSTMENT</td>
-                        <td>: <b>{{state.weightadjustment}}{% else %}Set Batch State terlebih dahulu!{% endif %}</b></b></td>
-                    </tr>
-                    <tr>
-                        <td>JUMLAH KOLI</td>
-                        <td>: <b id="jumlahkoli"></b></td>
-                    </tr>
-                </table>
+                REPRINT LIST
             </div>
             <div class="card-body" style="overflow-y: scroll; height:500px;">
                 <ul class="products-list product-list-in-card pl-2 pr-2" id="batchhistorylist">
+                {%for row in data%}
+                <li class="item">
+                    <div class="product-img" style="margin-right:7px">
+                        <i class="fa fa-box"></i>
+                    </div>
+                    <div class="product-info">
+                        <a href="javascript:void(0)" class="product-title">
+                            {% if row.register.status == 2 %}
+                            REJECT
+                            {% elif row.register.status == 1 %}
+                            OK
+                            {% elif row.register.status == 3 %}
+                            LAST BOX
+                            {% endif %}
+                            <span class="display-4 float-right">{{row.register.weight}} g </span></a>
+                        <span class="product-description">
+                            BOX NO. {{row.register.boxno}} - <small>Input: {{row.createdon|date:"d-m-Y H:i"}}</small>
+                        </span>
+                    </div>
+                </li>
+                {%endfor%}
                 </ul>
             </div>
         </div>
@@ -166,25 +98,10 @@
 {% endblock %}
 {% block additionaljs %}
 <script>
-    var initialbatchno = '{{state.batchno}}'
-    var initialproductcode = '{{state.product.code}}'
-
     var url = "{% url 'registerqr' %}"
+
     $("#submitBoxno").click(function () {
         boxSubmit()
-    })
-
-    $.ajax({
-        type: "GET",
-        dataType: "json",
-        url: "{% url 'operatorlist' %}",
-        success: function (data) {   // success callback function
-            $.each(data, function (key, value) {
-                $("#operator1txt").append('<option>' + value.first_name + ' ' + value.last_name +'</option>');
-            });
-        }, error: function (jqXhr, textStatus, errorMessage) { // error callback 
-            alert(jqXhr.responseJSON.message)
-        }
     })
 
     function boxSubmit() {
@@ -198,288 +115,31 @@
         if (batchno != null || batchno != "") {
             $("#batchno").val(batchno)
         }
-        // alert(code+" "+batchno+" "+boxno)
+        alert(code+" "+batchno+" "+boxno)
         var data = {
             code: code,
             batchno: batchno,
             boxno: boxno
         }
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            url: url,
-            data: data,
-            success: function (data) {   // success callback function
-
-                console.log(data)
-            },
-            error: function (jqXhr, textStatus, errorMessage) { // error callback 
-                alert(jqXhr.responseJSON.message)
-            },
-            complete: function (data) {
-                if ((batchno != null || batchno != "") && (code != null || code != "")) {
-                    updateBoxList()
-                }
-                $("#qr").val("")
-                $('#qr').focus()
-            }
-        })
+        // $.ajax({
+        //     type: "POST",
+        //     dataType: "json",
+        //     url: url,
+        //     data: data,
+        //     success: function (data) {   // success callback function
+        //         console.log(data)
+        //     },
+        //     error: function (jqXhr, textStatus, errorMessage) { // error callback 
+        //         alert(jqXhr.responseJSON.message)
+        //     },
+        //     complete: function (data) {
+        //         if ((batchno != null || batchno != "") && (code != null || code != "")) {
+        //             updateBoxList()
+        //         }
+        //         $("#qr").val("")
+        //         $('#qr').focus()
+        //     }
+        // })
     }
-
-    function updateBoxList() {
-        var batchno = $("#batchno").val()
-        var code = $("#code").val()
-        if ($("#batchno").val() == "") {
-            batchno = initialbatchno
-        }
-        if ($("#code").val() == "") {
-            code = initialproductcode
-        }
-        var url = "{% url 'registerqr' %}"+"/register?batchno="+ batchno +"&code="+ code
-        // var url = "/weighing
-        if (code && batchno) {
-            $.ajax({
-                type: "GET",
-                dataType: "json",
-                url: url,
-                success: function (data) {   // success callback function
-                    var html = '';
-                    console.log(data)
-                    for (const row in data.batch) {
-                        var record = data.batch[row]
-                        var weight = record.iot_weight == null? '-': record.iot_weight
-                        var status = ""
-                        if (record.status==2) {
-                            status = 'REJECT'
-                        } else if (record.status==3){
-                            status = 'LAST BOX'
-                        } else if (record.status == 1) {
-                            status = 'OK'
-                        } else {
-                            status = 'WAITING FOR WEIGHING'
-                        } 
-                        html += '\
-                        <li class="item">\
-                            <div class="product-img" style="margin-right:7px">\
-                                <button class="btn btn-secondary btnweightAdjustment" data-id="'+ record.id + '" data-weight="' + weight +'">\
-                                    <i class="fa fa-edit"></i>\
-                                </button>\
-                            </div>\
-                            <div class="product-info">\
-                                <a href="javascript:void(0)" class="product-title">'+ status +'\
-                                    <span class="display-4 float-right">'+ weight+' g </span></a>\
-                                <span class="product-description">\
-                                    BOX NO. '+record.boxno+' - <small>Input: '+record.createdon.substring(0,16).replace("T", " ")+'</small>\
-                                </span>\
-                            </div>\
-                        </li>'
-                    }
-
-                    // <div class="product-img" style="margin-right:7px">\
-                    //     <button class="btn btn-danger deleteBox" data-id="'+ record.id +'">\
-                    //         <i class="fas fa-times"></i>\
-                    //     </button>\
-                    //     <button class="btn btn-secondary btnweightAdjustment" data-id="'+ record.id +'" data-weight="'+ weight +'">\
-                    //         <i class="fa fa-edit"></i>\
-                    //     </button>\
-                    // </div>\
-
-                    // if(data.insertsuccess == "False"){
-                    //     // $("#rejectedbox").text(data.)
-                    //     $("#rejectboxid").val(data.id)
-                    //     $("#rejectModal").modal('show')
-                    // }
-                    $('#batchhistorylist').html(html)
-                    $('#jumlahkoli').html(data.jumlahkoli)
-                    $('#operator1').html(data.operator)
-                    $('#operator2').html(data.petugasgudang)
-                    if (data.spvapproval) {
-                        $('#spvapprovalstatus').html("SPV APPROVAL: ON")
-                    } else {
-                        $('#spvapprovalstatus').html("SPV APPROVAL: OFF")
-                    }
-                }
-            })
-        }
-    }
-
-    const interval = setInterval(function () {
-        updateBoxList()
-    }, 2500);
-
-    function updateWeight() {
-        var url = "{% url 'scale' %}"
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            url: url,
-            success: function (data) {   // success callback function
-                if(data==null){
-                    $("#weight").text("-")
-                }else{
-                    $("#weight").text(data.weighing)
-                }
-                
-            }
-        })
-    }
-
-    $("#btnrunconveyorbc").click(function () {
-        var url = "{% url 'runconveyorbc' %}"
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            url: url,
-            success: function (data) {   // success callback function
-                console.log(data)
-            }, 
-            error: function (jqXhr, textStatus, errorMessage) { // error callback 
-                alert(jqXhr.responseJSON)
-            },
-        })
-    })
-
-    const interval2 = setInterval(function () {
-        updateWeight()
-    }, 5000);
-
-    $("#batchhistorylist").on("click", ".deleteBox",function () {
-        var registerid = $(this).data('id');
-        var allow = confirm("Apakah anda yakin untuk menghapus data?")
-        if (allow){
-            $.ajax({
-                type: "PUT",
-                dataType: "json",
-                url: url,
-                data: JSON.stringify({ "registerid": registerid }),
-                success: function (data) {   // success callback function
-                    alert(data.message)
-                    updateBoxList()
-                }
-            })
-        }
-    })
-
-    $("#btnsubmitweightAdjustment").click(function () {
-        var url = "{% url 'editregisterweight' %}"
-        var registerid = $("#registerid").val();
-        var finalweight = parseFloat($("#finalweight").val());
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            url: url,
-            data: JSON.stringify({"registerid": registerid, "finalweight": finalweight}),
-            success: function (data) {   // success callback function
-                alert(data.message)
-                updateBoxList()
-            }
-        })
-    })
-
-    $("#btnlastbox").click(function () {
-        var rejectboxid = $("#rejectboxid").val();
-        var url = "{% url 'rejectbox' %}"
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            url: url,
-            data: { "id": rejectboxid, "status":2 },
-            success: function (data) {   // success callback function
-                alert(data.message)
-                updateBoxList()
-            },
-            error: function (jqXhr, textStatus, errorMessage) { // error callback 
-                alert(jqXhr.responseJSON.message)
-            },
-        })
-    })
-
-    $("#btnreject").click(function () {
-        var rejectboxid = $("#rejectboxid").val();
-        var url = "{% url 'rejectbox' %}"
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            url: url,
-            data: { "id": rejectboxid, "status": 0 },
-            success: function (data) {   // success callback function
-                alert(data.message)
-                updateBoxList()
-            },
-            error: function (jqXhr, textStatus, errorMessage) { // error callback 
-                alert(jqXhr.responseJSON.message)
-            },
-        })
-    })
-
-    $("#btnapprovalmodal").click(function () {
-        $("#spvapprovalmodal").modal('show')
-    })
-
-    $("#btnoperatormodal").click(function () {
-        $("#operatormodal").modal('show')
-    })
-
-    $("#btnapprove").click(function () {
-        var url = "{% url 'spvapproval' %}"
-        var username = $("#spvusername").val();
-        var password = $("#spvpassword").val();
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            url: url,
-            data: JSON.stringify({ "username": username, "password": password }),
-            success: function (data) {   // success callback function
-                alert(data.message)
-                $("#spvusername").val("")
-                $("#spvpassword").val("")
-            }, error: function (jqXhr, textStatus, errorMessage) { // error callback 
-                alert(jqXhr.responseJSON.message)
-                $("#spvusername").val("")
-                $("#spvpassword").val("")
-            }
-        })
-    })
-
-    $("#btnsetoperator").click(function () {
-        var url = "{% url 'setoperator' %}"
-        var operator1 = $("#operator1txt").val();
-        var operator2 = $("#operator2txt").val();
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            url: url,
-            data: JSON.stringify({ "operator1": operator1, "operator2": operator2 }),
-            success: function (data) {   // success callback function
-                alert(data.message)
-                $("#operator1txt").val("")
-                $("#operator2txt").val("")
-            }, error: function (jqXhr, textStatus, errorMessage) { // error callback 
-                alert(jqXhr.responseJSON.message)
-                $("#operator1txt").val("")
-                $("#operator2txt").val("")
-            }
-        })
-    })
-    
-    $("#batchhistorylist").on("click", ".btnweightAdjustment", function () {
-        $("#differenceweight").val("")
-        $("#finalweight").val("")
-        $("#weightAdjustmentModal").modal('show')
-        $("#currentweight").val($(this).data('weight'))
-        $("#registerid").val($(this).data('id'))
-    })
-
-    $("#finalweight").keyup(function () {
-        $("#differenceweight").val($("#finalweight").val() - $("#currentweight").val())
-    });
-
-    // $(document).on('keypress', function (e) {
-    //     if (e.which == 13 && e.target.id == 'qr') {
-    //         boxSubmit()
-    //         $('#' + e.target.id).val("")
-    //     }
-    //     $('#qr').focus()
-    // });
 </script>
 {% endblock %}

@@ -21,6 +21,7 @@ from .relay2on import relay_on
 import json
 import csv
 from datetime import datetime, timedelta
+from django.contrib import messages
 
 
 loginpage = 'login'
@@ -293,11 +294,32 @@ def ScaleView(request):
                     #     run_conveyor()
         return JsonResponse(data, safe=False, status=200)
 
-@csrf_exempt
+@login_required(login_url=loginpage)
+# @allowed_check(feature_alias='masterproduct')
 def ReprintView(request):
     context = {}
     context['action'] = 'view'
-    context['data'] = Logging.objects.all().order_by('-id')[:10]
+    context['data'] = ReprintList.objects.all().order_by('-id')[:2]
+    if request.method == "POST":
+        form = ReprintForm(request.POST)
+        context['form'] = form
+        if form.is_valid():
+            qr = form.cleaned_data.get('qr').split('|')
+            productid = Product.objects.filter(code=qr[0]).first()
+            if productid:
+                register = Register.objects.filter(product=productid, batchno=qr[1], boxno=qr[2]).last()
+                if register:
+                    reprint = ReprintList(register=register)
+                    reprint.save()
+                    relay_on()
+                else:
+                    messages.error(request, 'Box tidak ditemukan.')
+            else:
+                messages.error(request, 'Box tidak ditemukan.')
+            return redirect('reprint')
+    else:
+        context['form'] = ReprintForm()
+
     return render(request, 'reprint.html', context=context)
 
 @csrf_exempt

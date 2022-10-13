@@ -174,6 +174,7 @@ class AdminConfig(models.Model):
     pdf_will_be_reviewed = models.CharField(max_length=50, default="This document will be reviewed on", null=False)
     pdf_will_be_reviewed_value = models.DateTimeField(null=False)
     pdf_rev_of_dn = models.CharField(max_length=50, default="Rev. of DN", null=False)
+    pdf_dn_date = models.CharField(max_length=50, default="Date", null=False)
     pdf_reporttitle = models.ForeignKey(ReportTitle, on_delete=models.RESTRICT, null=True)
     pdf_department = models.ForeignKey(Department, on_delete=models.RESTRICT, null=True)
     pdf_nama_produk = models.CharField(max_length=50, default="Nama Produk", null=False)

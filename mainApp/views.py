@@ -426,11 +426,18 @@ def viewUploadProduct(request):
         if form.is_valid():
             file = request.FILES['file'].read().decode('utf-8')
             reader = csv.reader(StringIO(file), delimiter=',')
+            try:
+                print(list(reader)[0][1])
+            except:
+                reader = csv.reader(StringIO(file), delimiter=';')
             next(reader) #skip header
             ProductUploadTemp.objects.all().delete()
             for row in reader:
+                jumlahkoli = row[5]
+                if jumlahkoli == '':
+                    jumlahkoli = 0
                 obj = ProductUploadTemp(code=row[0], name=row[1], minweight=row[2],
-                                        maxweight=row[3], standardweight=row[4], jumlahkoli=row[5], createdby=request.user)
+                                        maxweight=row[3], standardweight=row[4], jumlahkoli=jumlahkoli, createdby=request.user)
                 obj.save()
             return redirect('uploadproduct')
     else:
@@ -1271,7 +1278,7 @@ def viewConfig(request):
 
 ## printing
 @csrf_exempt
-def printWeightCurrentBox(request):
+def printWeightCurrentBox(request): #obsolete
     if request.method == "GET":
         batchno = request.GET.get('batchno')
         boxno = request.GET.get('boxno')
@@ -1282,6 +1289,22 @@ def printWeightCurrentBox(request):
             data = list(Register.objects.values().order_by('-id'))[0]
         else:
             data = list({"Complete batchno and boxno!"})
+        return JsonResponse(data, safe=False, status=200)
+    else:
+        data = ['Wrong page!']
+        return JsonResponse(data, safe=False, status=400)
+
+## printing
+@csrf_exempt
+def getPrintData(request):
+    if request.method == "GET":
+        mode = request.GET.get('mode')
+        if mode == 'reprint':
+            data = list(ReprintList.objects.filter(status=0).values('register__weight').last())
+        elif not boxno and not batchno and not productcode:
+            data = list(Register.objects.values().order_by('-id'))[0]
+        else:
+            data = list({"Complete product code, batchno, boxno!"})
         return JsonResponse(data, safe=False, status=200)
     else:
         data = ['Wrong page!']

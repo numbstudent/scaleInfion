@@ -14,7 +14,7 @@ def relay_off():
         result = True
     except:
         result = False
-    return 
+    return result
     
 def debug_relay_off():
     ser = serial.Serial('/dev/relay', baudrate=9600, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE)

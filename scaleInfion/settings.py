@@ -90,7 +90,7 @@ if pf == 'Windows':
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'USER': 'root',
-            'NAME': 'iot',
+            'NAME': 'iot3',
             'HOST': 'localhost',
             'PORT': '3306',
         },

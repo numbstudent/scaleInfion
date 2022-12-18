@@ -699,7 +699,7 @@ def viewReportBody(request):
             reviewdate = AdminConfig.objects.first().pdf_will_be_reviewed_value
             effectivedate = AdminConfig.objects.first().pdf_eff_date_value
             dnno = AdminConfig.objects.first().pdf_dn_value
-            dnrev = AdminConfig.objects.first().pdf_dn_rev_value
+            dnrev = AdminConfig.objects.first().pdf_rev_of_dn_value
             # reviewdate = request.POST.get('reviewdate')
             # effectivedate = request.POST.get('effectivedate')
             # dnno = request.POST.get('dnno')

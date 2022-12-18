@@ -81,6 +81,22 @@ class Register(models.Model):
     updatedby = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, blank=True, related_name="updatedby_rel")
     printedon = models.DateTimeField(null=True, default=None)
 
+class RegisterHistory(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.RESTRICT)
+    batchno = models.CharField(max_length=15)
+    boxno = models.IntegerField()
+    status = models.IntegerField(null=True, default=None)
+    createdon = models.DateTimeField(auto_now_add=True)
+    updatedon = models.DateTimeField(auto_now=True)
+    weight = models.FloatField(null=True)
+    operator = models.CharField(max_length=50, default=None, null=True)
+    petugasgudang = models.CharField(max_length=50, default=None, null=True)
+    createdby = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="createdby_rel_history")
+    updatedby = models.ForeignKey(User, on_delete=models.RESTRICT,
+                                  null=True, blank=True, related_name="updatedby_rel_history")
+    printedon = models.DateTimeField(null=True, default=None)
+    action = models.CharField(max_length=15)
+
 class PrintHeader(models.Model):
     name = models.CharField(max_length=50)
     label = models.CharField(max_length=20)
@@ -165,6 +181,8 @@ class AdminConfig(models.Model):
     pdf_form = models.CharField(max_length=50, default="FORM", null=False)
     pdf_dn = models.CharField(max_length=50, default="DN", null=False)
     pdf_dn_value = models.CharField(max_length=20, default="NOT ASSIGNED")
+    pdf_dn_rev = models.CharField(max_length=50, default="DN Rev", null=False)
+    pdf_dn_rev_value = models.CharField(max_length=20, default="NOT ASSIGNED")
     pdf_eff_date = models.CharField(max_length=50, default="Eff. Date", null=False)
     pdf_eff_date_value = models.DateTimeField(null=False)
     pdf_will_be_reviewed = models.CharField(max_length=50, default="This document will be reviewed on", null=False)

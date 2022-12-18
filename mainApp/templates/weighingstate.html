@@ -78,25 +78,25 @@
                                             </td>
                                             <td>
                                                 {% if row.pendingstatus %}
-                                                <a class="btn btn-secondary" href="{% url 'editweighingstate' row.id %}"><i class="fas fa-edit"></i></a>
-                                                <a class="btn btn-danger" href="{% url 'deleteweighingstate' row.id %}"
+                                                <a class="btn btn-sm btn-secondary" data-toggle="tooltip" title="Edit Batch" href="{% url 'editweighingstate' row.id %}"><i class="fas fa-pen"></i></a>
+                                                <a class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete Batch" href="{% url 'deleteweighingstate' row.id %}"
                                                     onclick="return confirm('Apakah anda yakin untuk menghapus data?')"><i class="fas fa-trash"></i></a>
                                                 {% endif %}
                                             </td>
                                             <td>
                                                 {% if row.status and row.pendingstatus %}
-                                                <a class="btn btn-danger"
+                                                <a class="btn btn-sm btn-danger" data-toggle="tooltip" title="Deactivate Batch"
                                                     onclick="return confirm('Apakah anda yakin untuk mendeaktivasi No Batch {{row.batchno}}?')"
                                                     href="{% url 'activateweighingstate' row.id 'deactivate' %}"><i class="fas fa-times"></i></a>
                                                 {% elif not row.status and row.pendingstatus %}
-                                                <a class="btn btn-primary"
+                                                <a class="btn btn-sm btn-primary" data-toggle="tooltip" title="Activate Batch"
                                                     onclick="return confirm('Apakah anda yakin untuk mengaktivasi No Batch {{row.batchno}}?')"
                                                     href="{% url 'activateweighingstate' row.id 'activate' %}"><i class="fas fa-check"></i></a>
                                                 {% endif %}
                                             </td>
                                             <td>
                                                 {% if row.pendingstatus and not row.status %}
-                                                <a class="btn btn-danger" href="{% url 'closeweighingstate' row.id %}"><i class="fas fa-minus-circle"></i></a>
+                                                <a class="btn btn-sm btn-danger" data-toggle="tooltip" title="Close Batch" href="{% url 'closeweighingstate' row.id %}"><i class="fas fa-minus-circle"></i></a>
                                                 {% endif %}
                                             </td>
                                         </tr>

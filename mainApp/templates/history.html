@@ -71,13 +71,14 @@
                 <table class="table small" id="batchhistorylist">
                     <thead>
                         <tr>
-                            <th>Product</th>
+                            <th width="15%">Product</th>
                             <th>Batch No</th>
                             <th>Box No</th>
                             <th>Weight</th>
-                            <th>Status</th>
+                            <th width="5%">Status</th>
                             <th>Input Date</th>
                             <th>Petugas Penimbangan / Gudang</th>
+                            <th>Hist. Action</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -101,12 +102,13 @@
                             </td>
                             <td>{{row.input_date|date:"Y/n/j h:m:i"}}</td>
                             <td>{{row.operator}} / <br>{{row.petugasgudang}}</td>
+                            <td>{{row.action| capfirst}}</td>
                             <td>
-                                <button class="btn btn-danger deleteBox" data-id="{{row.id}}">
-                                    <i class="fas fa-times"></i>
+                                <button class="btn btn-danger btn-sm deleteBox" data-id="{{row.id}}">
+                                    <i class="fas fa-trash"></i>
                                 </button>
-                                <button class="btn btn-secondary btnweightAdjustment" data-id="{{row.id}}" data-weight="{{row.iot_weight}}">
-                                    <i class="fa fa-edit"></i>
+                                <button class="btn btn-secondary btn-sm  btnweightAdjustment" data-id="{{row.id}}" data-weight="{{row.iot_weight}}">
+                                    <i class="fa fa-pen"></i>
                                 </button>
                             </td>
                         </tr>

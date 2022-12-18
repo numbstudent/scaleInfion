@@ -131,11 +131,32 @@ def RegisterView(request, batchno=None):
                     return JsonResponse({"message": "Box kosong harus ditimbang terlebih dahulu."}, status=400)
                 elif boxrejectexists:
                     if spvapproval:
+                        # save register history
+                        obj = Register.objects.filter(
+                            product=productid, batchno=batchno, boxno=boxno).filter(status=2).last()
+                        obj2 = RegisterHistory(
+                            product=obj.product,
+                            batchno=obj.batchno,
+                            boxno=obj.boxno,
+                            status=obj.status,
+                            createdon=obj.createdon,
+                            updatedon=obj.updatedon,
+                            weight=obj.weight,
+                            operator=obj.operator,
+                            petugasgudang=obj.petugasgudang,
+                            createdby=obj.createdby,
+                            updatedby=obj.updatedby,
+                            printedon=obj.printedon,
+                            action="delete reject"
+                        )
+                        obj2.save()
+                        # delete rejected box
                         boxreject = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).filter(status=2).last()
                         boxreject.delete()
                         config = AdminConfig.objects.first()
                         config.spvapproval = False
                         config.save()
+                        # save new record
                         instance = form.save(commit=False)
                         instance.product = productid
                         instance.createdby = request.user
@@ -160,6 +181,7 @@ def RegisterView(request, batchno=None):
                     instance.operator = operator
                     instance.petugasgudang = petugasgudang.title()
                     instance.save()
+
                     # ser_instance = serializers.serialize('json', [instance, ])
                     return JsonResponse({"message": "Data berhasil diinput"}, status=200)
         else:
@@ -233,6 +255,24 @@ def editRegisterWeight(request):
             if(((finalweight - obj.weight) < 3) and ((finalweight - obj.weight) > -3)):
                 obj.weight = finalweight
                 obj.save()
+                # save register history
+                obj = Register.objects.filter(id=registerid).first()
+                obj2 = RegisterHistory(
+                    product=obj.product,
+                    batchno=obj.batchno,
+                    boxno=obj.boxno,
+                    status=obj.status,
+                    createdon=obj.createdon,
+                    updatedon=obj.updatedon,
+                    weight=obj.weight,
+                    operator=obj.operator,
+                    petugasgudang=obj.petugasgudang,
+                    createdby=obj.createdby,
+                    updatedby=obj.updatedby,
+                    printedon=obj.printedon,
+                    action="update weight"
+                )
+                obj2.save()
                 message = "Data berhasil diubah."
             else:
                 message = "Perubahan data melebihi 3 gram!"
@@ -276,7 +316,7 @@ def ScaleView(request):
             activebatchno = WeighingState.objects.filter(status=True).last().batchno
         weightadjustment = AdminConfig.objects.last().weightadjustment
         if activebatchno:
-            currentbox = Register.objects.filter(batchno = activebatchno, status = None).last()
+            currentbox = Register.objects.filter(batchno = activebatchno, status = None).order_by('createdon').last()
             if currentbox:
                 weight = Logging.objects.filter(datetime__gte=currentbox.createdon).last()
                 if weight:
@@ -287,6 +327,26 @@ def ScaleView(request):
                     currentbox.weight = weight.weighing + weightadjustment
                     currentbox.status = weight.status
                     currentbox.save()
+                    # save register history
+                    obj = Register.objects.filter(
+                        batchno=activebatchno).order_by('createdon').last()
+                    obj2 = RegisterHistory(
+                        product=obj.product,
+                        batchno=obj.batchno,
+                        boxno=obj.boxno,
+                        status=obj.status,
+                        createdon=obj.createdon,
+                        updatedon=obj.updatedon,
+                        weight=obj.weight,
+                        operator=obj.operator,
+                        petugasgudang=obj.petugasgudang,
+                        createdby=obj.createdby,
+                        updatedby=obj.updatedby,
+                        printedon=obj.printedon,
+                        action="insert"
+                    )
+                    obj2.save()
+
                     config = AdminConfig.objects.first()
                     config.spvapproval = False
                     config.save()
@@ -639,6 +699,7 @@ def viewReportBody(request):
             reviewdate = AdminConfig.objects.first().pdf_will_be_reviewed_value
             effectivedate = AdminConfig.objects.first().pdf_eff_date_value
             dnno = AdminConfig.objects.first().pdf_dn_value
+            dnrev = AdminConfig.objects.first().pdf_dn_rev_value
             # reviewdate = request.POST.get('reviewdate')
             # effectivedate = request.POST.get('effectivedate')
             # dnno = request.POST.get('dnno')
@@ -651,7 +712,7 @@ def viewReportBody(request):
             # dnrev = dnrev+1
             
             # manual dnrev
-            dnrev = request.POST.get('dnrev')
+            # dnrev = request.POST.get('dnrev')
             signingdate = request.POST.get('signingdate')
             
             obj = Report(product=product, batchno=batchno, reporttitle=reporttitle, department=department,
@@ -678,7 +739,7 @@ def viewReportBody(request):
 
 
 @login_required(login_url=loginpage)
-@allowed_check(feature_alias='reportpdf')
+@allowed_check(feature_alias='deletereportpdf')
 def deleteReportBody(request, id):
     obj = Report.objects.filter(id=id)
 
@@ -724,8 +785,8 @@ def editReportBody(request, id):
 @allowed_check(feature_alias='history')
 def viewHistory(request):
     context = {}
-    datamodel = Register.objects.annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
-        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date', 'status', 'operator', 'petugasgudang').order_by('-input_date')
+    datamodel = RegisterHistory.objects.annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
+        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date', 'status', 'operator', 'petugasgudang','action').order_by('-input_date')
     hasFilter = False
     if request.method == "POST":
         form = HistoryForm(request.POST)
@@ -1246,8 +1307,10 @@ def closeWeighingState(request, id):
 @allowed_check(feature_alias='viewendbatch')
 def viewBatchHistory(request, batchno):
     context = {}
-    datamodel = Register.objects.filter(batchno=batchno).filter(Q(status=1) | Q(status=3)).annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
+    datamodel = RegisterHistory.objects.filter(batchno=batchno).annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
         .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date', 'status','operator','petugasgudang').order_by('-input_date')
+    # datamodel = RegisterHistory.objects.filter(batchno=batchno).filter(Q(status=1) | Q(status=3)).annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
+    #     .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date', 'status','operator','petugasgudang').order_by('-input_date')
     context['data'] = datamodel
     return render(request, 'batchno_history.html', context=context)
 

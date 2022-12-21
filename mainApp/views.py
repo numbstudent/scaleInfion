@@ -130,14 +130,14 @@ def RegisterView(request, batchno=None):
                 elif boxexists or int(boxno) < 1:
                     return JsonResponse({"message": "Box ini sudah pernah diinput!"}, status=400)
                 elif boxkosongexists:
-                    result = relay_on()
+                    result = relay3_on()
                     if result:
                         msg = "Relay 3 On!"
                     else:
                         msg = "Relay 3 tidak dapat berjalan!"
                     import time
                     time.sleep(5)
-                    result = relay_on()
+                    result = relay3_off()
                     if result:
                         msg = msg+" Relay 3 Off!"
                     else:
@@ -185,14 +185,14 @@ def RegisterView(request, batchno=None):
                         # config.spvapproval = False
                         # config.save()
                         # return JsonResponse({"message": "Input last box dengan persetujuan supervisor berhasil ditambahkan."}, status=200)
-                        result = relay_on()
+                        result = relay3_on()
                         if result:
                             msg = "Relay 3 On!"
                         else:
                             msg = "Relay 3 tidak dapat berjalan!"
                         import time
                         time.sleep(5)
-                        result = relay_on()
+                        result = relay3_off()
                         if result:
                             msg = msg+" Relay 3 Off!"
                         else:

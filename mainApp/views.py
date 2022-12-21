@@ -109,9 +109,9 @@ def RegisterView(request, batchno=None):
         msg = ""
         result = relay3_on()
         if result:
-            msg = "Relay 3 On!"
+            msg = msg+"Relay 3 On!"
         else:
-            msg = "Relay 3 tidak dapat berjalan!"
+            msg = msg+"Relay 3 tidak dapat berjalan!"
         import time
         time.sleep(8)
         result = relay3_off()
@@ -119,7 +119,7 @@ def RegisterView(request, batchno=None):
             msg = msg+" Relay 3 Off!"
         else:
             msg = msg+" Relay 3 tidak dapat berjalan!"
-            return JsonResponse({"message": msg}, status=200)
+        return JsonResponse({"message": msg}, status=200)
         form = RegisterForm(request.POST)
         if form.is_valid():
             code = request.POST.get('code')

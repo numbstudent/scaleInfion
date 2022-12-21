@@ -18,6 +18,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .conveyor import run_conveyor
 from .relay2off import relay_off
 from .relay2on import relay_on
+from .relay3off import relay3_off
+from .relay3on import relay3_on
 import json
 import csv
 from datetime import datetime, timedelta
@@ -164,7 +166,6 @@ def RegisterView(request, batchno=None):
                         instance.petugasgudang = petugasgudang.title()
                         instance.save()
                         # ser_instance = serializers.serialize('json', [instance, ])
-                        return JsonResponse({"message": "Data berhasil diinput"}, status=200)
                         # boxreject = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).filter(status=2).last()
                         # obj = Register(product=productid, batchno=batchno, boxno=boxno, createdby = request.user, operator = operator, petugasgudang = petugasgudang, weight = boxreject.weight, status=3)
                         # obj.save()
@@ -172,6 +173,19 @@ def RegisterView(request, batchno=None):
                         # config.spvapproval = False
                         # config.save()
                         # return JsonResponse({"message": "Input last box dengan persetujuan supervisor berhasil ditambahkan."}, status=200)
+                        result = relay_on()
+                        if result:
+                            msg = "Relay 3 On!"
+                        else:
+                            msg = "Relay 3 tidak dapat berjalan!"
+                        import time
+                        time.sleep(5)
+                        result = relay_on()
+                        if result:
+                            msg = msg+" Relay 3 Off!"
+                        else:
+                            msg = msg+" Relay 3 tidak dapat berjalan!"
+                        return JsonResponse({"message": "Data berhasil diinput. "+msg}, status=200)
                     else :
                         return JsonResponse({"message": "Box ini sudah pernah diinput!"}, status=400)
                 else:
@@ -1437,7 +1451,7 @@ def turn_relay_on(request):
         data = [msg]
         return JsonResponse(data, safe=False, status=status)
 
-        return JsonResponse(data, safe=False, status=status)
+        # return JsonResponse(data, safe=False, status=status)
     else:
         data = ['Wrong page!']
         return JsonResponse(data, safe=False, status=400)

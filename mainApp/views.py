@@ -104,6 +104,17 @@ def OperatorListView(request):
         return JsonResponse(list(data), safe=False, status=200)
 
 @csrf_exempt
+def turnoffrelay3(sleeptime=3):
+    import time
+    time.sleep(sleeptime)
+    result = relay3_off()
+    if result:
+        msg = msg+" Relay 3 Off!"
+    else:
+        msg = msg+" Relay 3 tidak dapat berjalan!"
+    return msg
+    
+@csrf_exempt
 def RegisterView(request, batchno=None):
     if is_ajax(request) and request.method == "POST":
         msg = ""
@@ -112,14 +123,6 @@ def RegisterView(request, batchno=None):
             msg = msg+"Relay 3 On!"
         else:
             msg = msg+"Relay 3 tidak dapat berjalan!"
-        import time
-        time.sleep(8)
-        result = relay3_off()
-        if result:
-            msg = msg+" Relay 3 Off!"
-        else:
-            msg = msg+" Relay 3 tidak dapat berjalan!"
-        return JsonResponse({"message": msg}, status=200)
         form = RegisterForm(request.POST)
         if form.is_valid():
             code = request.POST.get('code')
@@ -132,6 +135,7 @@ def RegisterView(request, batchno=None):
             weighingstate = WeighingState.objects.filter(status=True, batchno=batchno, product=productid).exists()
             
             if not weighingstate:
+                turnoffrelay3(2)
                 return JsonResponse({"message": "Box tidak sesuai dengan Batch."}, status=400)
             else:
                 # operator = WeighingState.objects.filter(status=True, batchno=batchno, product=productid).first().operator
@@ -140,10 +144,13 @@ def RegisterView(request, batchno=None):
                 petugasgudang = AdminConfig.objects.first().petugasgudang
                 spvapproval = AdminConfig.objects.first().spvapproval
                 if (not operator) or (not petugasgudang):
+                    turnoffrelay3(2)
                     return JsonResponse({"message": "Isikan nama operator terlebih dahulu."}, status=400)
                 elif boxexists or int(boxno) < 1:
+                    turnoffrelay3(2)
                     return JsonResponse({"message": "Box ini sudah pernah diinput!"}, status=400)
                 elif boxkosongexists:
+                    turnoffrelay3(2)
                     return JsonResponse({"message": "Box kosong harus ditimbang terlebih dahulu. "}, status=400)
                 elif boxrejectexists:
                     if spvapproval:
@@ -187,8 +194,10 @@ def RegisterView(request, batchno=None):
                         # config.spvapproval = False
                         # config.save()
                         # return JsonResponse({"message": "Input last box dengan persetujuan supervisor berhasil ditambahkan."}, status=200)
+                        turnoffrelay3(8)
                         return JsonResponse({"message": "Data berhasil diinput. "}, status=200)
                     else :
+                        turnoffrelay3(2)
                         return JsonResponse({"message": "Box ini sudah pernah diinput!"}, status=400)
                 else:
                     instance = form.save(commit=False)
@@ -199,8 +208,10 @@ def RegisterView(request, batchno=None):
                     instance.save()
 
                     # ser_instance = serializers.serialize('json', [instance, ])
+                    turnoffrelay3(2)
                     return JsonResponse({"message": "Data berhasil diinput"}, status=200)
         else:
+            turnoffrelay3(2)
             return JsonResponse({"message": "Isikan parameter."}, status=400)
 
     elif request.method == "GET":

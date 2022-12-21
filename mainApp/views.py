@@ -106,6 +106,20 @@ def OperatorListView(request):
 @csrf_exempt
 def RegisterView(request, batchno=None):
     if is_ajax(request) and request.method == "POST":
+        msg = ""
+        result = relay3_on()
+        if result:
+            msg = "Relay 3 On!"
+        else:
+            msg = "Relay 3 tidak dapat berjalan!"
+        import time
+        time.sleep(8)
+        result = relay3_off()
+        if result:
+            msg = msg+" Relay 3 Off!"
+        else:
+            msg = msg+" Relay 3 tidak dapat berjalan!"
+            return JsonResponse({"message": msg}, status=200)
         form = RegisterForm(request.POST)
         if form.is_valid():
             code = request.POST.get('code')
@@ -130,20 +144,7 @@ def RegisterView(request, batchno=None):
                 elif boxexists or int(boxno) < 1:
                     return JsonResponse({"message": "Box ini sudah pernah diinput!"}, status=400)
                 elif boxkosongexists:
-                    msg = ""
-                    result = relay3_on()
-                    if result:
-                        msg = "Relay 3 On!"
-                    else:
-                        msg = "Relay 3 tidak dapat berjalan!"
-                    import time
-                    time.sleep(8)
-                    result = relay3_off()
-                    if result:
-                        msg = msg+" Relay 3 Off!"
-                    else:
-                        msg = msg+" Relay 3 tidak dapat berjalan!"
-                    return JsonResponse({"message": "Box kosong harus ditimbang terlebih dahulu. "+msg}, status=400)
+                    return JsonResponse({"message": "Box kosong harus ditimbang terlebih dahulu. "}, status=400)
                 elif boxrejectexists:
                     if spvapproval:
                         # save register history
@@ -186,20 +187,7 @@ def RegisterView(request, batchno=None):
                         # config.spvapproval = False
                         # config.save()
                         # return JsonResponse({"message": "Input last box dengan persetujuan supervisor berhasil ditambahkan."}, status=200)
-                        msg = ""
-                        result = relay3_on()
-                        if result:
-                            msg = "Relay 3 On!"
-                        else:
-                            msg = "Relay 3 tidak dapat berjalan!"
-                        import time
-                        time.sleep(8)
-                        result = relay3_off()
-                        if result:
-                            msg = msg+" Relay 3 Off!"
-                        else:
-                            msg = msg+" Relay 3 tidak dapat berjalan!"
-                        return JsonResponse({"message": "Data berhasil diinput. "+msg}, status=200)
+                        return JsonResponse({"message": "Data berhasil diinput. "}, status=200)
                     else :
                         return JsonResponse({"message": "Box ini sudah pernah diinput!"}, status=400)
                 else:

@@ -136,7 +136,7 @@ def RegisterView(request, batchno=None):
                     else:
                         msg = "Relay 3 tidak dapat berjalan!"
                     import time
-                    time.sleep(5)
+                    time.sleep(10)
                     result = relay3_off()
                     if result:
                         msg = msg+" Relay 3 Off!"
@@ -191,7 +191,7 @@ def RegisterView(request, batchno=None):
                         else:
                             msg = "Relay 3 tidak dapat berjalan!"
                         import time
-                        time.sleep(5)
+                        time.sleep(10)
                         result = relay3_off()
                         if result:
                             msg = msg+" Relay 3 Off!"

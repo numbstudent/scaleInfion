@@ -130,6 +130,18 @@ def RegisterView(request, batchno=None):
                 elif boxexists or int(boxno) < 1:
                     return JsonResponse({"message": "Box ini sudah pernah diinput!"}, status=400)
                 elif boxkosongexists:
+                    result = relay_on()
+                    if result:
+                        msg = "Relay 3 On!"
+                    else:
+                        msg = "Relay 3 tidak dapat berjalan!"
+                    import time
+                    time.sleep(5)
+                    result = relay_on()
+                    if result:
+                        msg = msg+" Relay 3 Off!"
+                    else:
+                        msg = msg+" Relay 3 tidak dapat berjalan!"
                     return JsonResponse({"message": "Box kosong harus ditimbang terlebih dahulu."}, status=400)
                 elif boxrejectexists:
                     if spvapproval:

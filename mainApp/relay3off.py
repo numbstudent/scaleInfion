@@ -1,7 +1,7 @@
 import serial
 import time
 
-def relay_off():
+def relay3_off():
     try:
         ser = serial.Serial('/dev/relay', baudrate=9600, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE)
         msg = bytearray()

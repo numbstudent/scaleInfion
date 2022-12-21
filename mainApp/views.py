@@ -131,18 +131,18 @@ def RegisterView(request, batchno=None):
                     return JsonResponse({"message": "Box ini sudah pernah diinput!"}, status=400)
                 elif boxkosongexists:
                     msg = ""
-                    result = relay3_on()
-                    if result:
-                        msg = "Relay 3 On!"
-                    else:
-                        msg = "Relay 3 tidak dapat berjalan!"
-                    # import time
-                    # time.sleep(10)
-                    # result = relay3_off()
-                    # if result:
-                    #     msg = msg+" Relay 3 Off!"
-                    # else:
-                    #     msg = msg+" Relay 3 tidak dapat berjalan!"
+                        result = relay3_on()
+                        if result:
+                            msg = "Relay 3 On!"
+                        else:
+                            msg = "Relay 3 tidak dapat berjalan!"
+                        import time
+                        time.sleep(10)
+                        result = relay3_off()
+                        if result:
+                            msg = msg+" Relay 3 Off!"
+                        else:
+                            msg = msg+" Relay 3 tidak dapat berjalan!"
                     return JsonResponse({"message": "Box kosong harus ditimbang terlebih dahulu. "+msg}, status=400)
                 elif boxrejectexists:
                     if spvapproval:
@@ -192,13 +192,13 @@ def RegisterView(request, batchno=None):
                             msg = "Relay 3 On!"
                         else:
                             msg = "Relay 3 tidak dapat berjalan!"
-                        # import time
-                        # time.sleep(10)
-                        # result = relay3_off()
-                        # if result:
-                        #     msg = msg+" Relay 3 Off!"
-                        # else:
-                        #     msg = msg+" Relay 3 tidak dapat berjalan!"
+                        import time
+                        time.sleep(10)
+                        result = relay3_off()
+                        if result:
+                            msg = msg+" Relay 3 Off!"
+                        else:
+                            msg = msg+" Relay 3 tidak dapat berjalan!"
                         return JsonResponse({"message": "Data berhasil diinput. "+msg}, status=200)
                     else :
                         return JsonResponse({"message": "Box ini sudah pernah diinput!"}, status=400)

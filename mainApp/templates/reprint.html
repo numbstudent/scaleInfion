@@ -83,10 +83,15 @@
                             OK
                             {% elif row.register.status == 3 %}
                             LAST BOX
+                            {% else %}
+                            BELUM DITIMBANG
                             {% endif %}
-                            <span class="display-4 float-right">{{row.register.weight}} g </span></a>
+                            <span class="display-4 float-right">{{row.register.weight|default_if_none:"-"}} g </span></a>
                         <span class="product-description">
-                            BOX NO. {{row.register.boxno}} - <small>Input: {{row.createdon|date:"d-m-Y H:i"}}</small>
+                            BATCH: {{row.register.batchno}}
+                        </span>
+                        <span class="product-description">
+                            BOX: {{row.register.boxno}} - <small>Input: {{row.createdon|date:"d-m-Y H:i"}}</small>
                         </span>
                     </div>
                 </li>
@@ -144,7 +149,7 @@
     }
 
     $("#btnrelayoff").click(function () {
-        var url = "{% url 'runrelayoff' %}"
+        var url = "{% url 'runrelayoff' %}" 
         $.ajax({
             type: "GET",
             dataType: "json",

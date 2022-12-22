@@ -224,7 +224,7 @@ def RegisterView(request, batchno=None):
             # if not box['status']:
             #     insertsuccess = "False"
             data = Register.objects.annotate(product_name=F('product__name'),iot_weight=F('weight'))\
-            .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight','status','createdon')\
+            .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight','status','createdon','printedon')\
             .filter(batchno=batchno, product__code=code).order_by('-createdon')
         else:
             data = Register.objects.all().values()
@@ -386,7 +386,7 @@ def ScaleView(request):
 def ReprintView(request):
     context = {}
     context['action'] = 'view'
-    context['data'] = ReprintList.objects.all().order_by('-id')[:2]
+    context['data'] = ReprintList.objects.all().order_by('-id')[:10]
     if request.method == "POST":
         form = ReprintForm(request.POST)
         context['form'] = form

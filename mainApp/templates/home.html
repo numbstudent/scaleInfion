@@ -267,6 +267,7 @@
                         var record = data.batch[row]
                         var weight = record.iot_weight == null? '-': record.iot_weight
                         var status = ""
+                        var printedon = ""
                         if (record.status==2) {
                             status = 'REJECT'
                         } else if (record.status==3){
@@ -276,6 +277,11 @@
                         } else {
                             status = 'WAITING FOR WEIGHING'
                         } 
+                        if (record.printedon){
+                            printedon = record.printedon.substring(0, 16).replace("T", " ")
+                        }else{
+                            printedon = 'NOT PRINTED'
+                        }
                         html += '\
                         <li class="item">\
                             <div class="product-img" style="margin-right:7px">\
@@ -288,6 +294,9 @@
                                     <span class="display-4 float-right">'+ weight+' g </span></a>\
                                 <span class="product-description">\
                                     BOX NO. '+record.boxno+' - <small>Input: '+record.createdon.substring(0,16).replace("T", " ")+'</small>\
+                                </span>\
+                                <span class="product-description">\
+                                    PRINTED : <small>' + printedon +'</small>\
                                 </span>\
                             </div>\
                         </li>'

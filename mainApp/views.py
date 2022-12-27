@@ -382,7 +382,7 @@ def ScaleView(request):
         return JsonResponse(data, safe=False, status=200)
 
 @login_required(login_url=loginpage)
-# @allowed_check(feature_alias='masterproduct')
+@allowed_check(feature_alias='reprint')
 def ReprintView(request):
     context = {}
     context['action'] = 'view'
@@ -1028,12 +1028,13 @@ def reportBatchPDF(request):
     else:
         datamodel = datamodel[0]
         datamodel2 = datamodel2[0]
-    if datamodel.count()%2 == 0:
-        rowlen = datamodel.count()//2
-    else:
-        rowlen = datamodel.count()//2+1
+    rowlen = 2
+    # if datamodel.count()%2 == 0:
+    #     rowlen = datamodel.count()//2
+    # else:
+    #     rowlen = datamodel.count()//2+1
     # testing in windows
-    return render(request, 'report_batch_pdf_template2.html', context={'data': datamodel, 'data2': datamodel2, 'header': header, 'config':config,'rowlen': rowlen, 'signature':signature})
+    return render(request, 'report_batch_pdf_template2.html', context={'data': datamodel, 'header': header, 'config':config,'rowlen': rowlen, 'signature':signature})
     html_string = render_to_string('report_batch_pdf_template.html', {'data': datamodel, 'data2': datamodel2, 'header':header, 'rowlen':rowlen, 'signature':signature})
 
     html = HTML(string=html_string, base_url=request.build_absolute_uri())

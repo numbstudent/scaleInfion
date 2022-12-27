@@ -55,7 +55,7 @@
                                             <td>{{row.reporttitle}}</td>
                                             <td>{{row.dnno}}</td>
                                             <td>{{row.dnrev}}</td>
-                                            <td>{{row.createdon|date:"Y/n/j h:m:i"}}</td>
+                                            <td>{{row.createdon|date:"Y/n/j G:i:s"}}</td>
                                             <td><a data-toggle="tooltip" title="Export to PDF" target="_blank" class="btn btn-sm btn-primary"
                                                     href="{% url 'reportbatchpdf' %}?id={{row.id}}"><i class="fas fa-file"></i></a>
                                                 <!-- <a data-toggle="tooltip" title="Edit" class="btn btn-secondary"

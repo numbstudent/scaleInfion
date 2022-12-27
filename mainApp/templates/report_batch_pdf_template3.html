@@ -56,8 +56,8 @@
             <div class="row invoice-info">
                 <div class="col-sm-12 invoice-col">
                     {%for row in data%}
-                    {% if forloop.counter0|divisibleby:10 %}
-                    <table class="table table-bordered page">
+                    {% if forloop.counter0|divisibleby:30 %}
+                    <table class="table table-bordered page {% if forloop.counter0 != 0 %}pagebreak{% endif %}" >
                         <tr class="text-center align-middle h5">
                             <td rowspan="2" width="300px" class="align-middle"><img height="100px" src="{% static 'others/logo.png' %}">
                             </td>
@@ -92,27 +92,33 @@
                                 <table class="table table-borderless">
                                     <tr>
                                         <td>
+                                            <table class="table table-striped table-bordered" id="tr{{forloop.counter0}}a">
+                                                <tr class="text-center">
+                                                    <th>{{config.pdf_tanggal_penimbangan}}</th>
+                                                    <th>{{config.pdf_no_karton}}</th>
+                                                    <th>{{config.pdf_hasil_penimbangan}}</th>
+                                                </tr>
+                                                <tr>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td>
                                             <table class="table table-striped table-bordered">
                                                 <tr class="text-center">
                                                     <th>{{config.pdf_tanggal_penimbangan}}</th>
                                                     <th>{{config.pdf_no_karton}}</th>
                                                     <th>{{config.pdf_hasil_penimbangan}}</th>
                                                 </tr>
-                    {% endif%}
-                                                <tr>
-                                                    <td>{{row.createdon|date:"d/m/Y H:i:s"}}</td>
-                                                    <td>{{row.boxno}}</td>
-                                                    <td class="text-right">{{row.weight|floatformat:1}}</td>
+                                                <tr id="tr{{ forloop.counter0 }}b">
                                                 </tr>
-                    {% if forloop.counter0|divisibleby:10 %}
                                             </table>
-                                        </td> 
+                                        </td>
                                     </tr>
                                 </table>
                             </td>
                         </tr>
                     </table>
-                    {% endif %}
+                    {% endif%}
                     {% endfor %}
                     <table class="table table-bordered">
                         <tr class="text-center text-bold">
@@ -153,12 +159,54 @@
     </div>
 
 
+    <script src="{% static 'adminlte/plugins/jquery/jquery.min.js' %}"></script>
+
     <!-- <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script> -->
     <script>
         // setTimeout(() => {
         //         window.print();
         //     }, 6000)
     </script>
+    <script>
+        var numofsection = Math.ceil({{ data| length }} / 30)
+        for (var i = 0; i < numofsection; i++) {
+            var offset = i * 30
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "{% url 'contentprintpdf' %}",
+                data: JSON.stringify({ "reportid": "{{reportid}}", "offset": offset, "type": "a" }),
+                success: function (data) {   // success callback function
+                    var el = `
+                    <tr>
+                        <td>`+data.boxno+`</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    `
+                    $("#tr" + offset + "a").append(el)
+                }, error: function (jqXhr, textStatus, errorMessage) { // error callback 
+                    console.log(jqXhr.responseJSON.message)
+                }
+            })
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "{% url 'contentprintpdf' %}",
+                data: JSON.stringify({ "reportid": "{{reportid}}", "offset": offset, "type": "b" }),
+                success: function (data) {   // success callback function
+                    var el = `
+                    <tr>
+                        <td>`+ data.boxno + `</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    `
+                    $("#tr" + offset + "b").append(el)
+                }, error: function (jqXhr, textStatus, errorMessage) { // error callback 
+                    console.log(jqXhr.responseJSON.message)
+                }
+            })
+        }
+    </script>
 </body>
-
-</html>

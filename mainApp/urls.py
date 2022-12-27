@@ -49,6 +49,7 @@ urlpatterns = [
     path('report/batch', views.viewReportBatch, name='reportbatch'),
     path('report/batch/export', views.reportBatchCSV, name='reportbatchcsv'),
     path('report/batch/exportpdf', views.reportBatchPDF, name='reportbatchpdf'),
+    path('report/batch/contentprintpdf', views.contentPrintPDF, name='contentprintpdf'),
 
     path('uploadbatch', views.viewUploadBatch, name='viewuploadbatch'),
     path('delete-uploadbatch/<int:id>', views.deleteUploadBatch, name='deleteuploadbatch'),

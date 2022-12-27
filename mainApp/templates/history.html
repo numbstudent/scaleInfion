@@ -77,9 +77,10 @@
                             <th>Weight</th>
                             <th width="5%">Status</th>
                             <th>Input Date</th>
+                            <th>Print Date</th>
                             <th>Petugas Penimbangan / Gudang</th>
                             <th>Hist. Action</th>
-                            <th>Action</th>
+                            <!-- <th>Action</th> -->
                         </tr>
                     </thead>
                     <tbody>
@@ -100,17 +101,18 @@
                                 Belum Ditimbang
                                 {% endif %}
                             </td>
-                            <td>{{row.input_date|date:"Y/n/j h:m:i"}}</td>
+                            <td>{{row.input_date|date:"Y/n/j G:i:s"}}</td>
+                            <td>{{row.printedon|date:"Y/n/j G:i:s"|default_if_none:"Not Printed"}}</td>
                             <td>{{row.operator}} / <br>{{row.petugasgudang}}</td>
                             <td>{{row.action| capfirst}}</td>
-                            <td>
+                            <!-- <td>
                                 <button class="btn btn-danger btn-sm deleteBox" data-id="{{row.id}}">
                                     <i class="fas fa-trash"></i>
                                 </button>
                                 <button class="btn btn-secondary btn-sm  btnweightAdjustment" data-id="{{row.id}}" data-weight="{{row.iot_weight}}">
                                     <i class="fa fa-pen"></i>
                                 </button>
-                            </td>
+                            </td> -->
                         </tr>
                         {%endfor%}
                     </tbody>

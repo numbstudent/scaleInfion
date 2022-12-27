@@ -813,7 +813,7 @@ def editReportBody(request, id):
 def viewHistory(request):
     context = {}
     datamodel = RegisterHistory.objects.annotate(product_name=F('product__name'), iot_weight=F('weight'), input_date=F('createdon'))\
-        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date', 'status', 'operator', 'petugasgudang','action').order_by('-input_date')
+        .values('id', 'batchno', 'boxno', 'product_name', 'iot_weight', 'input_date', 'status', 'operator', 'printedon', 'petugasgudang','action').order_by('-input_date')
     hasFilter = False
     if request.method == "POST":
         form = HistoryForm(request.POST)
@@ -1034,7 +1034,7 @@ def reportBatchPDF(request):
     # else:
     #     rowlen = datamodel.count()//2+1
     # testing in windows
-    return render(request, 'report_batch_pdf_template2.html', context={'data': datamodel, 'header': header, 'config':config,'rowlen': rowlen, 'signature':signature})
+    return render(request, 'report_batch_pdf_template3.html', context={'data': datamodel, 'header': header, 'config':config,'rowlen': rowlen, 'signature':signature, 'reportid':reportid})
     html_string = render_to_string('report_batch_pdf_template.html', {'data': datamodel, 'data2': datamodel2, 'header':header, 'rowlen':rowlen, 'signature':signature})
 
     html = HTML(string=html_string, base_url=request.build_absolute_uri())
@@ -1366,6 +1366,31 @@ def viewConfig(request):
                 context['message'] = 'Data berhasil diubah.'
                 return redirect('config')
     return render(request, 'config.html', context=context)
+
+## PDF
+@csrf_exempt
+def contentPrintPDF(request):
+    if request.method == "POST":
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        reportid = body['reportid']
+        startoffset = body['offset']
+        reporttype = body['type']
+        print(reportid)
+        if reporttype == "b":
+            startoffset = startoffset + 15
+        endoffset = startoffset+15
+
+        datamodel = ReportRegister.objects.order_by('boxno')
+        header = Report.objects.all().get(id=reportid)
+        datamodel = datamodel.filter(report = header).filter(Q(status=1) | Q(status=3)).order_by('boxno')
+        config = AdminConfig.objects.all().first()
+        group = request.user.groups.all()[0].name
+        if group != 'administrator':
+            datamodel = datamodel.filter(Q(status=1) | Q(status=3))
+        datamodel = datamodel.filter(report = header).filter(Q(status=1) | Q(status=3)).order_by('boxno')
+        data = datamodel.values('createdon','weight','boxno')[startoffset:endoffset]
+        return JsonResponse(list(data), safe=False, status=200)
 
 ## printing
 @csrf_exempt

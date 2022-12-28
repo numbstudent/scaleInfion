@@ -12,8 +12,8 @@
     <link rel="stylesheet" href="{% static 'adminlte/plugins/fontawesome-free/css/all.min.css' %}">
 
     <link rel="stylesheet" href="{% static 'adminlte/dist/css/adminlte.min.css' %}">
-    <script
-        nonce="7941c383-69e0-408e-b64f-8349f35440b6">(function (w, d) { !function (a, e, t, r) { a.zarazData = a.zarazData || {}, a.zarazData.executed = [], a.zaraz = { deferred: [] }, a.zaraz.q = [], a.zaraz._f = function (e) { return function () { var t = Array.prototype.slice.call(arguments); a.zaraz.q.push({ m: e, a: t }) } }; for (const e of ["track", "set", "ecommerce", "debug"]) a.zaraz[e] = a.zaraz._f(e); a.addEventListener("DOMContentLoaded", (() => { var t = e.getElementsByTagName(r)[0], z = e.createElement(r), n = e.getElementsByTagName("title")[0]; for (n && (a.zarazData.t = e.getElementsByTagName("title")[0].text), a.zarazData.x = Math.random(), a.zarazData.w = a.screen.width, a.zarazData.h = a.screen.height, a.zarazData.j = a.innerHeight, a.zarazData.e = a.innerWidth, a.zarazData.l = a.location.href, a.zarazData.r = e.referrer, a.zarazData.k = a.screen.colorDepth, a.zarazData.n = e.characterSet, a.zarazData.o = (new Date).getTimezoneOffset(), a.zarazData.q = []; a.zaraz.q.length;) { const e = a.zaraz.q.shift(); a.zarazData.q.push(e) } z.defer = !0; for (const e of [localStorage, sessionStorage]) Object.keys(e).filter((a => a.startsWith("_zaraz_"))).forEach((t => { try { a.zarazData["z_" + t.slice(7)] = JSON.parse(e.getItem(t)) } catch { a.zarazData["z_" + t.slice(7)] = e.getItem(t) } })); z.referrerPolicy = "origin", z.src = "/cdn-cgi/zaraz/s.js?z=" + btoa(encodeURIComponent(JSON.stringify(a.zarazData))), t.parentNode.insertBefore(z, t) })) }(w, d, 0, "script"); })(window, document);</script>
+    <!-- <script
+        nonce="7941c383-69e0-408e-b64f-8349f35440b6">(function (w, d) { !function (a, e, t, r) { a.zarazData = a.zarazData || {}, a.zarazData.executed = [], a.zaraz = { deferred: [] }, a.zaraz.q = [], a.zaraz._f = function (e) { return function () { var t = Array.prototype.slice.call(arguments); a.zaraz.q.push({ m: e, a: t }) } }; for (const e of ["track", "set", "ecommerce", "debug"]) a.zaraz[e] = a.zaraz._f(e); a.addEventListener("DOMContentLoaded", (() => { var t = e.getElementsByTagName(r)[0], z = e.createElement(r), n = e.getElementsByTagName("title")[0]; for (n && (a.zarazData.t = e.getElementsByTagName("title")[0].text), a.zarazData.x = Math.random(), a.zarazData.w = a.screen.width, a.zarazData.h = a.screen.height, a.zarazData.j = a.innerHeight, a.zarazData.e = a.innerWidth, a.zarazData.l = a.location.href, a.zarazData.r = e.referrer, a.zarazData.k = a.screen.colorDepth, a.zarazData.n = e.characterSet, a.zarazData.o = (new Date).getTimezoneOffset(), a.zarazData.q = []; a.zaraz.q.length;) { const e = a.zaraz.q.shift(); a.zarazData.q.push(e) } z.defer = !0; for (const e of [localStorage, sessionStorage]) Object.keys(e).filter((a => a.startsWith("_zaraz_"))).forEach((t => { try { a.zarazData["z_" + t.slice(7)] = JSON.parse(e.getItem(t)) } catch { a.zarazData["z_" + t.slice(7)] = e.getItem(t) } })); z.referrerPolicy = "origin", z.src = "/cdn-cgi/zaraz/s.js?z=" + btoa(encodeURIComponent(JSON.stringify(a.zarazData))), t.parentNode.insertBefore(z, t) })) }(w, d, 0, "script"); })(window, document);</script> -->
 
     <!-- POLYFIL - PAGINATION -->
     <script type="text/javascript" src="{% static 'others/paged.polyfill.js' %}"></script>
@@ -103,13 +103,13 @@
                                             </table>
                                         </td>
                                         <td>
-                                            <table class="table table-striped table-bordered">
+                                            <table class="table table-striped table-bordered" id="tr{{ forloop.counter0 }}b">
                                                 <tr class="text-center">
                                                     <th>{{config.pdf_tanggal_penimbangan}}</th>
                                                     <th>{{config.pdf_no_karton}}</th>
                                                     <th>{{config.pdf_hasil_penimbangan}}</th>
                                                 </tr>
-                                                <tr id="tr{{ forloop.counter0 }}b">
+                                                <tr>
                                                 </tr>
                                             </table>
                                         </td>
@@ -168,45 +168,56 @@
         //     }, 6000)
     </script>
     <script>
-        var numofsection = Math.ceil({{ data| length }} / 30)
-        for (var i = 0; i < numofsection; i++) {
-            var offset = i * 30
-            $.ajax({
-                type: "POST",
-                dataType: "json",
-                url: "{% url 'contentprintpdf' %}",
-                data: JSON.stringify({ "reportid": "{{reportid}}", "offset": offset, "type": "a" }),
-                success: function (data) {   // success callback function
-                    var el = `
-                    <tr>
-                        <td>`+data.boxno+`</td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    `
-                    $("#tr" + offset + "a").append(el)
-                }, error: function (jqXhr, textStatus, errorMessage) { // error callback 
-                    console.log(jqXhr.responseJSON.message)
-                }
-            })
-            $.ajax({
-                type: "POST",
-                dataType: "json",
-                url: "{% url 'contentprintpdf' %}",
-                data: JSON.stringify({ "reportid": "{{reportid}}", "offset": offset, "type": "b" }),
-                success: function (data) {   // success callback function
-                    var el = `
-                    <tr>
-                        <td>`+ data.boxno + `</td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    `
-                    $("#tr" + offset + "b").append(el)
-                }, error: function (jqXhr, textStatus, errorMessage) { // error callback 
-                    console.log(jqXhr.responseJSON.message)
-                }
-            })
-        }
+        $(document).ready(function () {
+            var numofsection = Math.ceil({{ data| length }} / 30)
+            for (var i = 0; i < numofsection; i++) {
+                var offset = i * 30
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "{% url 'contentprintpdf' %}",
+                    async:false,
+                    data: JSON.stringify({ "reportid": "{{reportid}}", "offset": offset, "type": "a" }),
+                    success: function (data) {   // success callback function
+                        data.forEach(row => {
+                            var el = `
+                            <tr>
+                                <td>`+ row.createdon + `</td>
+                                <td class="text-right">`+ row.boxno + `</td>
+                                <td class="text-right">`+ (row.weight == null ? "-" : row.weight) + `</td>
+                            </tr>
+                            `
+                            $("#tr" + offset + "a").append(el)
+                            console.log(offset, "a")
+                        });
+                    }, error: function (jqXhr, textStatus, errorMessage) { // error callback 
+                        console.log(jqXhr.responseJSON.message)
+                    }
+                })
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "{% url 'contentprintpdf' %}",
+                    async: false,
+                    data: JSON.stringify({ "reportid": "{{reportid}}", "offset": offset, "type": "b" }),
+                    success: function (data) {   // success callback function
+                        var el = ''
+                        data.forEach(row => {
+                            el += `
+                            <tr>
+                                <td>`+ row.createdon + `</td>
+                                <td class="text-right">`+ row.boxno + `</td>
+                                <td class="text-right">`+ (row.weight == null? "-":row.weight) + `</td>
+                            </tr>
+                            `
+                        });
+                        $("#tr" + offset + "b").append(el)
+                        console.log(offset, "b")
+                    }, error: function (jqXhr, textStatus, errorMessage) { // error callback 
+                        console.log(jqXhr.responseJSON.message)
+                    }
+                })
+            }
+        });
     </script>
 </body>

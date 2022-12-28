@@ -7,7 +7,7 @@ from secureapp.decorators import allowed_users, allowed_check, allowed_check_fun
 from secureapp.models import AccessList
 from django.shortcuts import get_list_or_404, render, redirect
 from django.http import HttpResponse, JsonResponse
-from django.db.models import RestrictedError, Sum, Q, F
+from django.db.models import RestrictedError, Sum, Q, F, Func, Value, CharField
 from django.db.models.functions import Coalesce
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
@@ -1389,6 +1389,8 @@ def contentPrintPDF(request):
         if group != 'administrator':
             datamodel = datamodel.filter(Q(status=1) | Q(status=3))
         datamodel = datamodel.filter(report = header).filter(Q(status=1) | Q(status=3)).order_by('boxno')
+        datamodel = datamodel.annotate(formatted_date=Func(F('createdon'),Value('DD/MM/YYYY HH:MM:SS'),function='to_char',output_field=CharField())
+)
         data = datamodel.values('createdon','weight','boxno')[startoffset:endoffset]
         return JsonResponse(list(data), safe=False, status=200)
 

@@ -1389,9 +1389,9 @@ def contentPrintPDF(request):
         if group != 'administrator':
             datamodel = datamodel.filter(Q(status=1) | Q(status=3))
         datamodel = datamodel.filter(report = header).filter(Q(status=1) | Q(status=3)).order_by('boxno')
-        datamodel = datamodel.annotate(formatted_date=Func(F('createdon'),Value('DD/MM/YYYY HH:MM:SS'),function='to_char',output_field=CharField())
+        datamodel = datamodel.annotate(formatted_date=Func(F('createdon'),Value('%d/%m/%Y %H:%i'),function='DATE_FORMAT',output_field=CharField())
 )
-        data = datamodel.values('createdon','weight','boxno')[startoffset:endoffset]
+        data = datamodel.values('formatted_date','weight','boxno')[startoffset:endoffset]
         return JsonResponse(list(data), safe=False, status=200)
 
 ## printing

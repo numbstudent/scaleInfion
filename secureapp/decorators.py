@@ -47,6 +47,7 @@ def allowed_check(feature_alias):
                 except:
                     print("An exception occurred")
                 print("LOAD not OK")
+                return HttpResponse('Anda tidak diizinkan untuk melihat halaman ini. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>')
             group = None
             if request.user.groups.exists():
                 group = request.user.groups.all()[0].id

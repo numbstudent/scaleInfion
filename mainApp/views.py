@@ -512,11 +512,10 @@ def viewUploadProduct(request):
         context['form'] = form
         if form.is_valid():
             file = request.FILES['file'].read().decode('utf-8')
-            reader = csv.reader(StringIO(file), delimiter=',')
-            try:
-                print(list(reader)[0][1])
-            except:
-                reader = csv.reader(StringIO(file), delimiter=';')
+            reader = ""
+            reader = csv.reader(StringIO(file), delimiter=';')
+            
+            print('jirr3',sum(1 for row in reader))  
             next(reader) #skip header
             ProductUploadTemp.objects.all().delete()
             for row in reader:
@@ -557,7 +556,7 @@ def updateProductByTemporary(request):
             defaults={'name': item.name, 'maxweight': item.maxweight,
                       'minweight': item.minweight, 'standardweight': item.standardweight, 'jumlahkoli':item.jumlahkoli, 'createdby': request.user},
         )
-        ProductUploadTemp.objects.all().delete()
+    ProductUploadTemp.objects.all().delete()
 
     return redirect('uploadproduct')
 
@@ -922,7 +921,7 @@ def reportBatchCSV(request):
         content_type='text/csv',
         headers={'Content-Disposition': 'attachment; filename="report_batch.csv"'},
     )
-    writer = csv.writer(response)
+    writer = csv.writer(response,delimiter =';')
     query_set = context['data']
     #Table Header
     writer.writerow(['Product Name', 'Batch No', 'Box No', 'Weight', 'Status', 'Date', 'Operator', 'Petugas Gudang'])
@@ -1065,7 +1064,7 @@ def viewUploadBatch(request):
             product = Product.objects.get(id=productid)
             batchno = request.POST.get('batchno')
             file = request.FILES['file'].read().decode('utf-8')
-            reader = csv.reader(StringIO(file), delimiter=',')
+            reader = csv.reader(StringIO(file), delimiter=';')
             next(reader) #skip header
             for row in reader:
                 measuredate = row[2]

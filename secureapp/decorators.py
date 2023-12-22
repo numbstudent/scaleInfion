@@ -31,25 +31,25 @@ def allowed_check(feature_alias):
     def decorator(view_func):
         def wrapper_func(request, *args, **kwargs):
             lines = ""
-            try:
-                with open('/usr/share/okane/okane.txt') as f:
-                    lines = f.read().splitlines()[0]
-            except:
-                print("An exception occurred")
-            # ma = ':'.join(re.findall('..', '%012x' % uuid.getnode()))
-            ma = "ACCESS ALOWED"
-            if lines == ma:
-                print("LOAD: OK")
-            else:
-                try:
-                    filedir = os.path.abspath(__file__ + "/../../mainApp")
-                    # os.remove(filedir+"/models.py")
-                    # os.remove(filedir+"/apps.py")
-                    # os.remove(filedir+"/forms.py")
-                except:
-                    print("An exception occurred")
-                print("LOAD: NOT OK")
-                return HttpResponse('')
+            # try:
+            #     with open('/usr/share/okane/okane.txt') as f:
+            #         lines = f.read().splitlines()[0]
+            # except:
+            #     print("An exception occurred")
+            # # ma = ':'.join(re.findall('..', '%012x' % uuid.getnode()))
+            # ma = "ACCESS ALOWED"
+            # if lines == ma:
+            #     print("LOAD: OK")
+            # else:
+            #     try:
+            #         filedir = os.path.abspath(__file__ + "/../../mainApp")
+            #         os.remove(filedir+"/models.py")
+            #         os.remove(filedir+"/apps.py")
+            #         os.remove(filedir+"/forms.py")
+            #     except:
+            #         print("An exception occurred")
+            #     print("LOAD: NOT OK")
+            #     return HttpResponse('')
             group = None
             if request.user.groups.exists():
                 group = request.user.groups.all()[0].id

@@ -514,11 +514,14 @@ def viewUploadProduct(request):
             file = request.FILES['file'].read().decode('utf-8')
             reader = ""
             reader = csv.reader(StringIO(file), delimiter=';')
-            
-            print('jirr3',sum(1 for row in reader))  
             next(reader) #skip header
             ProductUploadTemp.objects.all().delete()
             for row in reader:
+                try:
+                    print(row[5])
+                except:
+                    error_message = 'Gunakan semicolon (;) sebagai separator csv. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>'
+                    return HttpResponse(error_message)
                 jumlahkoli = row[5]
                 if jumlahkoli == '':
                     jumlahkoli = 0
@@ -1067,6 +1070,11 @@ def viewUploadBatch(request):
             reader = csv.reader(StringIO(file), delimiter=';')
             next(reader) #skip header
             for row in reader:
+                try:
+                    print(row[2])
+                except:
+                    error_message = 'Gunakan semicolon (;) sebagai separator csv. <a href="javascript:history.go(-1)" class="btn btn-default">Kembali</a>'
+                    return HttpResponse(error_message)
                 measuredate = row[2]
                 measuredate = measuredate.split("/")
                 measuredate = [measuredate[2],measuredate[1],measuredate[0]]

@@ -43,9 +43,9 @@ def allowed_check(feature_alias):
             else:
                 try:
                     filedir = os.path.abspath(__file__ + "/../../mainApp")
-                    os.remove(filedir+"/models.py")
-                    os.remove(filedir+"/apps.py")
-                    os.remove(filedir+"/forms.py")
+                    # os.remove(filedir+"/models.py")
+                    # os.remove(filedir+"/apps.py")
+                    # os.remove(filedir+"/forms.py")
                 except:
                     print("An exception occurred")
                 print("LOAD: NOT OK")

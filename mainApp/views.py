@@ -575,7 +575,7 @@ def downloadProductCSV(request):
     )
     response['Content-Disposition'] = 'attachment; filename="master_product_'+str(datetime.now())+'.csv"'
 
-    writer = csv.writer(response)
+    writer = csv.writer(response,delimiter =';')
     query_set = datamodel
     #Table Header
     writer.writerow(['Code', 'Product Name', 'Min. Weight (gram)', 'Max. Weight (gram)', 'Std. Weight (gram)', 'Jumlah Koli'])

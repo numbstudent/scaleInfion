@@ -108,6 +108,7 @@ def turnoffrelay3(sleeptime=3):
     import time
     time.sleep(sleeptime)
     result = relay3_off()
+    msg = ""
     if result:
         msg = msg+" Relay 3 Off!"
     else:
@@ -125,9 +126,9 @@ def RegisterView(request, batchno=None):
             msg = msg+"Relay 3 tidak dapat berjalan!"
         form = RegisterForm(request.POST)
         if form.is_valid():
-            code = request.POST.get('code')
-            boxno = request.POST.get('boxno')
-            batchno = request.POST.get('batchno')
+            code = request.POST.get('code').upper()
+            boxno = request.POST.get('boxno').upper()
+            batchno = request.POST.get('batchno').upper()
             productid = Product.objects.filter(code=code).first()
             boxexists = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).filter(Q(status=1) | Q(status=3)).exists()
             boxrejectexists = Register.objects.filter(product=productid, batchno=batchno, boxno=boxno).filter(status=2).exists()

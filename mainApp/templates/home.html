@@ -158,7 +158,7 @@
                 <table>
                     <tr>
                         <td>PRODUK</td>
-                        <td>: {% if state.status %}<b>{{state.product}}</b>{% else %}Set Batch State terlebih dahulu!{% endif %}</td>
+                        <td>: {% if state.status %}<b>{{state.product}}</b>{% else %}Aktivasi Batch terlebih dahulu! <a href="{% url 'viewweighingstate'%}" class="btn btn-sm btn-primary" title="Aktivasi Batch"><i class="fa fa-arrow-right"></i></a>{% endif %}</td>
                     </tr>
                     <tr>
                         <td>NO. BATCH</td>
@@ -166,7 +166,7 @@
                     </tr>
                     <tr>
                         <td>ADJUSTMENT</td>
-                        <td>: <b>{{state.weightadjustment}}{% else %}Set Batch State terlebih dahulu!{% endif %}</b></b></td>
+                        <td>: <b>{{state.weightadjustment}}{% else %}Aktivasi Batch terlebih dahulu! <a href="{% url 'viewweighingstate'%}" class="btn btn-sm btn-primary" title="Aktivasi Batch"><i class="fa fa-arrow-right"></i></a>{% endif %}</b></b></td>
                     </tr>
                     <tr>
                         <td>JUMLAH KOLI</td>

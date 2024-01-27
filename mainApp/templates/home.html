@@ -158,7 +158,7 @@
                 <table>
                     <tr>
                         <td>PRODUK</td>
-                        <td>: {% if state.status %}<b>{{state.product}}</b>{% else %}Aktivasi Batch terlebih dahulu! <a href="{% url 'viewweighingstate'%}" class="btn btn-sm btn-primary" title="Aktivasi Batch"><i class="fa fa-arrow-right"></i></a>{% endif %}</td>
+                        <td>: {% if state.status %}<b>{{state.product}}</b> <small>({{state.product.code}})</small>{% else %}Aktivasi Batch terlebih dahulu! <a href="{% url 'viewweighingstate'%}" class="btn btn-sm btn-primary" title="Aktivasi Batch"><i class="fa fa-arrow-right"></i></a>{% endif %}</td>
                     </tr>
                     <tr>
                         <td>NO. BATCH</td>

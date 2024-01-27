@@ -368,9 +368,14 @@ class SimulatorForm(ModelForm):
 class ConfigForm(ModelForm):
     class Meta:
         model = AdminConfig
-        exclude = ['petugasgudang', 'operator',
-                   'spvapprovalexpireddate', 'spvapproval']
-        field_order = ['spvapproval','spvapprovalexpireddate','operator','petugasgudang','weightadjustment',
+        # exclude = ['petugasgudang', 'operator',
+        #            'spvapprovalexpireddate', 'spvapproval']
+#         field_order = ['spvapproval','spvapprovalexpireddate','operator','petugasgudang','weightadjustment',
+#                        'pdf_form', 'pdf_dn', 'pdf_dn_value', 'pdf_rev_of_dn', 'pdf_rev_of_dn_value', 'pdf_eff_date', 'pdf_eff_date_value', 'pdf_will_be_reviewed', 'pdf_will_be_reviewed_value', 'pdf_dn_date', 'pdf_reporttitle',
+# 'pdf_department','pdf_nama_produk','pdf_no_batch','pdf_expired_date','pdf_tanggal_penimbangan',
+# 'pdf_no_karton','pdf_hasil_penimbangan','pdf_dilakukan_oleh','pdf_diperiksa_oleh',
+# 'pdf_diverifikasi_oleh','pdf_user_1','pdf_user_2','pdf_user_3','pdf_user_4','pdf_paraf','pdf_nama','pdf_tanggal_paraf']
+        fields = ['weightadjustment','pdf_template_name',
                        'pdf_form', 'pdf_dn', 'pdf_dn_value', 'pdf_rev_of_dn', 'pdf_rev_of_dn_value', 'pdf_eff_date', 'pdf_eff_date_value', 'pdf_will_be_reviewed', 'pdf_will_be_reviewed_value', 'pdf_dn_date', 'pdf_reporttitle',
 'pdf_department','pdf_nama_produk','pdf_no_batch','pdf_expired_date','pdf_tanggal_penimbangan',
 'pdf_no_karton','pdf_hasil_penimbangan','pdf_dilakukan_oleh','pdf_diperiksa_oleh',

@@ -750,6 +750,39 @@ def viewReportBody(request):
             obj.save()
 
             reportobj = Report.objects.last()
+            cur_rep_config = AdminConfig.objects.first()
+            rep_config = ReportConfig(
+                report=reportobj,
+                pdf_form = cur_rep_config.pdf_form,
+                pdf_dn = cur_rep_config.pdf_dn,
+                pdf_dn_value = cur_rep_config.pdf_dn_value,
+                pdf_eff_date = cur_rep_config.pdf_eff_date,
+                pdf_eff_date_value = cur_rep_config.pdf_eff_date_value,
+                pdf_will_be_reviewed = cur_rep_config.pdf_will_be_reviewed,
+                pdf_will_be_reviewed_value = cur_rep_config.pdf_will_be_reviewed_value,
+                pdf_rev_of_dn = cur_rep_config.pdf_rev_of_dn,
+                pdf_rev_of_dn_value = cur_rep_config.pdf_rev_of_dn_value,
+                pdf_dn_date = cur_rep_config.pdf_dn_date,
+                pdf_reporttitle = cur_rep_config.pdf_reporttitle,
+                pdf_department = cur_rep_config.pdf_department,
+                pdf_nama_produk = cur_rep_config.pdf_nama_produk,
+                pdf_no_batch = cur_rep_config.pdf_no_batch,
+                pdf_expired_date = cur_rep_config.pdf_expired_date,
+                pdf_tanggal_penimbangan = cur_rep_config.pdf_tanggal_penimbangan,
+                pdf_no_karton = cur_rep_config.pdf_no_karton,
+                pdf_hasil_penimbangan = cur_rep_config.pdf_hasil_penimbangan,
+                pdf_dilakukan_oleh = cur_rep_config.pdf_dilakukan_oleh,
+                pdf_diperiksa_oleh = cur_rep_config.pdf_diperiksa_oleh,
+                pdf_diverifikasi_oleh = cur_rep_config.pdf_diverifikasi_oleh,
+                pdf_user_1 = cur_rep_config.pdf_user_1,
+                pdf_user_2 = cur_rep_config.pdf_user_2,
+                pdf_user_3 = cur_rep_config.pdf_user_3,
+                pdf_user_4 = cur_rep_config.pdf_user_4,
+                pdf_paraf = cur_rep_config.pdf_paraf,
+                pdf_nama = cur_rep_config.pdf_nama,
+                pdf_tanggal_paraf = cur_rep_config.pdf_tanggal_paraf
+            )
+            rep_config.save()
             data = Register.objects.filter(batchno=reportobj.batchno, product=reportobj.product)
             for row in data:
                 obj = ReportRegister(report=reportobj, dnrev=reportobj.dnrev, product=row.product, batchno=row.batchno, \
@@ -823,7 +856,7 @@ def viewHistory(request):
         product = request.POST.get('productid')
         batchno = request.POST.get('batchno')
         inputdatefrom = request.POST.get('inputdatefrom')
-        inputdateto = request.GET.get('inputdateto')
+        inputdateto = request.GET.POST('inputdateto')
         context['form'] = list(form)
         if product:
             datamodel = datamodel.filter(product=product)
@@ -1013,7 +1046,7 @@ def reportBatchPDF(request):
     # datamodel = Register.objects.order_by('boxno')
     datamodel = ReportRegister.objects.order_by('boxno')
     datamodel2 = UploadedRegister.objects.order_by('boxno')
-    config = AdminConfig.objects.all().first()
+    # config = AdminConfig.objects.all().first()
     group = request.user.groups.all()[0].name
     if group != 'administrator':
         datamodel = datamodel.filter(Q(status=1) | Q(status=3))
@@ -1024,6 +1057,7 @@ def reportBatchPDF(request):
         product = request.GET.get('productid')
         reportid = request.GET.get('id')
         header = Report.objects.all().get(id=reportid)
+        config = ReportConfig.objects.filter(report_id=reportid).first()
         # datamodel = datamodel.filter(batchno=header.batchno, product=header.product)
         datamodel = datamodel.filter(report = header).filter(Q(status=1) | Q(status=3)).order_by('boxno')
         datamodel2 = datamodel2.filter(batchno=header.batchno, product=header.product)
@@ -1362,6 +1396,7 @@ def viewConfig(request):
     context['form'] = form[:halflen]
     context['form2'] = form[halflen:]
     context['data'] = AdminConfig.objects.all()
+    context['templates'] = ReportConfigTemplate.objects.all().order_by('pdf_template_name')
     # context['data'] = obj
     if request.method == "POST":
         form = ConfigForm(request.POST, instance=obj)
@@ -1372,8 +1407,100 @@ def viewConfig(request):
             else:
                 form.save()
                 context['message'] = 'Data berhasil diubah.'
+
+                rctexists = ReportConfigTemplate.objects.filter(pdf_template_name=form.cleaned_data.get('pdf_template_name')).exists()
+                if rctexists == True:
+                    rct_todelete = ReportConfigTemplate.objects.get(pdf_template_name=form.cleaned_data.get('pdf_template_name'))
+                    rct_todelete.delete()
+                rct = ReportConfigTemplate(
+                    pdf_dilakukan_oleh = form.cleaned_data.get('pdf_dilakukan_oleh'),
+                    pdf_diperiksa_oleh = form.cleaned_data.get('pdf_diperiksa_oleh'),
+                    pdf_diverifikasi_oleh = form.cleaned_data.get('pdf_diverifikasi_oleh'),
+                    pdf_expired_date = form.cleaned_data.get('pdf_expired_date'),
+                    pdf_hasil_penimbangan = form.cleaned_data.get('pdf_hasil_penimbangan'),
+                    pdf_nama = form.cleaned_data.get('pdf_nama'),
+                    pdf_nama_produk = form.cleaned_data.get('pdf_nama_produk'),
+                    pdf_no_batch = form.cleaned_data.get('pdf_no_batch'),
+                    pdf_no_karton = form.cleaned_data.get('pdf_no_karton'),
+                    pdf_paraf = form.cleaned_data.get('pdf_paraf'),
+                    pdf_tanggal_paraf = form.cleaned_data.get('pdf_tanggal_paraf'),
+                    pdf_tanggal_penimbangan = form.cleaned_data.get('pdf_tanggal_penimbangan'),
+                    pdf_user_1 = form.cleaned_data.get('pdf_user_1'),
+                    pdf_user_2 = form.cleaned_data.get('pdf_user_2'),
+                    pdf_user_3 = form.cleaned_data.get('pdf_user_3'),
+                    pdf_dn = form.cleaned_data.get('pdf_dn'),
+                    pdf_eff_date = form.cleaned_data.get('pdf_eff_date'),
+                    pdf_form = form.cleaned_data.get('pdf_form'),
+                    pdf_rev_of_dn = form.cleaned_data.get('pdf_rev_of_dn'),
+                    pdf_user_4 = form.cleaned_data.get('pdf_user_4'),
+                    pdf_will_be_reviewed = form.cleaned_data.get('pdf_will_be_reviewed'),
+                    pdf_dn_value = form.cleaned_data.get('pdf_dn_value'),
+                    pdf_eff_date_value = form.cleaned_data.get('pdf_eff_date_value'),
+                    pdf_will_be_reviewed_value = form.cleaned_data.get('pdf_will_be_reviewed_value'),
+                    pdf_dn_date = form.cleaned_data.get('pdf_dn_date'),
+                    pdf_rev_of_dn_value = form.cleaned_data.get('pdf_rev_of_dn_value'),
+                    pdf_template_name = form.cleaned_data.get('pdf_template_name'),
+                    pdf_department_id = form.cleaned_data.get('pdf_department').id,
+                    pdf_reporttitle_id = form.cleaned_data.get('pdf_reporttitle').id
+                )
+                print(form.cleaned_data.get('pdf_department').id)
+                print(form.cleaned_data.get('pdf_reporttitle').id)
+                rct.save()
                 return redirect('config')
     return render(request, 'config.html', context=context)
+
+@csrf_exempt
+def changeTemplate(request):
+    if request.method == "GET":
+        pdf_template_name = request.GET.get('pdf_template_name')
+        print(pdf_template_name)
+        rct = ReportConfigTemplate.objects.filter(pdf_template_name = pdf_template_name).first()
+        ac = AdminConfig.objects.all().first()
+        # print(rct.__dict__)
+        # print(ac.__dict__)
+        ac.pdf_dilakukan_oleh = rct.pdf_dilakukan_oleh
+        ac.pdf_diperiksa_oleh = rct.pdf_diperiksa_oleh
+        ac.pdf_diverifikasi_oleh = rct.pdf_diverifikasi_oleh
+        ac.pdf_expired_date = rct.pdf_expired_date
+        ac.pdf_hasil_penimbangan = rct.pdf_hasil_penimbangan
+        ac.pdf_nama = rct.pdf_nama
+        ac.pdf_nama_produk = rct.pdf_nama_produk
+        ac.pdf_no_batch = rct.pdf_no_batch
+        ac.pdf_no_karton = rct.pdf_no_karton
+        ac.pdf_paraf = rct.pdf_paraf
+        ac.pdf_tanggal_paraf = rct.pdf_tanggal_paraf
+        ac.pdf_tanggal_penimbangan = rct.pdf_tanggal_penimbangan
+        ac.pdf_user_1 = rct.pdf_user_1
+        ac.pdf_user_2 = rct.pdf_user_2
+        ac.pdf_user_3 = rct.pdf_user_3
+        ac.pdf_dn = rct.pdf_dn
+        ac.pdf_eff_date = rct.pdf_eff_date
+        ac.pdf_form = rct.pdf_form
+        ac.pdf_rev_of_dn = rct.pdf_rev_of_dn
+        ac.pdf_user_4 = rct.pdf_user_4
+        ac.pdf_will_be_reviewed = rct.pdf_will_be_reviewed
+        ac.pdf_dn_value = rct.pdf_dn_value
+        ac.pdf_eff_date_value = rct.pdf_eff_date_value
+        ac.pdf_will_be_reviewed_value = rct.pdf_will_be_reviewed_value
+        ac.pdf_dn_date = rct.pdf_dn_date
+        ac.pdf_rev_of_dn_value = rct.pdf_rev_of_dn_value
+        ac.pdf_template_name = rct.pdf_template_name
+        # ac.pdf_department_id = rct.pdf_department_id
+        # ac.pdf_reporttitle_id = rct.pdf_reporttitle_id
+        print(rct.pdf_department.id,rct.pdf_reporttitle.id)
+        ac.save()
+        data = list({"Template is set to "+pdf_template_name})
+        return JsonResponse(data, safe=False, status=200)
+
+@csrf_exempt
+def deleteTemplate(request):
+    if request.method == "GET":
+        pdf_template_name = request.GET.get('pdf_template_name')
+        print(pdf_template_name)
+        rct = ReportConfigTemplate.objects.filter(pdf_template_name = pdf_template_name).first()
+        rct.delete()
+        data = list({"Template successfully deleted."})
+        return JsonResponse(data, safe=False, status=200)
 
 ## PDF
 @csrf_exempt

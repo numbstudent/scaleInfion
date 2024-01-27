@@ -213,8 +213,89 @@ class AdminConfig(models.Model):
     pdf_nama = models.CharField(max_length=50, default="Nama", null=False)
     pdf_tanggal_paraf = models.CharField(
         max_length=50, default="Supervisor DS&S", null=False)
+    pdf_template_name = models.CharField(max_length=50, null=False)
 
 class ReprintList(models.Model):
     register = models.ForeignKey(Register, on_delete=models.RESTRICT)
     createdon = models.DateTimeField(auto_now_add=True)
     status = models.IntegerField(default=0)
+
+
+class ReportConfig(models.Model):
+    # report pdf
+    report = models.ForeignKey(Report, on_delete=models.CASCADE)
+    pdf_form = models.CharField(max_length=50, default="FORM", null=False)
+    pdf_dn = models.CharField(max_length=50, default="DN", null=False)
+    pdf_dn_value = models.CharField(max_length=20, default="NOT ASSIGNED")
+    pdf_eff_date = models.CharField(max_length=50, default="Eff. Date", null=False)
+    pdf_eff_date_value = models.DateTimeField(null=False)
+    pdf_will_be_reviewed = models.CharField(max_length=50, default="This document will be reviewed on", null=False)
+    pdf_will_be_reviewed_value = models.DateTimeField(null=False)
+    pdf_rev_of_dn = models.CharField(max_length=50, default="Rev. of DN", null=False)
+    pdf_rev_of_dn_value = models.CharField(
+        max_length=20, default="NOT ASSIGNED")
+    pdf_dn_date = models.CharField(max_length=50, default="Date", null=False)
+    pdf_reporttitle = models.ForeignKey(ReportTitle, on_delete=models.RESTRICT, null=True)
+    pdf_department = models.ForeignKey(Department, on_delete=models.RESTRICT, null=True)
+    pdf_nama_produk = models.CharField(max_length=50, default="Nama Produk", null=False)
+    pdf_no_batch = models.CharField(max_length=50, default="No Batch", null=False)
+    pdf_expired_date = models.CharField(max_length=50, default="Expired Date", null=False)
+    pdf_tanggal_penimbangan = models.CharField(max_length=50, default="Tanggal Penimbangan", null=False)
+    pdf_no_karton = models.CharField(max_length=50, default="No Karton", null=False)
+    pdf_hasil_penimbangan = models.CharField(
+        max_length=50, default="Hasil Penimbangan", null=False)
+    pdf_dilakukan_oleh = models.CharField(max_length=50, default="Dilakukan oleh", null=False)
+    pdf_diperiksa_oleh = models.CharField(max_length=50, default="Diperiksa oleh", null=False)
+    pdf_diverifikasi_oleh = models.CharField(
+        max_length=50, default="Diverifikasi oleh", null=False)
+    pdf_user_1 = models.CharField(
+        max_length=50, default="Petugas Penimbangan", null=False)
+    pdf_user_2 = models.CharField(
+        max_length=50, default="Petugas Gudang", null=False)
+    pdf_user_3 = models.CharField(
+        max_length=50, default="Supervisor Produksi", null=False)
+    pdf_user_4 = models.CharField(max_length=50, default="Supervisor Gudang", null=False)
+    pdf_paraf = models.CharField(max_length=50, default="Paraf", null=False)
+    pdf_nama = models.CharField(max_length=50, default="Nama", null=False)
+    pdf_tanggal_paraf = models.CharField(
+        max_length=50, default="Supervisor DS&S", null=False)
+    
+
+class ReportConfigTemplate(models.Model): #ini yang template per rev of dn digrouping
+    # report pdf
+    pdf_template_name = models.CharField(max_length=50, null=False, unique=True)
+    pdf_form = models.CharField(max_length=50, default="FORM", null=False)
+    pdf_dn = models.CharField(max_length=50, default="DN", null=False)
+    pdf_dn_value = models.CharField(max_length=20, default="NOT ASSIGNED")
+    pdf_eff_date = models.CharField(max_length=50, default="Eff. Date", null=False)
+    pdf_eff_date_value = models.DateTimeField(null=False)
+    pdf_will_be_reviewed = models.CharField(max_length=50, default="This document will be reviewed on", null=False)
+    pdf_will_be_reviewed_value = models.DateTimeField(null=False)
+    pdf_rev_of_dn = models.CharField(max_length=50, default="Rev. of DN", null=False)
+    pdf_rev_of_dn_value = models.CharField(
+        max_length=20, default="NOT ASSIGNED")
+    pdf_dn_date = models.CharField(max_length=50, default="Date", null=False)
+    pdf_reporttitle = models.ForeignKey(ReportTitle, on_delete=models.RESTRICT, null=True)
+    pdf_department = models.ForeignKey(Department, on_delete=models.RESTRICT, null=True)
+    pdf_nama_produk = models.CharField(max_length=50, default="Nama Produk", null=False)
+    pdf_no_batch = models.CharField(max_length=50, default="No Batch", null=False)
+    pdf_expired_date = models.CharField(max_length=50, default="Expired Date", null=False)
+    pdf_tanggal_penimbangan = models.CharField(max_length=50, default="Tanggal Penimbangan", null=False)
+    pdf_no_karton = models.CharField(max_length=50, default="No Karton", null=False)
+    pdf_hasil_penimbangan = models.CharField(
+        max_length=50, default="Hasil Penimbangan", null=False)
+    pdf_dilakukan_oleh = models.CharField(max_length=50, default="Dilakukan oleh", null=False)
+    pdf_diperiksa_oleh = models.CharField(max_length=50, default="Diperiksa oleh", null=False)
+    pdf_diverifikasi_oleh = models.CharField(
+        max_length=50, default="Diverifikasi oleh", null=False)
+    pdf_user_1 = models.CharField(
+        max_length=50, default="Petugas Penimbangan", null=False)
+    pdf_user_2 = models.CharField(
+        max_length=50, default="Petugas Gudang", null=False)
+    pdf_user_3 = models.CharField(
+        max_length=50, default="Supervisor Produksi", null=False)
+    pdf_user_4 = models.CharField(max_length=50, default="Supervisor Gudang", null=False)
+    pdf_paraf = models.CharField(max_length=50, default="Paraf", null=False)
+    pdf_nama = models.CharField(max_length=50, default="Nama", null=False)
+    pdf_tanggal_paraf = models.CharField(
+        max_length=50, default="Supervisor DS&S", null=False)

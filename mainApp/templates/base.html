@@ -23,6 +23,8 @@
         href="{% static 'adminlte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
     <link rel="stylesheet" href="{% static 'adminlte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
     <link rel="stylesheet" href="{% static 'adminlte/plugins/daterangepicker/daterangepicker.css' %}">
+    <link rel="stylesheet" href="{% static 'adminlte/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+    
     {% block css %}
     {% endblock %}
 </head>
@@ -777,6 +779,8 @@
         <script src="{% static 'adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
         <script src="{% static 'adminlte/plugins/moment/moment.min.js' %}"></script>
         <script src="{% static 'adminlte/plugins/daterangepicker/daterangepicker.js' %}"></script>
+        <script src="{% static 'adminlte/plugins/moment/moment.min.js' %}"></script>
+        <script src="{% static 'adminlte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
         <script>
             $(function () {
                 //Initialize Select2 Elements
@@ -796,22 +800,32 @@
                 "autoWidth": false,
                 "responsive": true,
             });
-            $('.datepick').daterangepicker({
-                autoUpdateInput: false,
-                singleDatePicker: true,
-                locale: {
-                    cancelLabel: 'Clear',
-                    format: 'YYYY-MM-DD'
-                }
+            $('.datepick').datetimepicker({
+                format: 'YYYY-MM-DD'
+            });
+            $('.datepick').click(function (e) {
+                $(this).datetimepicker('show');
+            });
+            $('.datepick').blur(function (e) {
+                $(this).datetimepicker('hide');
             });
 
-            $('.datepick').on('apply.daterangepicker', function (ev, picker) {
-                $(this).val(picker.startDate.format('YYYY-MM-DD'));
-            });
+            // $('.datepick').daterangepicker({
+            //     autoUpdateInput: false,
+            //     singleDatePicker: true,
+            //     locale: {
+            //         cancelLabel: 'Clear',
+            //         format: 'YYYY-MM-DD'
+            //     }
+            // });
 
-            $('.datepick').on('cancel.daterangepicker', function (ev, picker) {
-                $(this).val('');
-            });
+            // $('.datepick').on('apply.daterangepicker', function (ev, picker) {
+            //     $(this).val(picker.startDate.format('YYYY-MM-DD'));
+            // });
+
+            // $('.datepick').on('cancel.daterangepicker', function (ev, picker) {
+            //     $(this).val('');
+            // });
 
             $(function () {
                 var hash = window.location.hash;

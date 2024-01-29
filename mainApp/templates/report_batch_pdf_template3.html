@@ -135,6 +135,36 @@
                         </tr>
                     </table>
                     {% endif%}
+                    {% empty %}
+                    <table class="table table-bordered page {% if forloop.counter0 != 0 %}pagebreak{% endif %}">
+                        <tr class="text-center align-middle h5">
+                            <td rowspan="2" width="300px" class="align-middle"><img height="100px" src="{% static 'others/logo.png' %}">
+                            </td>
+                            <td width="300px" class="align-middle"><b><i>{{config.pdf_form}}</i></b></td>
+                            <td width="300px">
+                                <div id="page{{forloop.counter0}}">
+                            </td>
+                        </tr>
+                        <tr class="text-center align-middle h5">
+                            <td><b><i>{{header.reporttitle.title}}
+                                        <br><small>{{header.reporttitle.subtitle}}</small></i></b></td>
+                            <td><i>{{header.department.name}}</i></td>
+                        </tr>
+                        <tr class="align-middle h5">
+                            <td class="text-left"><i>{{config.pdf_dn}}: {{header.dnno}}</i><br>{{config.pdf_eff_date}}:
+                                {{header.effectivedate|date:"d-m-Y"|upper}}</td>
+                            <td class="text-center"><i>{{config.pdf_will_be_reviewed}}:
+                                    <br>{{header.reviewdate|date:"F Y"}}</i></td>
+                            <td class="text-left"><i>{{config.pdf_rev_of_dn}}:
+                                    {{header.dnrev|stringformat:"02d"}}<br>{{config.pdf_dn_date}}: {{header.createdon|date:"d-m-Y"}}</i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                No data available for this Batch No
+                            </td>
+                        </tr>
+                    </table>
                     {% endfor %}
                 </div>
             </div>

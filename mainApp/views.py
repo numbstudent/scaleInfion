@@ -856,7 +856,7 @@ def viewHistory(request):
         product = request.POST.get('productid')
         batchno = request.POST.get('batchno')
         inputdatefrom = request.POST.get('inputdatefrom')
-        inputdateto = request.GET.POST('inputdateto')
+        inputdateto = request.POST.get('inputdateto')
         context['form'] = list(form)
         if product:
             datamodel = datamodel.filter(product=product)

@@ -160,8 +160,26 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>
-                                No data available for this Batch No
+                            <td colspan="3">
+                                <table border="0" class="table table-borderless">
+                                    <tr>
+                                        <td width="150px">{{config.pdf_nama_produk}}</td>
+                                        <td colspan="3">: {{header.product.name}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td width="150px">{{config.pdf_no_batch}}</td>
+                                        <td width="200px">: {{header.batchno}}</td>
+                                        <td width="150px">{{config.pdf_expired_date}}</td>
+                                        <td width="200px">: {{signature.expireddate}}</td>
+                                    </tr>
+                                </table>
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td>
+                                        No data available for this Batch No
+                                        </td>
+                                    </tr>
+                                </table>
                             </td>
                         </tr>
                     </table>

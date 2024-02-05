@@ -1485,8 +1485,8 @@ def changeTemplate(request):
         ac.pdf_dn_date = rct.pdf_dn_date
         ac.pdf_rev_of_dn_value = rct.pdf_rev_of_dn_value
         ac.pdf_template_name = rct.pdf_template_name
-        # ac.pdf_department_id = rct.pdf_department_id
-        # ac.pdf_reporttitle_id = rct.pdf_reporttitle_id
+        ac.pdf_department_id = rct.pdf_department_id
+        ac.pdf_reporttitle_id = rct.pdf_reporttitle_id
         print(rct.pdf_department.id,rct.pdf_reporttitle.id)
         ac.save()
         data = list({"Template is set to "+pdf_template_name})
